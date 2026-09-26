@@ -137,6 +137,18 @@ export default function StudyAbroad(){
   const countryLimit = plan.country_compare_limit;
   const uniLimit = plan.university_compare_limit || 0;
 
+  // Canonical entitlement guards (display only — backend enforces where APIs exist).
+  const addCountry = (id) => {
+    if (compareIds.includes(id)) { setCompareIds(compareIds.filter((x) => x !== id)); return; }
+    if (compareIds.length >= countryLimit) { setUpgradeFeature('country_compare'); return; }
+    setCompareIds([...compareIds, id]);
+  };
+  const addUni = (id) => {
+    if (uniCompare.includes(id)) { setUniCompare(uniCompare.filter((x) => x !== id)); return; }
+    if (uniCompare.length >= uniLimit) { setUpgradeFeature('university_compare'); return; }
+    setUniCompare([...uniCompare, id]);
+  };
+
   // Pre-fill from NAVORA profile if exists
   const inferredLevel = useMemo(()=>{
     const s = String(navAnswers?.stream || navAnswers?.streamV2 || '').toLowerCase();
@@ -613,17 +625,7 @@ export default function StudyAbroad(){
 
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
-                            if (isCompared) {
-                              setCompareIds(compareIds.filter(x => x !== c.id));
-                            } else {
-                              if (compareIds.length >= countryLimit) {
-                                alert('Compare more countries with NAVORA Pro. Free: up to 2. Pro: up to 10.');
-                                return;
-                              }
-                              setCompareIds([...compareIds, c.id]);
-                            }
-                          }}
+                          onClick={() => addCountry(c.id)}
                           className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all ${
                             isCompared
                               ? 'bg-brand-50 border-brand-300 text-brand-700'
@@ -631,7 +633,7 @@ export default function StudyAbroad(){
                           }`}
                         >
                           <Scale className="w-3.5 h-3.5" />
-                          {isCompared ? `In Compare (${compareIds.length}/4)` : '+ Add to Compare'}
+                          {isCompared ? `In Compare (${compareIds.length}/${countryLimit})` : '+ Add to Compare'}
                         </button>
                         <button
                           onClick={() => {
@@ -876,10 +878,7 @@ export default function StudyAbroad(){
 
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
-                            if (isCompared) setCompareIds(compareIds.filter(x => x !== c.id));
-                            else if (compareIds.length < 4) setCompareIds([...compareIds, c.id]);
-                          }}
+                          onClick={() => addCountry(c.id)}
                           className="text-xs text-ink-3 hover:text-ink font-medium px-2.5 py-1.5 rounded-lg border border-line bg-paper"
                         >
                           {isCompared ? 'Remove Compare' : 'Add to Compare'}
@@ -930,6 +929,7 @@ export default function StudyAbroad(){
               )}
             </div>
           </div>
+          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -1255,9 +1255,7 @@ export default function StudyAbroad(){
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <button onClick={()=>{
-                      setCompareIds(ids=> ids.includes(r.country.id) ? ids.filter(x=>x!==r.country.id) : ids.length<3? [...ids, r.country.id]: ids);
-                    }} className={`text-xs font-semibold rounded-full px-3 py-1.5 border ${compareIds.includes(r.country.id)?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{compareIds.includes(r.country.id)?'Selected for compare':'Add to compare'}</button>
+                    <button onClick={()=> addCountry(r.country.id)} className={`text-xs font-semibold rounded-full px-3 py-1.5 border ${compareIds.includes(r.country.id)?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{compareIds.includes(r.country.id)?'Selected for compare':'Add to compare'}</button>
                     <a href={r.country.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-ink-2 hover:text-ink">Official source <ExternalLink className="w-3 h-3"/></a>
                   </div>
                 </div>
@@ -1300,6 +1298,7 @@ export default function StudyAbroad(){
               </div>
             </div>
           </div>
+          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -1341,9 +1340,10 @@ export default function StudyAbroad(){
           <p className="mt-3 text-xs text-ink-3">*Annual total = mid tuition + mid living, converted at ~ {Object.entries(FX).slice(0,4).map(([k,v])=>`${k} ₹${v}`).join(' · ')}.</p>
           <div className="mt-6 flex flex-wrap gap-2">
             {COUNTRIES.slice(0,8).map(c=>(
-              <button key={c.id} onClick={()=>setCompareIds(ids=> ids.includes(c.id) ? ids.filter(x=>x!==c.id) : ids.length<3? [...ids,c.id]: ids)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium ${compareIds.includes(c.id)?'bg-ink text-white border-ink':'bg-white border-line'}`}><FlagLogo code={c.code} size={20} /><span aria-hidden="true" className="hidden">{flagFromCode(c.code)}</span>{c.name}</button>
+              <button key={c.id} onClick={()=> addCountry(c.id)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium ${compareIds.includes(c.id)?'bg-ink text-white border-ink':'bg-white border-line'}`}><FlagLogo code={c.code} size={20} /><span aria-hidden="true" className="hidden">{flagFromCode(c.code)}</span>{c.name}</button>
             ))}
           </div>
+          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -1360,10 +1360,15 @@ export default function StudyAbroad(){
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h1 className="font-ui font-bold text-2xl text-ink">University shortlist</h1>
-              <p className="text-sm text-ink-3 mt-1">3–6 per recommended country. Categories: BEST FIT · AMBITIOUS · VALUE · ALTERNATIVE. Select up to 3 to compare.</p>
+              <p className="text-sm text-ink-3 mt-1">3–6 per recommended country. Categories: BEST FIT · AMBITIOUS · VALUE · ALTERNATIVE. {uniLimit > 0 ? `Select up to ${uniLimit} to compare.` : 'University comparison is a Pro feature.'}</p>
             </div>
-            {uniCompare.length>0 && <span className="text-xs bg-ink text-white rounded-full px-3 py-1.5">{uniCompare.length}/3 selected</span>}
+            {uniCompare.length>0 && <span className="text-xs bg-ink text-white rounded-full px-3 py-1.5">{uniCompare.length}/{Math.max(uniLimit, 1)} selected</span>}
           </div>
+          {!isPro && (
+            <div className="mt-4">
+              <LockedFeature title="University comparison" desc="Free includes country discovery and up to 2 country comparisons. Compare up to 20 universities/month with NAVORA Pro." cta="Available with Pro" onUnlock={()=>setUpgradeFeature('university_compare')} />
+            </div>
+          )}
 
           <div className="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {list.map(u=>{
@@ -1385,7 +1390,7 @@ export default function StudyAbroad(){
                   <p className="text-xs text-ink-3 mt-2"><b>Strengths:</b> {u.strengths.join(' · ')}</p>
                   {c && <p className="text-xs text-ink-3"><b>Est. living:</b> {c.currency} {c.monthlyLivingCost.min}–{c.monthlyLivingCost.max}/mo · <b>Post-study:</b> {c.postStudyDuration}</p>}
                   <div className="mt-3 flex flex-wrap gap-1.5">{u.scholarships.map(s=><Pill key={s}>{s}</Pill>)}<a href={u.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></a></div>
-                  <button onClick={()=> setUniCompare(ids=> ids.includes(u.id) ? ids.filter(x=>x!==u.id) : ids.length<3 ? [...ids,u.id] : ids)} className={`mt-4 w-full rounded-xl py-2.5 text-sm font-semibold border ${sel?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{sel?'Remove from compare':'Add to compare'}</button>
+                  <button onClick={()=> addUni(u.id)} className={`mt-4 w-full rounded-xl py-2.5 text-sm font-semibold border ${sel?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{sel?'Remove from compare':'Add to compare'}</button>
                   <SourceBadge url={u.sourceUrls[0]} date={u.lastVerified} />
                 </div>
               );
@@ -1414,6 +1419,7 @@ export default function StudyAbroad(){
             <button onClick={()=>setView('plan')} className="rounded-xl bg-brand-500 text-white font-semibold px-6 py-3 shadow-brand">Generate my study plan →</button>
             <button onClick={()=>setView('results')} className="rounded-xl bg-white border border-line font-semibold px-6 py-3">Back to countries</button>
           </div>
+          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'university_compare'} />
         </div>
       </div>
     );

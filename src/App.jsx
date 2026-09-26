@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 import Advisor from './pages/Advisor';
 import Login from './pages/Login';
 import RequireAuth from './components/RequireAuth';
+import RequireAdmin from './components/RequireAdmin';
 import About from './pages/About';
 import StudyAbroad from './pages/StudyAbroad';
 import Colleges from './pages/Colleges';
@@ -73,7 +74,7 @@ function App() {
           <Route path="/scholarships/:scholarshipId" element={<Layout><ScholarshipDetail /></Layout>} />
           <Route path="/colleges/:slug/scholarships/:scholarshipId" element={<Layout><ScholarshipDetail /></Layout>} />
           <Route path="/colleges/:slug" element={<Layout><CollegeDetail /></Layout>} />
-          <Route path="/admin/colleges" element={<Layout><AdminColleges /></Layout>} />
+          <Route path="/admin/colleges" element={<Layout><RequireAdmin><AdminColleges /></RequireAdmin></Layout>} />
           <Route path="/dashboard" element={<Layout><RequireAuth><RequireAnswers><Dashboard /></RequireAnswers></RequireAuth></Layout>} />
           <Route path="/advisor" element={<Layout showHeader={false}><RequireAuth><RequireAnswers><Advisor /></RequireAnswers></RequireAuth></Layout>} />
           <Route path="/privacy" element={<Layout><Privacy /></Layout>} />

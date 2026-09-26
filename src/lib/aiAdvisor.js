@@ -215,12 +215,24 @@ function toFriendlyError(status, payload) {
   return err;
 }
 
+async function authHeaders() {
+  try {
+    const { supabase } = await import('./supabase.js');
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    if (token && !String(token).startsWith('local_jwt_')) {
+      return { Authorization: `Bearer ${token}` };
+    }
+  } catch {}
+  return {};
+}
+
 async function postJson(path, payload, signal) {
   let res;
   try {
     res = await fetch(path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
       body: JSON.stringify(payload),
       signal,
     });

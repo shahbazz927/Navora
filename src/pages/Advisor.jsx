@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp, Sparkles, Compass, MessageSquarePlus } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { sendAdvisorChat, buildAdvicePayload } from '../lib/aiAdvisor';
-import { useSubscription, getAiUsage, incAiUsage } from '../hooks/useSubscription';
+import { useSubscription } from '../hooks/useSubscription';
 import UpgradeModal from '../components/UpgradeModal';
 import { aiAdvisorResponses } from '../data/recommendations';
 import { getStudentContext } from '../data/streamConfig';
@@ -55,10 +55,9 @@ export default function Advisor() {
   const textareaRef = useRef(null);
   const prevHistoryLenRef = useRef(chatHistory.length);
 
-  const { isPro, plan } = useSubscription();
+  const { plan, aiUsed, aiLimit, fetchRemote } = useSubscription();
   const [showUpgrade, setShowUpgrade] = useState(false);
-  const [aiUsed, setAiUsed] = useState(getAiUsage);
-  const aiLimit = plan.ai_daily_limit;
+  // Server is authoritative for quota; hook value is display-only and refreshes after each send.
   const aiRemaining = Math.max(0, aiLimit - aiUsed);
   const context = userType ? getStudentContext(userType, answers) : null;
 
@@ -126,7 +125,8 @@ export default function Advisor() {
   const handleSend = async (message = input) => {
     const trimmed = String(message || '').trim().slice(0, 500);
     if (!trimmed) return;
-    if (getAiUsage() >= aiLimit) { setShowUpgrade(true); return; }
+    // Client-side hint only — server enforces the real quota (401/429).
+    if (aiRemaining <= 0) { setShowUpgrade(true); return; }
     const now = Date.now();
     if (now - lastSendRef.current < 1200) return; // rate-limit (F5)
     if (isTyping) return;
@@ -161,9 +161,15 @@ export default function Advisor() {
         }
       } catch {}
       const data = await sendAdvisorChat(history, userType, enriched);
-      incAiUsage(); setAiUsed(getAiUsage());
+      fetchRemote();
       addChatMessage({ role: 'assistant', content: data.content, timestamp: new Date() });
     } catch (err) {
+      if (err?.status === 429) {
+        setShowUpgrade(true);
+        fetchRemote();
+      } else if (err?.status === 401) {
+        fetchRemote();
+      }
       addChatMessage({
         role: 'assistant',
         content: err.message || 'The AI advisor could not respond right now. Please try again.',

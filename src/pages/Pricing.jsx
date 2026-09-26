@@ -1,12 +1,17 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, X, Sparkles, ArrowRight } from 'lucide-react';
 import { PLANS, track } from '../lib/entitlements';
 import { useSubscription } from '../hooks/useSubscription';
+import { useUser } from '../context/UserContext';
+import UpgradeModal from '../components/UpgradeModal';
 
 function Pill({children}){ return <span className="inline-flex items-center rounded-full bg-paper border border-line px-2.5 py-1 text-xs font-medium text-ink-2">{children}</span>; }
 
 export default function Pricing(){
-  const { isPro, sub } = useSubscription();
+  const { isPro, sub, fetchRemote } = useSubscription();
+  const { user } = useUser();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   return (
     <div className="bg-paper-gradient min-h-screen">
       {/* Hero */}
@@ -56,10 +61,7 @@ export default function Pricing(){
             {!isPro ? (
               <button onClick={()=>{
                 track('pro_checkout_started');
-                // provider-ready: if configured, redirect to real checkout; else show modal/info
-                const url = import.meta.env.VITE_CHECKOUT_URL;
-                if(url) window.location.href = url;
-                else alert('Checkout will be available once payment provider is configured. Your plan config is ready (₹999/year). Please set VITE_CHECKOUT_URL.');
+                setCheckoutOpen(true);
               }} className="mt-6 w-full inline-flex justify-center rounded-xl bg-white text-brand-950 font-bold px-5 py-3 hover:bg-brand-50">Start Pro — ₹999/year</button>
             ) : (
               <p className="mt-6 text-center text-sm font-semibold bg-white/10 border border-white/20 rounded-xl py-3">You are on NAVORA Pro</p>
@@ -104,7 +106,7 @@ export default function Pricing(){
             ['Career recommendations','Top 3','Full'],
             ['Career pathways','Basic / Preview','Full + alternatives'],
             ['Personalized roadmap','—','Yes'],
-            ['AI Advisor','5/day · Limited','30/day · Profile-aware + history'],
+            ['AI Advisor','3/day · Limited','20/day · Profile-aware + history'],
             ['College discovery','Limited preview','Full'],
             ['College comparison','2','10'],
             ['Global Study detailed','Preview','Full'],
@@ -124,7 +126,7 @@ export default function Pricing(){
         <div className="sm:hidden mt-4 space-y-3">
           {[
             {cat:'Guidance',free:'Top 3, basic pathways',pro:'Full + roadmap'},
-            {cat:'AI Advisor',free:'5/day limited',pro:'30/day + history'},
+            {cat:'AI Advisor',free:'5/day limited',pro:'20/day + history'},
             {cat:'College Intelligence',free:'Preview, compare 2',pro:'Full, compare 10, exams & scholarships'},
             {cat:'Global Study',free:'Preview, compare 2',pro:'Full, compare 10, course match + scholarships'},
             {cat:'Reports',free:'Basic results',pro:'Personalized + PDF + parent summary'},
@@ -175,6 +177,13 @@ export default function Pricing(){
           </div>
         </div>
       </section>
+      <UpgradeModal
+        open={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        feature="default"
+        prefill={{ email: user?.email || '', name: user?.user_metadata?.full_name || '' }}
+        onProActivated={() => fetchRemote()}
+      />
     </div>
   );
 }

@@ -32,6 +32,18 @@ import { ADVICE_SYSTEM_PROMPT, buildChatSystemPrompt } from './ai/systemPrompt.m
 import { buildAdviceUserPrompt, serializeChatContext, buildChatMessages } from './ai/contextBuilder.mjs';
 import { isLeakyResponse, RETRY_CORRECTION_INSTRUCTION, SAFE_FALLBACK_MESSAGE, buildSafeFallback } from './ai/responseValidator.mjs';
 import { HYDERABAD_INSTITUTIONS, filterInstitutions } from '../src/data/hyderabadInstitutions.js';
+import { getUserEntitlement, planFeatures } from './entitlement.mjs';
+import {
+  bearerToken, verifySupabaseUser, getSubscriptionRow, incrementAiUsage,
+  getAiUsageCount, isAdminUser, isServiceRoleConfigured, upsertSubscriptionRow,
+  findPaymentByProviderId, insertPaymentRow, updatePaymentStatus, activateProForPayment,
+} from './supabaseAdmin.mjs';
+import {
+  verifyRazorpaySignature, mapRazorpayToNavora, detectProvider,
+  createRazorpayOrder, verifyPaymentSignature, fetchRazorpayPayment,
+  isRazorpayConfigured, razorpayPublicKey, PRO_AMOUNT_PAISE, PRO_CURRENCY,
+} from './payments.mjs';
+import { buildRoadmap } from './roadmap.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -98,6 +110,31 @@ const OPENROUTER_TIMEOUT_MS = Math.max(1000, Number(process.env.OPENROUTER_TIMEO
 
 // In-memory per-IP rate limit for the AI endpoints (requests per minute).
 const AI_RATE_LIMIT_PER_MIN = Number(process.env.AI_RATE_LIMIT_PER_MIN) || 30;
+
+// CORS allowlist (no wildcard for authenticated APIs). Comma-separated env.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+function corsOrigin(req) {
+  const origin = String(req.headers?.origin || '').trim();
+  if (origin && ALLOWED_ORIGINS.includes(origin)) return origin;
+  // Same-origin / non-browser (no Origin header): no CORS header needed.
+  return null;
+}
+
+function setSecurityHeaders(res, req) {
+  const origin = corsOrigin(req);
+  if (origin) res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('X-Frame-Options', 'DENY');
+  // HSTS only makes sense over HTTPS; harmless to send, proxies strip if needed.
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+}
 
 // Hard token cap used ONLY as a safety net for the free-form advisor chat.
 // Words are not tokens, so the chat system prompt is the primary length
@@ -167,6 +204,9 @@ function buildUserPrompt(body) { return buildAdviceUserPrompt(body); }
 //  Helpers ------------------------------------------------------------------
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload);
+  // Security headers are applied by the caller (handleApiRequest) before routing;
+  // keep cache-busting here for all API payloads.
+  if (!res.getHeader('X-Content-Type-Options')) res.setHeader('X-Content-Type-Options', 'nosniff');
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Content-Length': Buffer.byteLength(body),
@@ -521,6 +561,82 @@ function validateAdviceRequest(body) {
 // buildChatSystemPrompt, serializeChatContext, isLeakyResponse, RETRY_CORRECTION_INSTRUCTION, SAFE_FALLBACK_MESSAGE
 // now live in server/ai/ — single source of truth via NAVORA_AI_RULES.md
 
+//  Auth + entitlement helpers (server is the ONLY authority) -----------------
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+/** Read raw request bytes (for webhook signature verification). */
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let size = 0;
+    const chunks = [];
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > MAX_BODY_BYTES) {
+        reject(new Error('PAYLOAD_TOO_LARGE'));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
+/**
+ * Authenticate request -> { user } or null. Never trusts body/query/headers
+ * like x-plan, ?plan=pro, {isPro:true} — only the verified Supabase JWT.
+ */
+async function authenticate(req) {
+  const token = bearerToken(req);
+  if (!token) return null;
+  return verifySupabaseUser(token);
+}
+
+/** Resolve authoritative entitlement for a user id (fail-safe: free). */
+async function entitlementFor(userId) {
+  try {
+    if (!userId || !isServiceRoleConfigured()) {
+      return { plan: 'free', status: 'active', features: planFeatures('free'), currentPeriodEnd: null, used: null };
+    }
+    const sub = await getSubscriptionRow(userId);
+    const ent = getUserEntitlement(sub);
+    const used = await getAiUsageCount(userId, todayStr());
+    return { ...ent, used };
+  } catch {
+    return { plan: 'free', status: 'active', features: planFeatures('free'), currentPeriodEnd: null, used: null };
+  }
+}
+
+/**
+ * Server-side AI quota gate. Atomically increments usage, then compares to
+ * the plan limit. Returns { allowed, used, limit, plan }.
+ * Fail-safe: if the counter is unavailable, authed users are treated as free
+ * with usage unknown -> allow but do not grant Pro.
+ */
+async function checkAiQuota(userId, plan) {
+  const limit = plan === 'pro' ? 30 : 5;
+  if (!userId) return { allowed: true, used: 0, limit, plan: 'free', demo: true };
+  const { count } = await incrementAiUsage(userId, todayStr());
+  if (count == null) {
+    const used = await getAiUsageCount(userId, todayStr());
+    return { allowed: true, used: used ?? 0, limit, plan, degraded: true };
+  }
+  return { allowed: count <= limit, used: count, limit, plan };
+}
+
+function quotaExceeded(res, q) {
+  return sendJson(res, 429, {
+    success: false,
+    message: 'AI daily limit reached. Upgrade to NAVORA Pro for a higher limit.',
+    error: 'AI daily limit reached',
+    limit: q.limit,
+    used: q.used,
+    plan: q.plan,
+    upgradeRequired: true,
+  });
+}
+
 //  Route handlers -------------------------------------------------------------
 async function handleCareerAdvice(req, res) {
   let body;
@@ -547,6 +663,17 @@ async function handleCareerAdvice(req, res) {
 
   if (missingApiKey()) {
     return sendConfigError(res);
+  }
+
+  // Auth is optional here (questionnaire runs pre-login) but quota is server-side:
+  // authed users get plan quota (3 free / 20 pro); anonymous gets IP rate-limit only.
+  const authUser = await authenticate(req);
+  let quotaPlan = 'free';
+  if (authUser) {
+    const ent = await entitlementFor(authUser.id);
+    quotaPlan = ent.plan;
+    const q = await checkAiQuota(authUser.id, quotaPlan);
+    if (!q.allowed) return quotaExceeded(res, q);
   }
 
   const userPrompt = buildUserPrompt(body);
@@ -612,10 +739,30 @@ async function handleAdvisorChat(req, res) {
   if (!last || typeof last.content !== 'string' || !last.content.trim()) {
     return sendJson(res, 400, { success: false, message: 'I’m having trouble responding right now. Please try again.' });
   }
+  // Validate history shape (length + per-message caps) before AI provider call.
+  if (history.length > 40) {
+    return sendJson(res, 400, { success: false, message: 'I’m having trouble responding right now. Please try again.' });
+  }
+  for (const m of history) {
+    if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string' || m.content.length > 4000) {
+      return sendJson(res, 400, { success: false, message: 'I’m having trouble responding right now. Please try again.' });
+    }
+  }
+
+  // Advisor chat requires an authenticated Supabase user (page is behind login).
+  // IP limit alone is not authorization — JWT identity resolves the quota.
+  // Auth is checked before provider config so unauthenticated callers always get 401.
+  const chatUser = await authenticate(req);
+  if (!chatUser) {
+    return sendJson(res, 401, { success: false, message: 'Please sign in to use the AI Advisor.' });
+  }
 
   if (missingApiKey()) {
     return sendConfigError(res);
   }
+  const chatEnt = await entitlementFor(chatUser.id);
+  const chatQuota = await checkAiQuota(chatUser.id, chatEnt.plan);
+  if (!chatQuota.allowed) return quotaExceeded(res, chatQuota);
 
   // --- Debug logging (structural, no PII) before OpenRouter call ---
   const ctxDbg = body?.context && typeof body.context === 'object' ? body.context : {};
@@ -784,9 +931,9 @@ export async function handleApiRequest(req, res) {
   const { method, url } = req;
   const path = (url || '/').split('?')[0];
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  setSecurityHeaders(res, req);
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (method === 'OPTIONS') {
     res.writeHead(204);
@@ -842,33 +989,297 @@ export async function handleApiRequest(req, res) {
   if (path === '/api/career-advice' && method === 'POST') return handleCareerAdvice(req, res);
   if (path === '/api/advisor/chat' && method === 'POST') return handleAdvisorChat(req, res);
 
-  // Entitlement — backend verifies plan before paid functionality
+  // Entitlement — backend verifies plan before paid functionality.
+  // The ONLY trusted inputs are the verified JWT identity + server subscription row.
+  // ?plan= / ?isPro= / body.plan / x-plan headers are NEVER read here.
+  if (path === '/api/entitlement' && method === 'GET') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    const ent = await entitlementFor(user.id);
+    return sendJson(res, 200, { success: true, ...ent });
+  }
   if (path === '/api/entitlement/check' && method === 'POST') {
-    let body={}; try{ body=await readBody(req);}catch{ body={};}
-    const feature = body.feature || 'default';
-    // In production, verify via Supabase service role using Authorization header.
-    // Here we enforce that client-reported plan is not trusted blindly: if auth header missing, default to free.
-    const auth = req.headers['authorization'] || '';
-    // If no auth, still return free limits — never auto-promote
-    const allowedProFeatures = new Set(['personalized_roadmap','pdf_reports','full_global_study','course_comparison','detailed_fees']);
-    const isPro = false; // until real checkout webhook marks pro; frontend limit is additional guard
-    if(allowedProFeatures.has(feature) && !isPro){
-      return sendJson(res, 403, { success:false, allowed:false, message:'This feature requires NAVORA Pro. Upgrade to unlock.' });
+    let body = {};
+    try { body = await readBody(req); } catch { body = {}; }
+    const feature = typeof body?.feature === 'string' ? body.feature.slice(0, 80) : 'default';
+    const user = await authenticate(req);
+    // Fail-safe: unknown/anonymous => free (never auto-promote).
+    const ent = user ? await entitlementFor(user.id) : { plan: 'free', features: planFeatures('free') };
+    const PRO_ONLY = new Set([
+      'personalized_roadmap', 'pdf_reports', 'full_global_study',
+      'course_comparison', 'detailed_fees', 'personalized_scholarships',
+      'full_career_map', 'application_planning',
+    ]);
+    if (PRO_ONLY.has(feature) && ent.plan !== 'pro') {
+      return sendJson(res, 403, { success: false, allowed: false, plan: 'free', message: 'This feature requires NAVORA Pro. Upgrade to unlock.' });
     }
-    return sendJson(res, 200, { success:true, allowed:true });
+    return sendJson(res, 200, { success: true, allowed: true, plan: ent.plan });
   }
   if (path === '/api/entitlement/subscription' && method === 'GET') {
-    return sendJson(res, 200, { plan:'free', status:'active', message:'Provider-ready; integrate webhook to activate Pro after verified payment.' });
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    const ent = await entitlementFor(user.id);
+    return sendJson(res, 200, { plan: ent.plan, status: ent.status, currentPeriodEnd: ent.currentPeriodEnd });
   }
   if (path === '/api/entitlement/checkout' && method === 'POST') {
-    // Provider-ready stub: never trust client-side success; webhook must activate
-    return sendJson(res, 200, { success:true, checkout_url: null, message:'Checkout requires VITE_CHECKOUT_URL. Pro activation only after webhook verification.' });
+    // Provider-ready stub: never activates Pro. Real checkout URL comes from env.
+    const checkoutUrl = (process.env.RAZORPAY_CHECKOUT_URL || process.env.VITE_CHECKOUT_URL || '').trim();
+    return sendJson(res, 200, {
+      success: true,
+      checkout_url: checkoutUrl || null,
+      provider: 'razorpay',
+      configured: Boolean(checkoutUrl),
+      message: checkoutUrl
+        ? 'Redirect to the provider checkout. Pro activates only after webhook verification.'
+        : 'Checkout requires RAZORPAY configuration. Pro activation only after webhook verification.',
+    });
   }
   if (path === '/api/entitlement/webhook' && method === 'POST') {
-    let body={}; try{ body=await readBody(req);}catch{}
-    // TODO: verify provider signature, then upsert subscriptions table
-    log.info('Webhook received (stub) — verify signature and update subscriptions');
-    return sendJson(res, 200, { success:true });
+    // Verified-webhook path ONLY. Rejects invalid signatures; never trusts body plan.
+    let raw;
+    try { raw = await readRawBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid payload.' });
+    }
+    const provider = detectProvider(req);
+    if (provider !== 'razorpay') {
+      log.warn('Webhook rejected: unknown provider / missing signature header');
+      return sendJson(res, 400, { success: false, message: 'Unknown provider.' });
+    }
+    const secret = (process.env.RAZORPAY_WEBHOOK_SECRET || process.env.PAYMENT_WEBHOOK_SECRET || '').trim();
+    if (!secret) {
+      log.err('Webhook misconfigured: RAZORPAY_WEBHOOK_SECRET missing');
+      return sendJson(res, 500, { success: false, message: 'Webhook not configured.' });
+    }
+    const signature = String(req.headers['x-razorpay-signature'] || '');
+    if (!verifyRazorpaySignature(raw, signature, secret)) {
+      log.warn('Webhook rejected: invalid signature');
+      return sendJson(res, 401, { success: false, message: 'Invalid signature.' });
+    }
+    let event = null;
+    try { event = JSON.parse(raw.toString('utf8')); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid JSON.' });
+    }
+    const mapped = mapRazorpayToNavora(event);
+    if (!mapped) {
+      log.info('Webhook ignored: event does not change entitlement');
+      return sendJson(res, 200, { success: true, ignored: true });
+    }
+    // Identify user: prefer notes.user_id set at checkout; else provider customer lookup.
+    const notesUser = event?.payload?.subscription?.entity?.notes?.user_id
+      || event?.payload?.payment?.entity?.notes?.user_id
+      || null;
+    if (!notesUser) {
+      log.warn('Webhook: no user linkage (notes.user_id missing); manual reconciliation required');
+      return sendJson(res, 200, { success: true, reconcilationRequired: true });
+    }
+    try {
+      await upsertSubscriptionRow({
+        user_id: notesUser,
+        plan: mapped.plan,
+        status: mapped.status,
+        provider: 'razorpay',
+        provider_customer_id: mapped.providerCustomerId,
+        provider_subscription_id: mapped.providerSubscriptionId,
+        current_period_start: mapped.startAt,
+        current_period_end: mapped.endAt,
+        updated_at: new Date().toISOString(),
+      });
+      log.info('Webhook: subscription updated for user');
+      return sendJson(res, 200, { success: true });
+    } catch (err) {
+      log.err('Webhook upsert failed', err?.message || 'unknown');
+      return sendJson(res, 500, { success: false, message: 'Update failed.' });
+    }
+  }
+
+  // Admin authorization probe (frontend route guard helper; mutations must re-check).
+  if (path === '/api/admin/check' && method === 'GET') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, admin: false });
+    const admin = await isAdminUser(user.id);
+    if (!admin) return sendJson(res, 403, { success: false, admin: false });
+    return sendJson(res, 200, { success: true, admin: true });
+  }
+
+  // Dashboard bundle: entitlement + usage + subscription + admin in one call.
+  // Assessment/answers/saved items stay client-side (existing architecture).
+  if (path === '/api/dashboard' && method === 'GET') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    const ent = await entitlementFor(user.id);
+    const admin = await isAdminUser(user.id);
+    return sendJson(res, 200, {
+      success: true,
+      plan: ent.plan,
+      status: ent.status,
+      features: ent.features,
+      aiUsed: ent.used ?? 0,
+      aiLimit: ent.plan === 'pro' ? 30 : 5,
+      expiresAt: ent.expiresAt || ent.currentPeriodEnd || null,
+      admin,
+    });
+  }
+
+  // Personalized roadmap — PRO ONLY. Answers are posted (already completed
+  // client-side); entitlement is verified before anything is returned.
+  if (path === '/api/roadmap' && method === 'POST') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    const ent = await entitlementFor(user.id);
+    if (ent.plan !== 'pro') {
+      return sendJson(res, 403, { success: false, allowed: false, plan: 'free', message: 'Personalized roadmap requires NAVORA Pro. Upgrade to unlock.' });
+    }
+    let body = {};
+    try { body = await readBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
+    }
+    const answers = body.answers && typeof body.answers === 'object' ? body.answers : {};
+    const userType = typeof body.userType === 'string' ? body.userType.slice(0, 40) : null;
+    if (!Object.keys(answers).length && !userType) {
+      return sendJson(res, 400, { success: false, message: 'Complete your assessment first to generate a roadmap.' });
+    }
+    return sendJson(res, 200, { success: true, roadmap: buildRoadmap(answers, userType) });
+  }
+
+  // ── Razorpay payments (one-time annual Pro, ₹999 = 99900 paise) ──
+  if (path === '/api/payments/create-pro-order' && method === 'POST') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    const ent = await entitlementFor(user.id);
+    if (ent.plan === 'pro') {
+      return sendJson(res, 200, {
+        success: true, alreadyPro: true, plan: 'pro',
+        expiresAt: ent.expiresAt || ent.currentPeriodEnd || null,
+        message: 'You already have NAVORA Pro.',
+      });
+    }
+    if (!isRazorpayConfigured()) {
+      return sendJson(res, 503, {
+        success: false, configured: false,
+        message: 'Payments are not configured yet. Set RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET (Test Mode).',
+      });
+    }
+    try {
+      const order = await createRazorpayOrder({
+        receipt: `navora_${user.id.slice(0, 12)}_${Date.now()}`.slice(0, 40),
+        notes: { user_id: user.id, product: 'navora_pro_annual' },
+      });
+      try {
+        await insertPaymentRow({
+          user_id: user.id,
+          provider: 'razorpay',
+          provider_order_id: order.id,
+          provider_payment_id: null,
+          amount: order.amount ?? PRO_AMOUNT_PAISE,
+          currency: order.currency || PRO_CURRENCY,
+          status: 'created',
+        });
+      } catch (e) { log.warn('order audit insert failed', e?.message || ''); }
+      return sendJson(res, 200, {
+        success: true,
+        orderId: order.id,
+        amount: order.amount ?? PRO_AMOUNT_PAISE,
+        currency: order.currency || PRO_CURRENCY,
+        keyId: razorpayPublicKey(),
+      });
+    } catch (err) {
+      log.err('create-pro-order failed', err?.message || 'unknown');
+      return sendJson(res, 502, { success: false, message: 'Could not start checkout. Please try again.' });
+    }
+  }
+
+  if (path === '/api/payments/verify-pro-payment' && method === 'POST') {
+    const user = await authenticate(req);
+    if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
+    let body = {};
+    try { body = await readBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
+    }
+    const orderId = typeof body?.razorpay_order_id === 'string' ? body.razorpay_order_id.trim() : '';
+    const paymentId = typeof body?.razorpay_payment_id === 'string' ? body.razorpay_payment_id.trim() : '';
+    const signature = typeof body?.razorpay_signature === 'string' ? body.razorpay_signature.trim() : '';
+    if (!orderId || !paymentId || !signature || orderId.length > 64 || paymentId.length > 64 || signature.length > 256) {
+      return sendJson(res, 400, { success: false, message: 'Invalid payment details.' });
+    }
+    // ONLY a valid cryptographic signature activates Pro — never checkout closure.
+    if (!verifyPaymentSignature(orderId, paymentId, signature)) {
+      await updatePaymentStatus(paymentId, 'failed');
+      return sendJson(res, 400, { success: false, message: 'Your payment could not be completed.' });
+    }
+    try {
+      const result = await activateProForPayment({
+        userId: user.id, orderId, paymentId, amount: PRO_AMOUNT_PAISE, currency: PRO_CURRENCY,
+      });
+      log.info('Pro activated via verified payment');
+      return sendJson(res, 200, {
+        success: true, plan: 'pro', expiresAt: result.expiresAt,
+        alreadyActive: result.alreadyActive === true,
+        message: 'Welcome to NAVORA Pro. Your Pro access is now active.',
+      });
+    } catch (err) {
+      log.err('verify-pro-payment activation failed', err?.message || 'unknown');
+      return sendJson(res, 500, { success: false, message: 'Payment verified but activation failed. Contact support.' });
+    }
+  }
+
+  // Razorpay payment webhook (payment.captured etc.). Idempotent: same payment
+  // id processed twice => single activation. Reconciliation requires notes.user_id.
+  if (path === '/api/payments/razorpay-webhook' && method === 'POST') {
+    let raw;
+    try { raw = await readRawBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid payload.' });
+    }
+    const secret = (process.env.RAZORPAY_WEBHOOK_SECRET || '').trim();
+    if (!secret) {
+      log.err('Razorpay webhook misconfigured: RAZORPAY_WEBHOOK_SECRET missing');
+      return sendJson(res, 500, { success: false, message: 'Webhook not configured.' });
+    }
+    const signature = String(req.headers['x-razorpay-signature'] || '');
+    if (!verifyRazorpaySignature(raw, signature, secret)) {
+      log.warn('Razorpay webhook rejected: invalid signature');
+      return sendJson(res, 401, { success: false, message: 'Invalid signature.' });
+    }
+    let event = null;
+    try { event = JSON.parse(raw.toString('utf8')); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid JSON.' });
+    }
+    const type = event?.event || '';
+    const entity = event?.payload?.payment?.entity || {};
+    if (type === 'payment.captured' && entity?.id) {
+      const userId = entity?.notes?.user_id || null;
+      if (!userId) {
+        log.warn('Razorpay webhook: captured payment without notes.user_id; reconciliation required');
+        return sendJson(res, 200, { success: true, reconcilationRequired: true });
+      }
+      // Confirm server-side with Razorpay when configured (payload is not trusted alone).
+      const confirmed = await fetchRazorpayPayment(entity.id);
+      const status = confirmed?.status || entity.status;
+      if (status !== 'captured') {
+        log.warn('Razorpay webhook: payment not captured, ignoring');
+        return sendJson(res, 200, { success: true, ignored: true });
+      }
+      try {
+        await activateProForPayment({
+          userId,
+          orderId: entity.order_id || null,
+          paymentId: entity.id,
+          amount: entity.amount ?? PRO_AMOUNT_PAISE,
+          currency: (entity.currency || PRO_CURRENCY).toUpperCase(),
+        });
+        return sendJson(res, 200, { success: true });
+      } catch (err) {
+        log.err('Razorpay webhook activation failed', err?.message || 'unknown');
+        return sendJson(res, 500, { success: false, message: 'Update failed.' });
+      }
+    }
+    if (type === 'payment.failed' && entity?.id) {
+      await updatePaymentStatus(entity.id, 'failed');
+      return sendJson(res, 200, { success: true, ignored: true });
+    }
+    return sendJson(res, 200, { success: true, ignored: true });
   }
 
   return sendJson(res, 404, { success: false, message: 'I’m having trouble responding right now. Please try again.' });
