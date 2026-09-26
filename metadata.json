@@ -1,0 +1,6 @@
+{
+  "name": "NAVORA",
+  "description": "Navigate Your Future — clear, honest guidance on streams, courses, colleges, and careers for students and parents.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
