@@ -17,6 +17,7 @@ import graduationDegrees, {
 } from '../data/graduationDegreeConfig';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { personas } from '../data/personas';
+import { saveAssessmentResult } from '../lib/assessmentResults';
 
 const hints = {
   class10: {
@@ -317,6 +318,13 @@ export default function Questions() {
       setCurrentQ(currentQ + 1);
     } else {
       setAnswers(newAnswers);
+      // Best-effort Supabase persistence (Dashboard/Advisor restore on any device).
+      saveAssessmentResult({
+        assessmentType: userType,
+        educationStage: newAnswers.stream?.[0] || newAnswers.currentDegree || null,
+        assessmentData: newAnswers,
+        resultData: {},
+      });
       navigate(`/recommendations/${userType}`);
     }
   }, [

@@ -18,6 +18,7 @@ import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import About from './pages/About';
 import StudyAbroad from './pages/StudyAbroad';
+import Scholarships from './pages/Scholarships';
 import Colleges from './pages/Colleges';
 import CollegeDetail from './pages/CollegeDetail';
 import CollegeCompare from './pages/CollegeCompare';
@@ -57,7 +58,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout><Landing /></Layout>} />
           <Route path="/login" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
+          {/* Auth aliases — single Login component hosts Sign In / Sign Up tabs + forgot-password modal */}
+          <Route path="/signup" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
+          <Route path="/forgot-password" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
+          {/* Public sitemap aliases — reuse existing pages, no duplicates */}
+          <Route path="/how-it-works" element={<Layout><About /></Layout>} />
+          <Route path="/career-guidance" element={<Layout><UserType /></Layout>} />
+          <Route path="/contact" element={<Layout><Support /></Layout>} />
           <Route path="/parents" element={<Layout><Parents /></Layout>} />
           <Route path="/get-started" element={<Layout><UserType /></Layout>} />
           <Route path="/onboarding/:userType" element={<Layout showFooter={false}><Onboarding /></Layout>} />
@@ -68,6 +76,9 @@ function App() {
           <Route path="/recommendations/:userType" element={<Layout><RequireAnswers><Recommendations /></RequireAnswers></Layout>} />
           <Route path="/compare" element={<Layout><Compare /></Layout>} />
           <Route path="/study-abroad" element={<Layout><StudyAbroad /></Layout>} />
+          {/* Canonical spec name — same component, no duplicate page */}
+          <Route path="/global-study" element={<Layout><StudyAbroad /></Layout>} />
+          <Route path="/scholarships" element={<Layout><Scholarships /></Layout>} />
           <Route path="/colleges" element={<Layout><Colleges /></Layout>} />
           <Route path="/colleges/compare" element={<Layout><CollegeCompare /></Layout>} />
           <Route path="/colleges/saved" element={<Layout><SavedColleges /></Layout>} />
@@ -75,8 +86,12 @@ function App() {
           <Route path="/colleges/:slug/scholarships/:scholarshipId" element={<Layout><ScholarshipDetail /></Layout>} />
           <Route path="/colleges/:slug" element={<Layout><CollegeDetail /></Layout>} />
           <Route path="/admin/colleges" element={<Layout><RequireAdmin><AdminColleges /></RequireAdmin></Layout>} />
-          <Route path="/dashboard" element={<Layout><RequireAuth><RequireAnswers><Dashboard /></RequireAnswers></RequireAuth></Layout>} />
-          <Route path="/advisor" element={<Layout showHeader={false}><RequireAuth><RequireAnswers><Advisor /></RequireAnswers></RequireAuth></Layout>} />
+          {/* Dashboard + Advisor handle their own empty states (assessment CTA via
+              CareerAssessmentHero / chat prompts), so they require auth only.
+              Gating on local answers here would bounce returning users whose
+              results live in Supabase (new device) back to /get-started. */}
+          <Route path="/dashboard" element={<Layout><RequireAuth><Dashboard /></RequireAuth></Layout>} />
+          <Route path="/advisor" element={<Layout showHeader={false}><RequireAuth><Advisor /></RequireAuth></Layout>} />
           <Route path="/privacy" element={<Layout><Privacy /></Layout>} />
           <Route path="/terms" element={<Layout><Terms /></Layout>} />
           <Route path="/cookies" element={<Layout><CookiePolicy /></Layout>} />
@@ -84,7 +99,7 @@ function App() {
           <Route path="/accessibility" element={<Layout><Accessibility /></Layout>} />
           <Route path="/acceptable-use" element={<Layout><AcceptableUse /></Layout>} />
           <Route path="/security" element={<Layout><Security /></Layout>} />
-          <Route path="/account" element={<Layout><Account /></Layout>} />
+          <Route path="/account" element={<Layout><RequireAuth><Account /></RequireAuth></Layout>} />
           <Route path="/verify-email" element={<Layout><VerifyEmail /></Layout>} />
           <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
           <Route path="/pricing" element={<Layout><Pricing /></Layout>} />

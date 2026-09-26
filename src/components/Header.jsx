@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight, LogOut, ChevronDown, Building2, Scale, Bookmark, GraduationCap, Globe } from 'lucide-react';
+import { Menu, X, ArrowRight, LogOut, ChevronDown, Building2, Scale, Bookmark, GraduationCap, Globe, Award } from 'lucide-react';
 import Logo from './Logo';
 import { useUser } from '../context/UserContext';
 import { supabase } from '../lib/supabase';
@@ -11,12 +11,14 @@ const exploreLinks = [
   { to: '/colleges?level=UG', icon: GraduationCap, label: 'UG Colleges', desc: 'Pathways after Class 12' },
   { to: '/colleges?level=PG', icon: GraduationCap, label: 'PG Colleges', desc: 'Pathways after graduation' },
   { to: '/study-abroad', icon: Globe, label: 'Global Study', desc: 'Countries & universities abroad' },
+  { to: '/scholarships', icon: Award, label: 'Scholarships', desc: 'Verified India + abroad aid' },
   { to: '/colleges/compare', icon: Scale, label: 'Compare Colleges', desc: 'Decide side by side' },
   { to: '/colleges/saved', icon: Bookmark, label: 'Saved', desc: 'Your shortlist' },
 ];
 
 const primaryLinks = [
   { to: '/about', label: 'About' },
+  { to: '/how-it-works', label: 'How It Works' },
   { to: '/pricing', label: 'Pricing' },
   { to: '/parents', label: 'For Parents' },
 ];
@@ -66,7 +68,7 @@ export default function Header() {
     return path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
   };
   const isExploreActive =
-    location.pathname.startsWith('/colleges') || location.pathname.startsWith('/study-abroad');
+    location.pathname.startsWith('/colleges') || location.pathname.startsWith('/study-abroad') || location.pathname.startsWith('/global-study') || location.pathname.startsWith('/scholarships');
 
   const linkCls = (active) =>
     `relative px-1 py-2 text-[0.9rem] font-medium tracking-[-0.01em] transition-colors ${

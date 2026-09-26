@@ -12,7 +12,7 @@ import { useUser } from '../context/UserContext';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { setUser } = useUser();
+  const { setUser, answers } = useUser();
 
   const [isAnimating, setIsAnimating] = useState(true);
   const [authMode, setAuthMode] = useState('login');
@@ -65,7 +65,10 @@ export default function Login() {
     // Prevent open redirect — only same-origin absolute paths
     const safeFrom = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : null;
     if (safeFrom) navigate(safeFrom, { replace: true });
-    else navigate('/get-started');
+    // Returning users with a completed questionnaire resume where they left
+    // off; everyone else starts the guided flow. Never re-ask unnecessarily.
+    else if (answers && Object.keys(answers).length > 0) navigate('/dashboard', { replace: true });
+    else navigate('/get-started', { replace: true });
   };
 
   return (

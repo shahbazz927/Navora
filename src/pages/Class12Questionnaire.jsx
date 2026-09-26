@@ -18,6 +18,7 @@ import {
   MAX_CAREER_PRIORITIES,
 } from '../data/careerQuestionnaire';
 import { buildResults } from '../data/class12Recommendations';
+import { saveAssessmentResult } from '../lib/assessmentResults';
 
 function ChoiceCard({ option, selected, multi = false, onClick, disabled = false }) {
   return (
@@ -248,6 +249,13 @@ export default function Class12Questionnaire() {
     else {
       const results = buildResults(answers);
       saveAnswers({ ...answers, completedAt: new Date().toISOString(), recommendations: results.recommendations, clusters: results.clusters, exploring: results.exploring });
+      // Best-effort Supabase persistence (Dashboard/Advisor restore on any device).
+      saveAssessmentResult({
+        assessmentType: 'class12',
+        educationStage: answers.streamV2 || null,
+        assessmentData: answers,
+        resultData: { recommendations: results.recommendations, clusters: results.clusters, exploring: results.exploring },
+      });
       navigate('/path/class12');
     }
   };

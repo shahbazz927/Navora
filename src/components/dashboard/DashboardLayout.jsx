@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   Menu, X, Home, Compass, BookOpen, Building2, MessageCircle, User,
-  Settings, Sparkles, GitCompare, Map, FileText, Users,
+  Settings, Sparkles, GitCompare, Map, FileText, Users, Award, Globe,
 } from 'lucide-react';
 import Logo from '../Logo';
 import { useUser } from '../../context/UserContext';
@@ -12,6 +12,8 @@ const FREE_NAV = [
   { to: '/get-started', label: 'Career Explorer', icon: Compass },
   { to: '/compare', label: 'Courses', icon: BookOpen },
   { to: '/colleges', label: 'Colleges', icon: Building2 },
+  { to: '/scholarships', label: 'Scholarships', icon: Award },
+  { to: '/study-abroad', label: 'Global Study', icon: Globe },
   { to: '/advisor', label: 'AI Advisor', icon: MessageCircle },
   { to: '/account', label: 'My Profile', icon: User },
 ];
@@ -22,6 +24,8 @@ const PRO_NAV = [
   { to: '/get-started', label: 'Career Explorer', icon: Compass },
   { to: '/compare', label: 'Courses', icon: BookOpen },
   { to: '/colleges', label: 'Colleges', icon: Building2 },
+  { to: '/scholarships', label: 'Scholarships', icon: Award },
+  { to: '/study-abroad', label: 'Global Study', icon: Globe },
   { to: '/colleges/compare', label: 'Comparisons', icon: GitCompare },
   { to: '/dashboard?view=roadmap', label: 'Roadmap', icon: Map },
   { to: '/advisor', label: 'AI Advisor', icon: MessageCircle },

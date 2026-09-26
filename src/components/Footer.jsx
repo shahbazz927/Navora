@@ -11,6 +11,7 @@ const columns = [
       { label: 'Explore Colleges', to: '/colleges' },
       { label: 'Compare Colleges', to: '/colleges/compare' },
       { label: 'Saved Colleges', to: '/colleges/saved' },
+      { label: 'Scholarships', to: '/scholarships' },
       { label: 'Global Study', to: '/study-abroad' },
       { label: 'Get Started', to: '/get-started' },
       { label: 'Dashboard', to: '/dashboard' },
@@ -20,12 +21,15 @@ const columns = [
   {
     heading: 'Guidance',
     links: [
+      { label: 'How It Works', to: '/how-it-works' },
+      { label: 'Career Guidance', to: '/career-guidance' },
       { label: 'Class 12 Stream Guidance', to: '/get-started' },
       { label: 'Graduation Pathways', to: '/get-started' },
       { label: 'For Parents Hub', to: '/parents' },
       { label: 'Admin Directory', to: '/admin/colleges' },
       { label: 'Help & FAQ', to: '/help' },
       { label: 'Support Desk', to: '/support' },
+      { label: 'Contact', to: '/contact' },
     ],
   },
   {

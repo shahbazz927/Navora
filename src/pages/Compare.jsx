@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Scale, Trash2, Plus } from 'lucide-react';
 import Button from '../components/Button';
 import BackLink from '../components/BackLink';
+import LockedFeature from '../components/LockedFeature';
+import UpgradeModal from '../components/UpgradeModal';
 import { FadeIn } from '../components/AnimatedPage';
 import { useUser } from '../context/UserContext';
+import { useSubscription } from '../hooks/useSubscription';
 import { useScrollTop } from '../hooks/useLocalStorage';
 
 const rows = [
@@ -17,16 +21,25 @@ const rows = [
 export default function Compare() {
   useScrollTop();
   const { userType, comparisonItems, setComparisonItems, answers, setAnswers } = useUser();
+  const { isPro } = useSubscription();
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const navigate = useNavigate();
   const recPath = userType ? `/recommendations/${userType}` : '/get-started';
+
+  // Free compares the top 3 side by side; Pro compares everything saved.
+  // (Course data itself is public/static — the Pro gate is on comparison depth,
+  // consistent with the top-3 Free recommendation limit.)
+  const visibleItems = isPro ? comparisonItems : comparisonItems.slice(0, 3);
+  const lockedCount = comparisonItems.length - visibleItems.length;
 
   const handleSaveAndContinue = () => {
     setAnswers({ ...answers, lastSavedAt: new Date().toISOString() });
     navigate('/dashboard');
   };
 
-  const removeItem = (index) => {
-    setComparisonItems(comparisonItems.filter((_, i) => i !== index));
+  const removeItem = (visibleIndex) => {
+    const target = visibleItems[visibleIndex];
+    setComparisonItems(comparisonItems.filter((c) => c !== target));
   };
 
   if (comparisonItems.length === 0) {
@@ -96,7 +109,7 @@ export default function Compare() {
                     <th className="p-5 text-left w-44 align-bottom">
                       <span className="eyebrow text-ink-3">Feature</span>
                     </th>
-                    {comparisonItems.map((item, index) => (
+                    {visibleItems.map((item, index) => (
                       <th key={index} className="p-5 text-left min-w-[200px] align-top">
                         <div className="flex items-start justify-between gap-3">
                           <h3 className="font-ui font-semibold text-ink text-lg leading-snug">
@@ -120,7 +133,7 @@ export default function Compare() {
                       <td className="p-4 text-sm font-medium text-ink-3 border-t border-line">
                         {row.label}
                       </td>
-                      {comparisonItems.map((item, index) => (
+                      {visibleItems.map((item, index) => (
                         <td key={index} className="p-4 border-t border-line text-sm text-ink-2">
                           {row.render
                             ? row.render(item[row.key] || '\u2014')
@@ -134,6 +147,20 @@ export default function Compare() {
             </div>
           </div>
         </FadeIn>
+
+        {lockedCount > 0 && !isPro && (
+          <FadeIn delay={0.12}>
+            <div className="mt-6">
+              <LockedFeature
+                title={`Compare all ${comparisonItems.length} courses with Pro`}
+                desc={`Free compares up to 3 courses side by side. ${lockedCount} more saved course${lockedCount === 1 ? ' is' : 's are'} waiting — upgrade to unlock full comparison.`}
+                cta="Unlock with Pro"
+                onUnlock={() => setShowUpgrade(true)}
+              />
+            </div>
+          </FadeIn>
+        )}
+        <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} feature="course_comparison" />
 
         <FadeIn delay={0.15} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button size="lg" fullWidth className="sm:w-auto" onClick={handleSaveAndContinue}>

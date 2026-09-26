@@ -72,6 +72,7 @@ import {
   buildParentClass10Result,
 } from '../data/assessmentConfig';
 import ParentClass10ResultsView from '../components/ParentClass10ResultsView';
+import { saveAssessmentResult } from '../lib/assessmentResults';
 
 // ── Flow definitions ─────────────────────────────────────────
 // Five journeys, five questions each. The graduation specialization picker
@@ -735,7 +736,16 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
           answers={answers}
           onRetake={retakeFlow}
           onSaveDashboard={() => {
-            saveAnswers({ flow: flowKey, ...answers, lastSavedAt: new Date().toISOString() });
+            const snapshot = { flow: flowKey, ...answers, lastSavedAt: new Date().toISOString() };
+            saveAnswers(snapshot);
+            // Best-effort Supabase persistence so Dashboard/Advisor on any
+            // device can restore this result (local answers stay primary).
+            saveAssessmentResult({
+              assessmentType: flowKey,
+              educationStage: 'class10',
+              assessmentData: snapshot,
+              resultData: result,
+            });
             navigate('/dashboard');
           }}
           onBack={handleBack}
@@ -753,7 +763,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
     const _header = headerFor(flowKey);
     const _context = contextFor(flowKey, answers);
     // Render via UnifiedResults helper defined below
-    return <UnifiedResults flowKey={flowKey} answers={answers} result={result} unified={unified} header={_header} context={_context} onBack={handleBack} onRetake={retakeFlow} onSaveDashboard={()=>{ saveAnswers({ flow: flowKey, ...answers, lastSavedAt: new Date().toISOString() }); navigate('/dashboard'); }} compareIds={compareIds} setCompareIds={setCompareIds} detailId={detailId} setDetailId={setDetailId} />;
+    return <UnifiedResults flowKey={flowKey} answers={answers} result={result} unified={unified} header={_header} context={_context} onBack={handleBack} onRetake={retakeFlow} onSaveDashboard={()=>{ const snapshot = { flow: flowKey, ...answers, lastSavedAt: new Date().toISOString() }; saveAnswers(snapshot); saveAssessmentResult({ assessmentType: flowKey, educationStage: answers.stream || answers.degree || answers.family || null, assessmentData: snapshot, resultData: { unified, result } }); navigate('/dashboard'); }} compareIds={compareIds} setCompareIds={setCompareIds} detailId={detailId} setDetailId={setDetailId} />;
   }
 
   /* ── Render: question screens ─────────────────────────────── */

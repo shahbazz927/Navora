@@ -106,7 +106,7 @@ export default function Pricing(){
             ['Career recommendations','Top 3','Full'],
             ['Career pathways','Basic / Preview','Full + alternatives'],
             ['Personalized roadmap','—','Yes'],
-            ['AI Advisor','3/day · Limited','20/day · Profile-aware + history'],
+            ['AI Advisor','5/day · Limited','30/day · Profile-aware + history'],
             ['College discovery','Limited preview','Full'],
             ['College comparison','2','10'],
             ['Global Study detailed','Preview','Full'],
@@ -126,7 +126,7 @@ export default function Pricing(){
         <div className="sm:hidden mt-4 space-y-3">
           {[
             {cat:'Guidance',free:'Top 3, basic pathways',pro:'Full + roadmap'},
-            {cat:'AI Advisor',free:'5/day limited',pro:'20/day + history'},
+            {cat:'AI Advisor',free:'5/day limited',pro:'30/day + history'},
             {cat:'College Intelligence',free:'Preview, compare 2',pro:'Full, compare 10, exams & scholarships'},
             {cat:'Global Study',free:'Preview, compare 2',pro:'Full, compare 10, course match + scholarships'},
             {cat:'Reports',free:'Basic results',pro:'Personalized + PDF + parent summary'},

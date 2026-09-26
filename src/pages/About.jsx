@@ -606,7 +606,7 @@ export default function About() {
               {
                 title: 'CLASS 12',
                 desc: 'Understand degree and career directions after school.',
-                link: '/class-12',
+                link: '/get-started',
                 icon: GraduationCap,
               },
               {
