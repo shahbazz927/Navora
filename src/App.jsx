@@ -70,6 +70,11 @@ function App() {
           <Route path="/get-started" element={<Layout><UserType /></Layout>} />
           <Route path="/onboarding/:userType" element={<Layout showFooter={false}><Onboarding /></Layout>} />
           <Route path="/assessment" element={<Layout showFooter={false}><AssessmentFlow /></Layout>} />
+          {/* Questionnaire/results aliases — reuse the unified AssessmentFlow
+              (questionnaire + results in one flow), same alias pattern as
+              /global-study and /career-guidance above. No logic duplicated. */}
+          <Route path="/questionnaire" element={<Layout showFooter={false}><AssessmentFlow /></Layout>} />
+          <Route path="/results" element={<Layout showFooter={false}><AssessmentFlow /></Layout>} />
           <Route path="/questions/class12" element={<Layout showFooter={false}><Class12Questionnaire /></Layout>} />
           <Route path="/path/:userType" element={<Layout><RequireAnswers><PathResults /></RequireAnswers></Layout>} />
           <Route path="/questions/:userType" element={<Layout showFooter={false}><Questions /></Layout>} />
