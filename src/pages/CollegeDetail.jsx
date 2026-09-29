@@ -27,6 +27,8 @@ import { SCHOLARSHIPS, getScholarshipsForInstitution, COLLEGE_SCHOLARSHIP_LINKS 
 import ScholarshipCard from '../components/ScholarshipCard';
 import { normalizeProfile, evaluateEligibility, PROFILE_MATCH, deadlineBucket, isScholarshipActive, getMatchLabel } from '../lib/scholarshipMatching';
 import { useUser } from '../context/UserContext';
+import { useGatedOfficialLink } from '../hooks/useGatedOfficialLink';
+import PhonePromptModal from '../components/PhonePromptModal';
 
 export default function CollegeDetail() {
   const { slug } = useParams();
@@ -34,6 +36,7 @@ export default function CollegeDetail() {
   const { isSaved, toggleSaveCollege } = useSavedColleges();
   const [activeTab, setActiveTab] = useState('overview');
   const { answers, onboardingData } = useUser();
+  const { gateLink, phoneModal, closePhoneModal, submitPhone } = useGatedOfficialLink();
   const [schFilterFunding, setSchFilterFunding] = useState('All');
   const [schFilterEligibility, setSchFilterEligibility] = useState('All');
   const [schFilterDeadline, setSchFilterDeadline] = useState('All');
@@ -150,6 +153,7 @@ export default function CollegeDetail() {
               {institution.website && (
                 <a
                   href={institution.website}
+                  onClick={(e) => gateLink(e, { url: institution.website, linkLabel: 'Official Website', section: 'colleges', collegeSlug: institution.slug, collegeName: institution.name })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-colors shadow-sm"
@@ -162,6 +166,7 @@ export default function CollegeDetail() {
               {institution.admissionUrl && (
                 <a
                   href={institution.admissionUrl}
+                  onClick={(e) => gateLink(e, { url: institution.admissionUrl, linkLabel: 'Admissions Portal', section: 'colleges', collegeSlug: institution.slug, collegeName: institution.name })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white hover:bg-blue-500 transition-colors shadow-sm"
@@ -318,6 +323,7 @@ export default function CollegeDetail() {
                           </span>
                           <a
                             href={course.sourceUrl}
+                            onClick={(e) => gateLink(e, { url: course.sourceUrl, linkLabel: 'View Official Source', section: 'colleges', collegeSlug: institution.slug, collegeName: institution.name })}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline inline-flex items-center gap-1 font-medium"
@@ -576,6 +582,7 @@ export default function CollegeDetail() {
                 <div className="mt-4 pt-3 border-t border-slate-100">
                   <a
                     href={institution.website}
+                    onClick={(e) => gateLink(e, { url: institution.website, linkLabel: 'View Official Source', section: 'colleges', collegeSlug: institution.slug, collegeName: institution.name })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
@@ -623,6 +630,13 @@ export default function CollegeDetail() {
           </aside>
         </div>
       </div>
+      <PhonePromptModal
+        open={phoneModal.open}
+        initialName={phoneModal.initialName}
+        linkLabel={phoneModal.payload?.linkLabel || 'Official link'}
+        onSubmit={submitPhone}
+        onClose={closePhoneModal}
+      />
     </div>
   );
 }

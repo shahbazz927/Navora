@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, Lock, User, Eye, EyeOff, ArrowRight, ShieldCheck,
-  AlertCircle, Check, X, CheckCircle2,
+  AlertCircle, Check, X, CheckCircle2, Smartphone,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { soundFx } from '../../utils/soundFx';
@@ -34,6 +34,20 @@ export default function AuthCard({
   const [successMessage, setSuccessMessage] = useState(null);
   const [focusedField, setFocusedField] = useState(null);
   const [shakeKey, setShakeKey] = useState(0);
+
+  // Phone OTP method state (Email is the default method)
+  const [authMethod, setAuthMethod] = useState('email'); // 'email' | 'phone'
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [phoneStep, setPhoneStep] = useState('enter'); // 'enter' | 'verify'
+  const [cooldown, setCooldown] = useState(0);
+
+  // Resend-code cooldown ticker
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   // Real-time password criteria evaluation
   const hasMinLength = password.length >= 8;
@@ -179,6 +193,99 @@ const triggerError = (msg) => {
     }
   };
 
+  const normalizePhone = (raw) => {
+    const cleaned = String(raw || '').replace(/[\s\-()]/g, '');
+    if (/^\+\d{8,15}$/.test(cleaned)) return cleaned;
+    const digits = cleaned.replace(/\D/g, '');
+    // Default to India (+91) for a 10-digit mobile number
+    if (/^[6-9]\d{9}$/.test(digits)) return `+91${digits}`;
+    if (/^91[6-9]\d{9}$/.test(digits)) return `+${digits}`;
+    return null;
+  };
+
+  const phoneErrorHint = (msg) => {
+    const lower = String(msg || '').toLowerCase();
+    if (lower.includes('provider') || lower.includes('sms') || lower.includes('phone')) {
+      return 'Phone sign-in is not enabled on this project yet. Please continue with email.';
+    }
+    return msg;
+  };
+
+  const handleSendOtp = async (e) => {
+    if (e) e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    const normalized = normalizePhone(phone);
+    if (!normalized) {
+      triggerError('Please enter a valid phone number with country code (e.g. +91 98765 43210).');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: normalized });
+      if (error) {
+        triggerError(phoneErrorHint(error.message) || 'Could not send the code. Please try again.');
+        return;
+      }
+      setPhone(normalized);
+      setOtp('');
+      setPhoneStep('verify');
+      setCooldown(30);
+      soundFx.playSuccess();
+      setSuccessMessage(`Code sent to ${normalized}. Enter it below to continue.`);
+    } catch (err) {
+      triggerError(phoneErrorHint(err.message) || 'Could not send the code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    if (e) e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    const code = String(otp || '').replace(/\D/g, '');
+    if (code.length < 6) {
+      triggerError('Please enter the 6-digit code sent to your phone.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone,
+        token: code,
+        type: 'sms',
+      });
+      if (error) {
+        triggerError(error.message || 'Invalid or expired code. Please try again.');
+        return;
+      }
+      if (data?.user) {
+        soundFx.playSuccess();
+        onLoginSuccess({
+          email: data.user.email || '',
+          phone: data.user.phone || phone,
+          name: data.user.user_metadata?.full_name || data.user.phone || phone,
+          loggedInAt: new Date(),
+        });
+      }
+    } catch (err) {
+      triggerError(err.message || 'Could not verify the code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const switchAuthMethod = (method) => {
+    setAuthMethod(method);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    if (method === 'phone') {
+      setPhoneStep('enter');
+      setOtp('');
+    }
+  };
+
   const handleSocialAuth = async (provider) => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -231,15 +338,40 @@ const triggerError = (msg) => {
           Create Account
         </button>
       </div>
+      {/* Auth Method Switcher: Email / Phone Number */}
+      <div className="grid grid-cols-2 p-1 rounded-xl mb-5 border bg-slate-50 border-slate-200/70">
+        <button
+          type="button"
+          id="method-email"
+          onClick={() => switchAuthMethod('email')}
+          className={`flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            authMethod === 'email' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <Mail className="w-3.5 h-3.5" /> Email
+        </button>
+        <button
+          type="button"
+          id="method-phone"
+          onClick={() => switchAuthMethod('phone')}
+          className={`flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            authMethod === 'phone' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <Smartphone className="w-3.5 h-3.5" /> Phone Number
+        </button>
+      </div>
 {/* Form Title & Subtitle */}
       <div className="mb-6 text-center">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-          {isLogin ? 'Welcome back' : 'Create an Account'}
+          {authMethod === 'phone' ? 'Continue with phone' : isLogin ? 'Welcome back' : 'Create an Account'}
         </h2>
         <p className="text-xs mt-1.5 text-slate-500">
-          {isLogin
-            ? 'Enter your credentials to access your NAVORA portal'
-            : 'Join NAVORA and unlock intelligent high-performance workflows'}
+          {authMethod === 'phone'
+            ? 'Enter your number to receive a one-time code by SMS'
+            : isLogin
+              ? 'Enter your credentials to access your NAVORA portal'
+              : 'Join NAVORA and unlock intelligent high-performance workflows'}
         </p>
       </div>
 
@@ -273,7 +405,9 @@ const triggerError = (msg) => {
         )}
       </AnimatePresence>
 
-      {/* Primary Form */}
+      {authMethod === 'email' && (
+      <>
+      {/* Primary Form (Email) */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Full Name field for Sign Up */}
         <AnimatePresence>
@@ -567,6 +701,142 @@ const triggerError = (msg) => {
           )}
         </motion.button>
       </form>
+      </>
+      )}
+
+      {/* Phone OTP Form */}
+      {authMethod === 'phone' && (
+        <div className="space-y-4">
+          {phoneStep === 'enter' ? (
+            <form onSubmit={handleSendOtp} className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="input-phone" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Phone Number
+                </label>
+                <motion.div
+                  animate={{ y: focusedField === 'phone' ? -2 : 0, boxShadow: focusedField === 'phone' ? '0 10px 25px -5px rgba(59,130,246,0.12)' : 'none' }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="relative rounded-xl"
+                >
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Smartphone className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="input-phone"
+                    type="tel"
+                    required
+                    placeholder="+91 98765 43210"
+                    autoComplete="tel"
+                    value={phone}
+                    onFocus={() => setFocusedField('phone')}
+                    onBlur={() => setFocusedField(null)}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (errorMessage) setErrorMessage(null);
+                      if (successMessage) setSuccessMessage(null);
+                    }}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm transition-all outline-none border bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 text-slate-900 placeholder:text-slate-400"
+                  />
+                </motion.div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  We&apos;ll text you a one-time code. New numbers create an account automatically.
+                </p>
+              </div>
+              <motion.button
+                variants={fieldMotionVariants}
+                initial="initial"
+                animate="animate"
+                transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                type="submit"
+                id="auth-send-otp-btn"
+                disabled={isLoading}
+                className="w-full relative group mt-2 py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Send Code</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </motion.button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="input-otp" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  Enter Code
+                </label>
+                <motion.div
+                  animate={{ y: focusedField === 'otp' ? -2 : 0, boxShadow: focusedField === 'otp' ? '0 10px 25px -5px rgba(59,130,246,0.12)' : 'none' }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="relative rounded-xl"
+                >
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <input
+                    id="input-otp"
+                    type="text"
+                    required
+                    placeholder="6-digit code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={otp}
+                    onFocus={() => setFocusedField('otp')}
+                    onBlur={() => setFocusedField(null)}
+                    onChange={(e) => {
+                      setOtp(e.target.value.replace(/\D/g, '').slice(0, 6));
+                      if (errorMessage) setErrorMessage(null);
+                      if (successMessage) setSuccessMessage(null);
+                    }}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm tracking-[0.3em] transition-all outline-none border bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 text-slate-900 placeholder:text-slate-400 placeholder:tracking-normal"
+                  />
+                </motion.div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Code sent to <span className="font-semibold text-slate-600">{phone}</span>.{' '}
+                  <button
+                    type="button"
+                    onClick={() => { setPhoneStep('enter'); setOtp(''); setErrorMessage(null); setSuccessMessage(null); }}
+                    className="text-blue-600 font-medium underline cursor-pointer"
+                  >
+                    Change number
+                  </button>
+                </p>
+              </div>
+              <motion.button
+                variants={fieldMotionVariants}
+                initial="initial"
+                animate="animate"
+                transition={{ duration: 0.35, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                type="submit"
+                id="auth-verify-otp-btn"
+                disabled={isLoading}
+                className="w-full relative group mt-2 py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>Verify &amp; Continue</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </motion.button>
+              <button
+                type="button"
+                disabled={isLoading || cooldown > 0}
+                onClick={handleSendOtp}
+                className="w-full text-center text-xs font-medium text-blue-600 hover:text-blue-500 underline cursor-pointer disabled:opacity-50 disabled:no-underline disabled:cursor-default"
+              >
+                {cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+              </button>
+            </form>
+          )}
+        </div>
+      )}
 {/* Divider */}
       <div className="relative my-5">
         <div className="absolute inset-0 flex items-center border-slate-200">

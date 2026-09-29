@@ -17,6 +17,7 @@ import Login from './pages/Login';
 import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import About from './pages/About';
+import HowItWorks from './pages/HowItWorks';
 import StudyAbroad from './pages/StudyAbroad';
 import Scholarships from './pages/Scholarships';
 import Colleges from './pages/Colleges';
@@ -62,8 +63,8 @@ function App() {
           <Route path="/signup" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
           <Route path="/forgot-password" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
-          {/* Public sitemap aliases — reuse existing pages, no duplicates */}
-          <Route path="/how-it-works" element={<Layout><About /></Layout>} />
+          {/* Dedicated How It Works page — split out from About */}
+          <Route path="/how-it-works" element={<Layout><HowItWorks /></Layout>} />
           <Route path="/career-guidance" element={<Layout><UserType /></Layout>} />
           <Route path="/contact" element={<Layout><Support /></Layout>} />
           <Route path="/parents" element={<Layout><Parents /></Layout>} />

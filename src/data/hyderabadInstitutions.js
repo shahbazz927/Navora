@@ -2439,6 +2439,127 @@ export const HYDERABAD_INSTITUTIONS = [
         verificationStatus: VERIFICATION_STATUS.VERIFIED
       }
     ]
+  },
+  {
+    id: 'sun-international-hyderabad',
+    slug: 'sun-international-hyderabad',
+    name: 'SUN International Institute of Tourism and Management',
+    shortName: 'SUN International',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    location: 'Ameerpet Campus, Near SR Nagar Police Station, East Srinivasa Nagar, Ameerpet, Hyderabad, Telangana 500038 (also at Ramnagar & Miyapur)',
+    institutionType: 'Private Hospitality & Management Institute',
+    ownership: 'Private',
+    universityAffiliation: 'BHMCT affiliated to Andhra University / Osmania University; B.Sc programs via Singhania & Lingayas Universities',
+    establishedYear: 2004,
+    autonomousStatus: false,
+    recognition: 'University-affiliated programs (AU / OU / Singhania / Lingayas)',
+    accreditation: 'Programs affiliated to Andhra / Osmania / Singhania / Lingayas Universities',
+    website: 'https://www.sun.edu.in/',
+    admissionUrl: 'https://www.sun.edu.in/contact-for-admissions/',
+    description: 'SUN International, established in 2004, offers industry-integrated programs in hospitality and business administration across three Hyderabad campuses (Ameerpet, Ramnagar, Miyapur) plus Visakhapatnam, including BHMCT, B.Sc Hotel Management & Catering Science, BBA, MBA in Hotel Management and PGDHM, with international internship exposure.',
+    hostelAvailable: false,
+    levels: ['UG', 'PG'],
+    minAnnualFee: 85000,
+    maxAnnualFee: 150000,
+    status: 'published',
+    courses: [
+      {
+        id: 'sun-bhmct',
+        level: 'UG',
+        degree: 'BHMCT',
+        courseName: 'Bachelor of Hotel Management & Catering Technology',
+        specialization: 'Hotel Operations, Food Production & Hospitality Services',
+        duration: '4 Years',
+        eligibility: 'Class 12 (10+2) in any stream',
+        entranceExam: 'Merit-based direct admission',
+        admissionMode: 'Direct admission via counselling (apply on official site)',
+        tuitionFee: 110000,
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.ESTIMATED,
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/programs/'
+      },
+      {
+        id: 'sun-bsc-hmcs',
+        level: 'UG',
+        degree: 'B.Sc',
+        courseName: 'Hotel Management & Catering Science (B.Sc HMCS)',
+        specialization: 'Hospitality & Catering Science via Singhania / Lingayas Universities',
+        duration: '3 Years',
+        eligibility: 'Class 12 (10+2) in any stream',
+        entranceExam: 'Merit-based direct admission',
+        admissionMode: 'Direct admission via counselling (apply on official site)',
+        tuitionFee: 90000,
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.ESTIMATED,
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/programs/'
+      },
+      {
+        id: 'sun-bba',
+        level: 'UG',
+        degree: 'BBA',
+        courseName: 'Bachelor of Business Administration',
+        specialization: 'Business Analytics, Travel & Tourism, Hospitality Management',
+        duration: '3 Years',
+        eligibility: 'Class 12 (10+2) in any stream',
+        entranceExam: 'Merit-based direct admission',
+        admissionMode: 'Direct admission via counselling (apply on official site)',
+        tuitionFee: 85000,
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.ESTIMATED,
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/programs/'
+      },
+      {
+        id: 'sun-mba-hm',
+        level: 'PG',
+        degree: 'MBA',
+        courseName: 'Master of Business Administration in Hotel Management',
+        specialization: 'Hospitality Management & Operations',
+        duration: '2 Years',
+        eligibility: 'Bachelor’s degree in any discipline',
+        entranceExam: 'Merit-based direct admission',
+        admissionMode: 'Direct admission via counselling (apply on official site)',
+        tuitionFee: 130000,
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.ESTIMATED,
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/programs/'
+      },
+      {
+        id: 'sun-pgdhm',
+        level: 'PG',
+        degree: 'PGDHM',
+        courseName: 'Post Graduate Diploma in Hotel Management',
+        specialization: 'Hotel Operations & Management',
+        duration: '1 Year',
+        eligibility: 'Bachelor’s degree in any discipline',
+        entranceExam: 'Merit-based direct admission',
+        admissionMode: 'Direct admission via counselling (apply on official site)',
+        tuitionFee: 95000,
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.ESTIMATED,
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/programs/'
+      }
+    ],
+    facilities: ['Three Hyderabad campuses (Ameerpet, Ramnagar, Miyapur)', 'Dedicated Training & Placements cell', 'Industry-integrated practical training', 'International internship exposure (USA, Canada)'],
+    sources: [
+      {
+        sourceType: SOURCE_TYPES.OFFICIAL_INSTITUTION,
+        sourceUrl: 'https://www.sun.edu.in/',
+        academicYear: '2026-27',
+        verifiedDate: '2026-09-28',
+        verificationStatus: VERIFICATION_STATUS.REQUIRES_VERIFICATION
+      }
+    ]
   }
 ];
 

@@ -5,13 +5,23 @@ import { getInstitutionBySlug } from '../data/institutionsMaster';
 import { normalizeProfile, evaluateEligibility, getMatchLabel } from '../lib/scholarshipMatching';
 import { useUser } from '../context/UserContext';
 import { useSavedScholarships } from '../hooks/useSavedScholarships';
+import { useGatedOfficialLink } from '../hooks/useGatedOfficialLink';
+import PhonePromptModal from '../components/PhonePromptModal';
 
 export default function ScholarshipDetail() {
   const { slug, scholarshipId } = useParams();
   const { answers, onboardingData } = useUser();
   const { isSaved, toggle } = useSavedScholarships();
+  const { gateLink, phoneModal, closePhoneModal, submitPhone } = useGatedOfficialLink();
   const scholarship = getScholarshipById(scholarshipId) || SCHOLARSHIPS.find(s=>s.id===scholarshipId);
   const institution = slug ? getInstitutionBySlug(slug) : null;
+  const gatedBase = {
+    section: 'scholarships',
+    collegeSlug: institution?.slug || slug || null,
+    collegeName: institution?.name || null,
+    scholarshipId: scholarship?.id,
+    scholarshipName: scholarship?.name,
+  };
 
   if (!scholarship) {
     return <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6"><div className="bg-white rounded-2xl p-8 border text-center"><h2 className="font-bold text-slate-900">Scholarship not found</h2><Link to={slug?`/colleges/${slug}`:'/colleges'} className="text-blue-600 text-sm mt-3 inline-block">Back</Link></div></div>;
@@ -39,7 +49,7 @@ export default function ScholarshipDetail() {
           <p className="text-sm text-slate-300 mt-2">{scholarship.provider_name} · {scholarship.provider_type}</p>
           <div className="flex gap-2 mt-4">
             <button onClick={()=>toggle(scholarship.id)} className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${saved? 'bg-amber-500 text-white':'bg-white/10 text-white border border-white/20'}`}><Bookmark className={`w-4 h-4 ${saved?'fill-white':''}`} />{saved?'Saved':'Save'}</button>
-            {scholarship.official_application_url && <a href={scholarship.official_application_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold inline-flex items-center gap-1.5">Apply on Official Site <ExternalLink className="w-3.5 h-3.5" /></a>}
+            {scholarship.official_application_url && <a href={scholarship.official_application_url} onClick={(e) => gateLink(e, { ...gatedBase, url: scholarship.official_application_url, linkLabel: 'Official application link' })} target="_blank" rel="noopener noreferrer" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold inline-flex items-center gap-1.5">Apply on Official Site <ExternalLink className="w-3.5 h-3.5" /></a>}
           </div>
         </div>
       </div>
@@ -100,8 +110,8 @@ export default function ScholarshipDetail() {
               <p><strong>Deadline:</strong> {scholarship.application_deadline ? new Date(scholarship.application_deadline).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'}) : 'Check official source'}</p>
               {scholarship.application_window && <p><strong>Application window:</strong> {scholarship.application_window}</p>}
               <p><strong>Academic year:</strong> {scholarship.academic_year}</p>
-              {scholarship.official_application_url && <a href={scholarship.official_application_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:underline"><Globe className="w-4 h-4" /> Official application link <ExternalLink className="w-3 h-3" /></a>}
-              {scholarship.official_source_url && <a href={scholarship.official_source_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600 ml-3 text-xs"><ShieldCheck className="w-3.5 h-3.5" /> Official source</a>}
+              {scholarship.official_application_url && <a href={scholarship.official_application_url} onClick={(e) => gateLink(e, { ...gatedBase, url: scholarship.official_application_url, linkLabel: 'Official application link' })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:underline"><Globe className="w-4 h-4" /> Official application link <ExternalLink className="w-3 h-3" /></a>}
+              {scholarship.official_source_url && <a href={scholarship.official_source_url} onClick={(e) => gateLink(e, { ...gatedBase, url: scholarship.official_source_url, linkLabel: 'Official source' })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600 ml-3 text-xs"><ShieldCheck className="w-3.5 h-3.5" /> Official source</a>}
             </div>
             <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900">
               Scholarship availability and eligibility can change. Verify the latest information on the official provider website before applying.
@@ -125,13 +135,20 @@ export default function ScholarshipDetail() {
           <div className="bg-white rounded-2xl border border-slate-200 p-5 text-xs">
             <h4 className="font-bold text-slate-900 text-sm mb-2">Verification</h4>
             <p><span className="text-slate-500">Source:</span> <span className="font-semibold">{scholarship.source_name}</span> ({scholarship.source_type})</p>
-            <p className="mt-1 break-all"><span className="text-slate-500">URL:</span> <a href={scholarship.official_source_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{scholarship.official_source_url}</a></p>
+            <p className="mt-1 break-all"><span className="text-slate-500">URL:</span> <a href={scholarship.official_source_url} onClick={(e) => gateLink(e, { ...gatedBase, url: scholarship.official_source_url, linkLabel: 'Official source' })} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{scholarship.official_source_url}</a></p>
             <p className="mt-1"><span className="text-slate-500">Status:</span> <span className="font-semibold">{scholarship.verification_status}</span></p>
             <p className="mt-1"><span className="text-slate-500">Last verified:</span> <span className="font-medium">{scholarship.last_verified_at || '—'}</span></p>
             <p className="mt-1"><span className="text-slate-500">Last updated:</span> <span className="font-medium">{scholarship.last_updated_at || '—'}</span></p>
           </div>
         </aside>
       </div>
+      <PhonePromptModal
+        open={phoneModal.open}
+        initialName={phoneModal.initialName}
+        linkLabel={phoneModal.payload?.linkLabel || 'Official link'}
+        onSubmit={submitPhone}
+        onClose={closePhoneModal}
+      />
     </div>
   );
 }

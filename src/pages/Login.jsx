@@ -41,7 +41,8 @@ export default function Login() {
           const user = data.session.user;
           setUser({
             email: user.email || '',
-            name: user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : ''),
+            phone: user.phone || '',
+            name: user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : '') || user.phone || '',
             avatarUrl: user.user_metadata?.avatar_url,
             loggedInAt: new Date(),
           });
