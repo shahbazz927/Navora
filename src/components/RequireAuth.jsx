@@ -14,15 +14,32 @@ export default function RequireAuth({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    const applySession = (session) => {
+    const applySession = async (session) => {
       if (!mounted) return;
       if (session?.user) {
-        setUser({
-          email: session.user.email || '',
-          name: session.user.user_metadata?.full_name || (session.user.email ? session.user.email.split('@')[0] : ''),
-          avatarUrl: session.user.user_metadata?.avatar_url,
+        const su = session.user;
+        // Preserve any phone already in context; otherwise hydrate from
+        // auth record (phone auth OR email-login metadata) + profiles table.
+        let phone = su.phone || su.user_metadata?.phone || '';
+        let profileName = '';
+        if (!phone && su.id) {
+          try {
+            const { data } = await supabase.from('profiles').select('phone, full_name').eq('user_id', su.id).maybeSingle();
+            if (data?.phone) phone = data.phone;
+            if (data?.full_name) profileName = data.full_name;
+          } catch {
+            /* ignore — logging must not block auth */
+          }
+        }
+        if (!mounted) return;
+        setUser((prev) => ({
+          ...(typeof prev === 'object' && prev ? prev : {}),
+          email: su.email || '',
+          phone: phone || (typeof prev === 'object' && prev?.phone) || '',
+          name: su.user_metadata?.full_name || profileName || (su.email ? su.email.split('@')[0] : ''),
+          avatarUrl: su.user_metadata?.avatar_url,
           loggedInAt: new Date(),
-        });
+        }));
         setStatus('authed');
       } else {
         setUser(null);

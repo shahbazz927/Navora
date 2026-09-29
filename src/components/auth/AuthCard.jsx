@@ -156,8 +156,17 @@ const triggerError = (msg) => {
         }
         if (data?.user) {
           soundFx.playSuccess();
+          // Hydrate persisted phone so 2nd official-link click auto-skips modal.
+          let profilePhone = '';
+          try {
+            const { data: profile } = await supabase.from('profiles').select('phone').eq('user_id', data.user.id).maybeSingle();
+            if (profile?.phone) profilePhone = profile.phone;
+          } catch {
+            /* ignore */
+          }
           onLoginSuccess({
             email: data.user.email || email,
+            phone: data.user.phone || data.user.user_metadata?.phone || profilePhone || '',
             name: data.user.user_metadata?.full_name || email.split('@')[0],
             loggedInAt: new Date(),
           });

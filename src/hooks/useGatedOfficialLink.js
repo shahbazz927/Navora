@@ -7,6 +7,8 @@ import {
   getPendingLink,
   clearPendingLink,
   resolveIdentity,
+  fetchPersistedProfile,
+  persistIdentityToSupabase,
   logOfficialLinkClick,
   openOfficialUrl,
 } from '../lib/officialLinks';
@@ -23,7 +25,32 @@ export function useGatedOfficialLink() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, setUser } = useUser();
-  const [phoneModal, setPhoneModal] = useState({ open: false, payload: null, initialName: '' });
+  const [phoneModal, setPhoneModal] = useState({ open: false, payload: null, initialName: '', initialPhone: '' });
+
+  // Merge live session + context + persisted Supabase profile so a phone
+  // number given once is found on the 2nd click (even after reload).
+  const getIdentity = useCallback(
+    async (sessionUser) => {
+      let profileRow = null;
+      if (sessionUser?.id) {
+        // Skip extra fetch if context already has a phone number.
+        if (!user?.phone && !sessionUser?.phone && !sessionUser?.user_metadata?.phone) {
+          profileRow = await fetchPersistedProfile(supabase, sessionUser.id);
+        }
+      }
+      const identity = resolveIdentity(user, sessionUser, profileRow);
+      // Backfill context so subsequent clicks skip the modal (auto-fill).
+      if (identity.phone && !user?.phone) {
+        try {
+          setUser({ ...(user || {}), name: identity.name, phone: identity.phone, email: identity.email });
+        } catch {
+          /* ignore */
+        }
+      }
+      return identity;
+    },
+    [setUser, user],
+  );
 
   const completeClick = useCallback(
     async (payload, identity) => {
@@ -51,15 +78,16 @@ export function useGatedOfficialLink() {
         navigate('/login', { state: { from: location.pathname } });
         return;
       }
-      const identity = resolveIdentity(user, sessionUser);
-      // Logged in but no phone number yet -> ask once, then log + open.
+      const identity = await getIdentity(sessionUser);
+      // Logged in but no phone number yet -> ask once (pre-filled if we
+      // know name/phone), then log + open. 2nd click auto-skips the modal.
       if (!identity.phone) {
-        setPhoneModal({ open: true, payload, initialName: identity.name || '' });
+        setPhoneModal({ open: true, payload, initialName: identity.name || '', initialPhone: identity.phone || '' });
         return;
       }
       await completeClick(payload, identity);
     },
-    [completeClick, location.pathname, navigate, user],
+    [completeClick, getIdentity, location.pathname, navigate],
   );
 
   const closePhoneModal = useCallback(() => {
@@ -86,20 +114,23 @@ export function useGatedOfficialLink() {
         navigate('/login', { state: { from: location.pathname } });
         return;
       }
-      const nextUser = { ...(user || {}), name, phone };
+      const email = user?.email || sessionUser?.email || '';
+      const nextUser = { ...(user || {}), name, phone, email };
       try {
         setUser(nextUser);
       } catch {
         /* ignore */
       }
-      // Best-effort: persist onto the auth profile so it's there next time.
-      try {
-        await supabase.auth.updateUser({ data: { full_name: name, phone } });
-      } catch {
-        /* ignore */
-      }
-      setPhoneModal({ open: false, payload: null, initialName: '' });
-      await completeClick(payload, resolveIdentity(nextUser, sessionUser));
+      // Persist to Supabase (auth metadata + profiles table) so the number
+      // is visible in the dashboard and auto-filled next time.
+      await persistIdentityToSupabase(supabase, {
+        userId: sessionUser.id,
+        name,
+        phone,
+        email,
+      });
+      setPhoneModal({ open: false, payload: null, initialName: '', initialPhone: '' });
+      await completeClick(payload, resolveIdentity(nextUser, sessionUser, null));
     },
     [closePhoneModal, completeClick, location.pathname, navigate, phoneModal.payload, setUser, user],
   );
@@ -122,9 +153,11 @@ export function useGatedOfficialLink() {
         sessionUser = null;
       }
       if (!sessionUser || cancelled) return;
-      const identity = resolveIdentity(user, sessionUser);
+      const profileRow = await fetchPersistedProfile(supabase, sessionUser.id);
+      if (cancelled) return;
+      const identity = resolveIdentity(user, sessionUser, profileRow);
       if (!identity.phone) {
-        setPhoneModal({ open: true, payload: pending, initialName: identity.name || '' });
+        setPhoneModal({ open: true, payload: pending, initialName: identity.name || '', initialPhone: '' });
       } else {
         await completeClick(pending, identity);
       }

@@ -1,14 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { normalizePhone } from '../lib/officialLinks';
 
 // Collects name + phone number before the first gated official-link click
 // is logged. Email-login users usually have no phone on their profile, so
-// we ask once and keep it in UserContext for subsequent clicks.
-export default function PhonePromptModal({ open, initialName = '', linkLabel = 'Official link', onSubmit, onClose }) {
+// we ask once and keep it in UserContext + Supabase for subsequent clicks.
+// On the 2nd open the saved number is auto-filled (editable).
+export default function PhonePromptModal({ open, initialName = '', initialPhone = '', linkLabel = 'Official link', onSubmit, onClose }) {
   const [name, setName] = useState(initialName);
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(initialPhone);
   const [error, setError] = useState(null);
+
+  // Re-sync each time the modal opens so the 2nd visit shows saved values
+  // instead of empty fields. Hooks must run before any early return.
+  useEffect(() => {
+    if (open) {
+      setName(initialName || '');
+      setPhone(initialPhone || '');
+      setError(null);
+    }
+  }, [open, initialName, initialPhone]);
 
   if (!open) return null;
 

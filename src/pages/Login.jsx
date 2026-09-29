@@ -39,10 +39,20 @@ export default function Login() {
         const { data, error } = await supabase.auth.getSession();
         if (!error && data?.session?.user && mounted) {
           const user = data.session.user;
+          let profilePhone = '';
+          let profileName = '';
+          try {
+            const { data: profile } = await supabase.from('profiles').select('phone, full_name').eq('user_id', user.id).maybeSingle();
+            if (profile?.phone) profilePhone = profile.phone;
+            if (profile?.full_name) profileName = profile.full_name;
+          } catch {
+            /* ignore */
+          }
+          if (!mounted) return;
           setUser({
             email: user.email || '',
-            phone: user.phone || '',
-            name: user.user_metadata?.full_name || (user.email ? user.email.split('@')[0] : '') || user.phone || '',
+            phone: user.phone || user.user_metadata?.phone || profilePhone || '',
+            name: user.user_metadata?.full_name || profileName || (user.email ? user.email.split('@')[0] : '') || user.phone || '',
             avatarUrl: user.user_metadata?.avatar_url,
             loggedInAt: new Date(),
           });

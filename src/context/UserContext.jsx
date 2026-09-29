@@ -96,7 +96,7 @@ export function UserProvider({ children }) {
   }, []);
 
   const setUser = useCallback((user) => {
-    setState((prev) => ({ ...prev, user }));
+    setState((prev) => ({ ...prev, user: typeof user === 'function' ? user(prev?.user ?? null) : user }));
   }, []);
 
   const reset = useCallback(() => {

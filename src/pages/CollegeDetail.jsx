@@ -633,6 +633,7 @@ export default function CollegeDetail() {
       <PhonePromptModal
         open={phoneModal.open}
         initialName={phoneModal.initialName}
+        initialPhone={phoneModal.initialPhone || ''}
         linkLabel={phoneModal.payload?.linkLabel || 'Official link'}
         onSubmit={submitPhone}
         onClose={closePhoneModal}
