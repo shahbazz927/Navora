@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { soundFx } from '../../utils/soundFx';
+import { saveLeadCapture } from '../../lib/leadCapture';
 
 const fieldMotionVariants = {
   initial: { opacity: 0, y: 14, scale: 0.98 },
@@ -170,6 +171,15 @@ const triggerError = (msg) => {
             name: data.user.user_metadata?.full_name || email.split('@')[0],
             loggedInAt: new Date(),
           });
+          // Backup the login identity (email + phone) to lead_captures.
+          saveLeadCapture({
+            sourcePage: 'login',
+            stepKey: `login:email:${data.user.email || email}`,
+            email: data.user.email || email,
+            phone: data.user.phone || data.user.user_metadata?.phone || profilePhone || '',
+            name: data.user.user_metadata?.full_name || email.split('@')[0],
+            userId: data.user.id,
+          });
         }
       } else {
         const signupEmail = email.trim();
@@ -184,6 +194,13 @@ const triggerError = (msg) => {
         }
         await supabase.auth.signOut().catch(() => {});
         soundFx.playSuccess();
+        // Backup the new signup email to lead_captures.
+        saveLeadCapture({
+          sourcePage: 'signup',
+          stepKey: `signup:email:${signupEmail}`,
+          email: signupEmail,
+          name: name.trim() || signupEmail.split('@')[0],
+        });
         setPassword('');
         setConfirmPassword('');
         setName('');
@@ -276,6 +293,13 @@ const triggerError = (msg) => {
           phone: data.user.phone || phone,
           name: data.user.user_metadata?.full_name || data.user.phone || phone,
           loggedInAt: new Date(),
+        });
+        saveLeadCapture({
+          sourcePage: 'login',
+          stepKey: `login:phone:${data.user.phone || phone}`,
+          email: data.user.email || '',
+          phone: data.user.phone || phone,
+          userId: data.user.id,
         });
       }
     } catch (err) {

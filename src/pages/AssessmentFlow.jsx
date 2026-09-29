@@ -73,6 +73,7 @@ import {
 } from '../data/assessmentConfig';
 import ParentClass10ResultsView from '../components/ParentClass10ResultsView';
 import { saveAssessmentResult } from '../lib/assessmentResults';
+import { saveLeadCapture, summarizeRecommendation } from '../lib/leadCapture';
 
 // ── Flow definitions ─────────────────────────────────────────
 // Five journeys, five questions each. The graduation specialization picker
@@ -549,14 +550,26 @@ export default function AssessmentFlow() {
   const handleNext = () => {
     if (!canContinue) return;
     if (step === total - 1) {
+      const finalAnswers = { flow: flowKey, ...answers };
       try {
-        saveAnswers({ flow: flowKey, ...answers });
+        saveAnswers(finalAnswers);
       } catch {
         /* persistence is best-effort */
       }
       setShowResult(true);
       return;
     }
+    // Backup THIS completed step to Supabase (lead_captures). Fire-and-forget
+    // so a slow/offline network can never delay the questionnaire.
+    const answeredStep = currentKey;
+    saveLeadCapture({
+      sourcePage: 'assessment_step',
+      stepKey: `${flowKey}:${answeredStep}`,
+      once: true,
+      userType,
+      answers: { flow: flowKey, ...answers },
+      onboardingName: answers.name,
+    });
     setStep((s) => Math.min(total - 1, s + 1));
   };
 
@@ -626,6 +639,21 @@ export default function AssessmentFlow() {
     () => ((gradProfile?.experiences || []).slice(0, 4)).map((e) => e.label),
     [gradProfile],
   );
+
+  // Final result -> Supabase `lead_captures` (Date | Name | Email | Phone |
+  // UserType | Answers | Recommendation). Runs once per completed flow.
+  useEffect(() => {
+    if (!showResult || !flowKey || !result) return;
+    saveLeadCapture({
+      sourcePage: 'assessment_result',
+      stepKey: `${flowKey}:result`,
+      once: true,
+      userType,
+      answers: { flow: flowKey, ...answers },
+      recommendation: summarizeRecommendation({ careerEngine, result }),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showResult, flowKey, result]);
 
   const toggleCompare = (id) => {
     setCompareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : prev.length < 3 ? [...prev, id] : prev));

@@ -19,6 +19,7 @@ import {
 } from '../data/careerQuestionnaire';
 import { buildResults } from '../data/class12Recommendations';
 import { saveAssessmentResult } from '../lib/assessmentResults';
+import { saveLeadCapture } from '../lib/leadCapture';
 
 function ChoiceCard({ option, selected, multi = false, onClick, disabled = false }) {
   return (
@@ -245,7 +246,17 @@ export default function Class12Questionnaire() {
     const errs = validateStep(currentStepId);
     if (Object.values(errs).some(Boolean)) { setErrors(errs); return; }
     setErrors({});
-    if (step < totalSteps - 1) { setDirection('right'); setStep(step + 1); }
+    if (step < totalSteps - 1) {
+      setDirection('right'); setStep(step + 1);
+      // Backup each completed step to lead_captures (best-effort).
+      saveLeadCapture({
+        sourcePage: 'assessment_step',
+        stepKey: `class12:${currentStepId}`,
+        once: true,
+        userType: 'class12',
+        answers,
+      });
+    }
     else {
       const results = buildResults(answers);
       saveAnswers({ ...answers, completedAt: new Date().toISOString(), recommendations: results.recommendations, clusters: results.clusters, exploring: results.exploring });
@@ -255,6 +266,19 @@ export default function Class12Questionnaire() {
         educationStage: answers.streamV2 || null,
         assessmentData: answers,
         resultData: { recommendations: results.recommendations, clusters: results.clusters, exploring: results.exploring },
+      });
+      // Backup the completed filling detail to lead_captures (Sheet-style log).
+      saveLeadCapture({
+        sourcePage: 'assessment_result',
+        stepKey: 'class12:result',
+        once: true,
+        userType: 'class12',
+        answers,
+        recommendation: {
+          primary: results.recommendations?.[0]?.title || results.recommendations?.[0]?.career || null,
+          top: (results.recommendations || []).slice(0, 5).map((r) => r?.title || r?.career || r),
+          clusters: results.clusters || undefined,
+        },
       });
       navigate('/path/class12');
     }

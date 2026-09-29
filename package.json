@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
-    "start": "node server.ts",
+  "scripts": {
+    "dev": "vite --port 3000 --host 127.0.0.1",
+    "start": "tsx server.ts",
     "build": "vite build",
-    "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "preview": "vite preview --port 3000",
+    "clean": "rimraf dist",
     "lint": "tsc --noEmit"
   },
   "dependencies": {

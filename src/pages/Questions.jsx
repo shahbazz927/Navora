@@ -18,6 +18,7 @@ import graduationDegrees, {
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { personas } from '../data/personas';
 import { saveAssessmentResult } from '../lib/assessmentResults';
+import { saveLeadCapture } from '../lib/leadCapture';
 
 const hints = {
   class10: {
@@ -316,6 +317,14 @@ export default function Questions() {
       setSelected(nextQ ? (newAnswers[nextQ.id] || []) : []);
       setDirection('right');
       setCurrentQ(currentQ + 1);
+      // Backup each completed step to lead_captures (best-effort).
+      saveLeadCapture({
+        sourcePage: 'assessment_step',
+        stepKey: `questions:${userType}:${question.id}`,
+        once: true,
+        userType,
+        answers: newAnswers,
+      });
     } else {
       setAnswers(newAnswers);
       // Best-effort Supabase persistence (Dashboard/Advisor restore on any device).
@@ -324,6 +333,13 @@ export default function Questions() {
         educationStage: newAnswers.stream?.[0] || newAnswers.currentDegree || null,
         assessmentData: newAnswers,
         resultData: {},
+      });
+      // Backup the completed filling detail to lead_captures (Sheet-style log).
+      saveLeadCapture({
+        sourcePage: 'assessment_result',
+        stepKey: `questions:${userType}:result`,
+        userType,
+        answers: newAnswers,
       });
       navigate(`/recommendations/${userType}`);
     }

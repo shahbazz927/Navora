@@ -255,7 +255,14 @@ function readBody(req) {
 async function callOpenRouterOnce(model, messages, opts = {}) {
   if (!OPENROUTER_API_KEY && process.env.GEMINI_API_KEY) {
     try {
-      const { GoogleGenAI } = await import('@google/genai');
+      // Specifier is held in a variable on purpose: a *literal* import('@google/genai')
+      // makes esbuild (used by Vite to bundle vite.config.ts -> server/server.mjs)
+      // try to resolve the package at startup. @google/genai@2.24.0 ships without
+      // dist/node/index.mjs, so that resolution fails and the dev server / build
+      // cannot even load the config. A non-literal specifier is left as a runtime
+      // import — only evaluated on this optional Gemini fallback path.
+      const GENAI_PACKAGE = '@google/genai';
+      const { GoogleGenAI } = await import(GENAI_PACKAGE);
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const systemMsg = messages.find((m) => m.role === 'system')?.content || '';
       const chatMessages = messages.filter((m) => m.role !== 'system');

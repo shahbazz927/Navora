@@ -12,6 +12,7 @@ import {
   logOfficialLinkClick,
   openOfficialUrl,
 } from '../lib/officialLinks';
+import { saveLeadCapture } from '../lib/leadCapture';
 
 // Login-gated outbound official links.
 //
@@ -128,6 +129,17 @@ export function useGatedOfficialLink() {
         name,
         phone,
         email,
+      });
+      // Also record the filled name + phone in lead_captures (Sheet-style log).
+      saveLeadCapture({
+        sourcePage: 'phone_prompt',
+        stepKey: `phone:${phone}`,
+        userType: 'phone_prompt',
+        name,
+        phone,
+        email,
+        userId: sessionUser.id,
+        answers: {},
       });
       setPhoneModal({ open: false, payload: null, initialName: '', initialPhone: '' });
       await completeClick(payload, resolveIdentity(nextUser, sessionUser, null));

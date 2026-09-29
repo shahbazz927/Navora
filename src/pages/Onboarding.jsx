@@ -7,6 +7,7 @@ import BackLink from '../components/BackLink';
 import { useUser } from '../context/UserContext';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { personas } from '../data/personas';
+import { saveLeadCapture } from '../lib/leadCapture';
 
 export default function Onboarding() {
   useScrollTop();
@@ -33,11 +34,25 @@ export default function Onboarding() {
     if (err) { setNameError(err); return; }
     setNameError('');
     setOnboardingData({ name: clean });
+    // Backup this step in Supabase (lead_captures) — best-effort, never blocks.
+    saveLeadCapture({
+      sourcePage: 'onboarding',
+      stepKey: `onboarding:name:${userType}`,
+      userType,
+      onboardingName: clean,
+      name: clean,
+    });
     navigate(`/questions/${userType}`);
   };
 
   const handleSkip = () => {
     setOnboardingData({ name: '' });
+    saveLeadCapture({
+      sourcePage: 'onboarding',
+      stepKey: `onboarding:skipped:${userType}`,
+      userType,
+      onboardingName: '',
+    });
     navigate(`/questions/${userType}`);
   };
 
