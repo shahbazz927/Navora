@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Trash2, Download, LogOut, KeyRound, Mail, AlertTriangle } from 'lucide-react';
 import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { supabase } from '../lib/supabase';
 import { useScrollTop } from '../hooks/useLocalStorage';
 
 export default function Account() {
   useScrollTop();
   const { user, setUser, reset } = useUser();
+  const { openAuthModal } = useAuthModal();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState(null);
@@ -24,7 +26,7 @@ export default function Account() {
     await supabase.auth.signOut().catch(() => {});
     setUser(null);
     reset();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleUpdatePassword = async (e) => {
@@ -77,7 +79,7 @@ export default function Account() {
           <section className="bg-surface border border-line rounded-2xl p-6">
             <h2 className="font-ui font-semibold flex items-center gap-2"><Mail className="w-4 h-4" /> Email</h2>
             <p className="text-sm text-ink-2 mt-1">{email || 'Not signed in'}</p>
-            {!email && <Link to="/login" className="mt-3 inline-flex rounded-xl bg-brand-500 text-white px-4 py-2 text-sm font-semibold">Sign in</Link>}
+            {!email && <button onClick={() => openAuthModal('login')} className="mt-3 inline-flex rounded-xl bg-brand-500 text-white px-4 py-2 text-sm font-semibold cursor-pointer">Sign in</button>}
           </section>
 
           <section className="bg-surface border border-line rounded-2xl p-6">

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ArrowRight, LogOut, ChevronDown, Building2, Scale, Bookmark, GraduationCap, Globe, Award } from 'lucide-react';
 import Logo from './Logo';
 import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { supabase } from '../lib/supabase';
 
 const exploreLinks = [
@@ -35,6 +36,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { user, setUser } = useUser();
+  const { openAuthModal } = useAuthModal();
 
   const handleLogout = async () => {
     await supabase.auth.signOut().catch(() => {});
@@ -207,12 +209,12 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-[0.88rem] font-semibold text-ink-2 hover:text-ink transition-colors"
+                <button
+                  onClick={() => openAuthModal('login')}
+                  className="px-4 py-2 text-[0.88rem] font-semibold text-ink-2 hover:text-ink transition-colors cursor-pointer"
                 >
                   Sign In
-                </Link>
+                </button>
                 <Link
                   to="/get-started"
                   className="inline-flex items-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-ui font-semibold text-[0.85rem] px-5 py-2.5 shadow-brand transition-all hover:-translate-y-px"
@@ -340,12 +342,12 @@ export default function Header() {
                       Start Your Path
                       <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <Link
-                      to="/login"
-                      className="flex items-center justify-center rounded-xl text-sm font-semibold text-ink-2 hover:text-ink px-5 py-2.5 transition-colors"
+                    <button
+                      onClick={() => { setMobileOpen(false); openAuthModal('login'); }}
+                      className="flex w-full items-center justify-center rounded-xl text-sm font-semibold text-ink-2 hover:text-ink px-5 py-2.5 transition-colors cursor-pointer"
                     >
                       Sign In
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>

@@ -1,14 +1,16 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Clock, LogIn } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
 export default function SessionExpired() {
-  const navigate = useNavigate();
   const { setUser } = useUser();
+  const { openAuthModal } = useAuthModal();
   const handleContinue = async () => {
     await supabase.auth.signOut().catch(()=>{});
     setUser(null);
-    navigate('/login');
+    // Same page popup — URL stays /session-expired, bg stays visible
+    openAuthModal('login');
   };
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6 py-16 bg-paper">

@@ -33,6 +33,7 @@ import { personas } from '../data/personas';
 import CoreJourneySection from '../components/CoreJourneySection';
 import StudentExplorationSection from '../components/StudentExplorationSection';
 import CareerPathwayVisualizer from '../components/CareerPathwayVisualizer';
+import FindYourCourseSection from '../components/FindYourCourseSection';
 
 // Authentic images
 import heroStudentImage from '../assets/images/hero_library_student_1789742031075.jpg';
@@ -142,6 +143,9 @@ export default function Landing() {
 
       {/* ── 5. Visual Connected Career Roadmap ────────────────────────────── */}
       <CareerPathwayVisualizer />
+
+      {/* ── 5b. Find the Right Course for You (course discovery + counselling) */}
+      <FindYourCourseSection />
 
       {/* ── 6. Dedicated Parent Callout ────────────────────────────────────── */}
       <section className="py-20 sm:py-24 bg-surface border-t border-line">

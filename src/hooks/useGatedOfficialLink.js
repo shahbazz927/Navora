@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import {
   savePendingLink,
   getPendingLink,
@@ -23,8 +24,8 @@ import { saveLeadCapture } from '../lib/leadCapture';
 //
 // Payload: { url, linkLabel, section, collegeSlug?, collegeName?, scholarshipId?, scholarshipName? }
 export function useGatedOfficialLink() {
-  const navigate = useNavigate();
   const location = useLocation();
+  const { openAuthModal } = useAuthModal();
   const { user, setUser } = useUser();
   const [phoneModal, setPhoneModal] = useState({ open: false, payload: null, initialName: '', initialPhone: '' });
 
@@ -73,10 +74,10 @@ export function useGatedOfficialLink() {
       } catch {
         sessionUser = null;
       }
-      // Not logged in -> remember intent, send to login, come back after.
+      // Not logged in -> remember intent, open popup on same page (no URL change).
       if (!sessionUser) {
         savePendingLink({ ...payload, returnPath: location.pathname });
-        navigate('/login', { state: { from: location.pathname } });
+        openAuthModal('login');
         return;
       }
       const identity = await getIdentity(sessionUser);
@@ -88,7 +89,7 @@ export function useGatedOfficialLink() {
       }
       await completeClick(payload, identity);
     },
-    [completeClick, getIdentity, location.pathname, navigate],
+    [completeClick, getIdentity, location.pathname, openAuthModal],
   );
 
   const closePhoneModal = useCallback(() => {
@@ -112,7 +113,7 @@ export function useGatedOfficialLink() {
       if (!sessionUser) {
         savePendingLink({ ...payload, returnPath: location.pathname });
         closePhoneModal();
-        navigate('/login', { state: { from: location.pathname } });
+        openAuthModal('login');
         return;
       }
       const email = user?.email || sessionUser?.email || '';
@@ -144,17 +145,14 @@ export function useGatedOfficialLink() {
       setPhoneModal({ open: false, payload: null, initialName: '', initialPhone: '' });
       await completeClick(payload, resolveIdentity(nextUser, sessionUser, null));
     },
-    [closePhoneModal, completeClick, location.pathname, navigate, phoneModal.payload, setUser, user],
+    [closePhoneModal, completeClick, location.pathname, openAuthModal, phoneModal.payload, setUser, user],
   );
 
-  // After login we land back on `returnPath` with the pending intent still in
-  // sessionStorage — pick it up here: prompt for phone if needed, else log +
-  // open automatically (user already clicked once, so popup blockers allow it
-  // on this user-gesture-adjacent navigation in most browsers; if blocked,
-  // the modal still offers an explicit continue button).
+  // Popup flow: URL never changes, so resume the pending intent when auth
+  // state flips to SIGNED_IN (login popup success on the same page).
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const resume = async () => {
       const pending = getPendingLink();
       if (!pending?.url || pending.returnPath !== location.pathname) return;
       let sessionUser = null;
@@ -173,13 +171,17 @@ export function useGatedOfficialLink() {
       } else {
         await completeClick(pending, identity);
       }
-    })();
+    };
+    resume();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') resume();
+    });
     return () => {
       cancelled = true;
+      sub?.subscription?.unsubscribe();
     };
-    // Run once per page mount — resuming exactly one pending intent.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.pathname]);
 
   return { gateLink, phoneModal, closePhoneModal, submitPhone };
 }

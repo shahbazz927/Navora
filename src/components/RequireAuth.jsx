@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
+import { useAuthModal } from '../context/AuthModalContext';
 
 // Gate that requires a valid Supabase session.
 // While the session is being checked, a lightweight spinner is shown to avoid
@@ -9,7 +9,7 @@ import { useUser } from '../context/UserContext';
 export default function RequireAuth({ children }) {
   const [status, setStatus] = useState('checking'); // 'checking' | 'authed' | 'unauthed'
   const { setUser } = useUser();
-  const location = useLocation();
+  const { openAuthModal, isOpen } = useAuthModal();
 
   useEffect(() => {
     let mounted = true;
@@ -71,6 +71,11 @@ export default function RequireAuth({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Stay on the same URL — open login popup over the current page instead of navigating to /login.
+  useEffect(() => {
+    if (status === 'unauthed' && !isOpen) openAuthModal('login');
+  }, [status, isOpen, openAuthModal]);
+
   if (status === 'checking') {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-paper">
@@ -80,7 +85,22 @@ export default function RequireAuth({ children }) {
   }
 
   if (status === 'unauthed') {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    // Background stays visible behind the AuthModal popup (URL unchanged).
+    // Render a lightweight locked placeholder — real content reveals after login.
+    return (
+      <div className="min-h-[60vh] w-full flex flex-col items-center justify-center gap-3 py-20 text-center px-6">
+        <p className="text-lg font-semibold text-ink">Sign in to continue</p>
+        <p className="text-sm text-ink-3 max-w-sm">This page needs authentication. The sign-in popup is open — complete it to unlock this page without leaving it.</p>
+        {!isOpen && (
+          <button
+            onClick={() => openAuthModal('login')}
+            className="mt-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm px-5 py-2.5 transition-colors cursor-pointer"
+          >
+            Open Sign In
+          </button>
+        )}
+      </div>
+    );
   }
 
   return children;

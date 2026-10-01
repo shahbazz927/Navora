@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { KeyRound, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useScrollTop } from '../hooks/useLocalStorage';
+import { useAuthModal } from '../context/AuthModalContext';
 
 export default function ResetPassword() {
   useScrollTop();
-  const navigate = useNavigate();
+  const { openAuthModal } = useAuthModal();
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [err, setErr] = useState(null);
@@ -29,7 +29,7 @@ export default function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) setErr(error.message);
-    else { setMsg('Password updated. You can now sign in.'); setTimeout(()=>navigate('/login'), 1200); }
+    else { setMsg('Password updated. You can now sign in.'); setTimeout(() => openAuthModal('login'), 1200); }
   };
 
   return (
@@ -37,7 +37,7 @@ export default function ResetPassword() {
       <div className="w-full max-w-md bg-surface border border-line rounded-3xl p-8 shadow-card">
         <span className="w-12 h-12 rounded-2xl bg-brand-50 border border-brand-100 flex items-center justify-center mb-4"><KeyRound className="w-6 h-6 text-brand-600" /></span>
         <h1 className="font-ui font-bold text-2xl text-ink">Set a new password</h1>
-        {hasSession === false && <p className="mt-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">This link is only valid when opened from your recovery email. If it expired, request a new one from <Link to="/login" className="underline">Sign in → Forgot password</Link>.</p>}
+        {hasSession === false && <p className="mt-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">This link is only valid when opened from your recovery email. If it expired, request a new one from <button onClick={() => openAuthModal('login')} className="underline cursor-pointer">Sign in → Forgot password</button>.</p>}
         {hasSession && <p className="mt-2 text-sm text-ink-2">Enter your new password. The recovery token is single-use and expiring (managed by Supabase).</p>}
         {msg && <div className="mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex gap-2"><CheckCircle2 className="w-4 h-4" />{msg}</div>}
         {err && <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm flex gap-2"><AlertCircle className="w-4 h-4" />{err}</div>}
@@ -48,7 +48,7 @@ export default function ResetPassword() {
             {busy ? 'Updating…' : 'Update password'}
           </button>
         </form>
-        <p className="mt-4 text-xs text-ink-3 text-center"><Link to="/login" className="underline">Back to sign in</Link></p>
+        <p className="mt-4 text-xs text-ink-3 text-center"><button onClick={() => openAuthModal('login')} className="underline cursor-pointer">Back to sign in</button></p>
       </div>
     </div>
   );

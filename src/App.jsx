@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider, useUser } from './context/UserContext';
+import { AuthModalProvider, useAuthModal } from './context/AuthModalContext';
+import AuthModal from './components/auth/AuthModal';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Parents from './pages/Parents';
@@ -13,7 +16,6 @@ import Recommendations from './pages/Recommendations';
 import Compare from './pages/Compare';
 import Dashboard from './pages/Dashboard';
 import Advisor from './pages/Advisor';
-import Login from './pages/Login';
 import RequireAuth from './components/RequireAuth';
 import RequireAdmin from './components/RequireAdmin';
 import About from './pages/About';
@@ -52,16 +54,31 @@ function RequireAnswers({ children }) {
   return children;
 }
 
+// No separate login page — /login, /signup, /forgot-password all render the
+// normal page as background + auto-open the AuthModal popup on top of it.
+function AuthPopupRoute({ mode = 'login' }) {
+  const { openAuthModal } = useAuthModal();
+  useEffect(() => {
+    openAuthModal(mode);
+  }, [mode, openAuthModal]);
+  return (
+    <Layout>
+      <Landing />
+    </Layout>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
       <UserProvider>
+        <AuthModalProvider>
         <Routes>
           <Route path="/" element={<Layout><Landing /></Layout>} />
-          <Route path="/login" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
-          {/* Auth aliases — single Login component hosts Sign In / Sign Up tabs + forgot-password modal */}
-          <Route path="/signup" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
-          <Route path="/forgot-password" element={<Layout showHeader={false} showFooter={false}><Login /></Layout>} />
+          {/* No separate login page — popup opens over the page, bg stays visible */}
+          <Route path="/login" element={<AuthPopupRoute mode="login" />} />
+          <Route path="/signup" element={<AuthPopupRoute mode="signup" />} />
+          <Route path="/forgot-password" element={<AuthPopupRoute mode="login" />} />
           <Route path="/about" element={<Layout><About /></Layout>} />
           {/* Dedicated How It Works page — split out from About */}
           <Route path="/how-it-works" element={<Layout><HowItWorks /></Layout>} />
@@ -117,6 +134,9 @@ function App() {
           <Route path="/session-expired" element={<Layout><SessionExpired /></Layout>} />
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
+        {/* Global login popup — opens over current page, URL never changes */}
+        <AuthModal />
+        </AuthModalProvider>
       </UserProvider>
     </BrowserRouter>
   );

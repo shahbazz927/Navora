@@ -343,7 +343,7 @@ const triggerError = (msg) => {
       id="auth-main-card"
       animate={shakeKey > 0 ? { x: [0, -10, 10, -8, 8, -4, 4, 0], rotate: [0, -1, 1, -0.8, 0.8, 0] } : {}}
       transition={{ duration: 0.45, ease: 'easeInOut' }}
-      className="relative w-full max-w-[440px] rounded-3xl p-7 sm:p-8 backdrop-blur-2xl transition-all duration-300 shadow-2xl border bg-white/95 border-slate-200/90 text-slate-900 shadow-xl shadow-slate-200/60 ring-1 ring-black/5"
+      className="relative w-full max-w-[360px] rounded-2xl p-5 backdrop-blur-2xl transition-all duration-300 shadow-2xl border bg-white/95 border-slate-200/90 text-slate-900 shadow-xl shadow-slate-200/60 ring-1 ring-black/5"
     >
       {/* Decorative Card Top Glow Bar */}
       <div className="absolute -top-px left-12 right-12 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80" />
@@ -395,8 +395,8 @@ const triggerError = (msg) => {
         </button>
       </div>
 {/* Form Title & Subtitle */}
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+      <div className="mb-4 text-center">
+        <h2 className="text-lg font-bold tracking-tight text-slate-900">
           {authMethod === 'phone' ? 'Continue with phone' : isLogin ? 'Welcome back' : 'Create an Account'}
         </h2>
         <p className="text-xs mt-1.5 text-slate-500">
