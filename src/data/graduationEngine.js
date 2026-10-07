@@ -36,6 +36,7 @@ import {
   TRACK_DIRECTIONS,
   TRACK_RULES,
 } from './graduationPathwayData.js';
+import { getCareerDetails } from './careerDetails.js';
 
 // ── Small text helpers ───────────────────────────────────────
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -509,6 +510,16 @@ function unifiedFromOutcome(profile, scored, level, isParent) {
   const activity = ideas.length
     ? ideas[scored.rank % Math.min(3, ideas.length)]
     : 'Talk to two people already doing this work.';
+  // Full JD for Learn more — curated when available, otherwise generated
+  // from this outcome's own title / family / skills / track.
+  const jd = getCareerDetails({ id: outcome.value, title: outcome.title }, {
+    id: outcome.value,
+    title: outcome.title,
+    category: outcome.category,
+    skills: requiredSkills,
+    track: outcome.track,
+    higherStudies: outcome.higherStudies || [],
+  });
   return {
     career: {
       id: outcome.id,
@@ -521,6 +532,10 @@ function unifiedFromOutcome(profile, scored, level, isParent) {
         : [outcome.higherStudies[0] || `${profile.degreeLabel} → ${outcome.title}`],
       experienceIdeas: ideas.slice(0, 3),
       roles: [],
+      objectives: jd.objectives,
+      responsibilities: jd.responsibilities,
+      skillsAndQualifications: jd.required,
+      preferredQualifications: jd.preferred,
     },
     title: outcome.title,
     category: outcome.category,

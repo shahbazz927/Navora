@@ -1,6 +1,7 @@
 import { scoreParentClass12, fitLevel, whyMatches, tradeOffs, examsForCareer, degreeOf } from './parentClass12Scoring.js';
 import { buildStudentProfile, scoreCareers, diversify, getPrimaryDirection } from './careerEngine.js';
 import { graduationUnifiedItems, graduationNextSteps } from './graduationEngine.js';
+import { getCareerDetails } from './careerDetails.js';
 import { evaluateParentClass10 } from './parentClass10Pathways.js';
 
 const pretty = (s)=> String(s||'').replace(/_/g,' ').trim().replace(/\b\w/g,c=>c.toUpperCase());
@@ -151,8 +152,11 @@ export function unifiedFromCareerEngine(flowKey, answers){
     if(s.breakdown.eduCompat<1) cons.push('Reachable via an extra step — check the education route below.');
     if(s.breakdown.strengthMatch<0.3) cons.push(`Key skills to build: ${(c.skillsToDevelop||[]).slice(0,2).join(', ')}.`);
     if(!cons.length) cons.push('Needs real-world exposure before committing — try the activity below.');
+    // Attach full JD so Learn more / Compare always have the 4 sections
+    const jd = getCareerDetails(c, { id: c.id, title: c.title, category: c.category, skills: c.skillsToDevelop || [] });
+    const enrichedCareer = { ...c, objectives: jd.objectives, responsibilities: jd.responsibilities, skillsAndQualifications: jd.required, preferredQualifications: jd.preferred };
     return {
-      career: c,
+      career: enrichedCareer,
       title: c.title, category: c.category, score: s.score, level: s.band, band: s.band,
       degree: { short: (c.educationRoutes?.[0]||'').split(/[\(→+]/)[0].trim()||'See route', full: c.educationRoutes?.[0]||'' },
        exams: (()=>{ const blob=(c.educationRoutes||[]).join(' ').toLowerCase(); const list=[]; if(blob.includes('jee')) list.push({name:'JEE Main', period:'Jan / Apr · Typical'}); if(blob.includes('neet')) list.push({name:'NEET-UG', period:'May · Typical'}); if(blob.includes('clat')) list.push({name:'CLAT', period:'Dec · Typical'}); if(blob.includes('cuet')) list.push({name:'CUET-UG', period:'May · Typical'}); if(blob.includes('nata')) list.push({name:'NATA / JEE Paper 2', period:'Apr onwards · Typical'}); if(blob.includes('nchmct')) list.push({name:'NCHMCT JEE', period:'Apr · Typical'}); if(blob.includes('polycet') || blob.includes('lateral') || blob.includes('ecet')) list.push({name:'POLYCET / Lateral Entry', period:'Apr-May · Typical'}); if(!list.length) list.push({name:'Merit / university admission', period:'Varies by college'}); return list.slice(0,2); })(),

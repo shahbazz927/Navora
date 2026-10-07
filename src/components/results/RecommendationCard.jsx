@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown, Bookmark, ArrowRight, X, Briefcase, ClipboardList, Target, Award, Star, BookOpen } from 'lucide-react';
 import Button from '../Button';
 import FitRing from './FitRing';
+import { getCareerDetails } from '../../data/careerDetails.js';
 
 function MatchPill({ level }) {
   const cls = level === 'Strong match' || level === 'Strong fit'
@@ -13,6 +14,7 @@ function MatchPill({ level }) {
 export default function RecommendationCard({ item, rank, compared, cantAdd, onToggleCompare, onToggleDetail, open, saved, onSave, onExplore }) {
   const [savedLocal, setSavedLocal] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const isSaved = saved ?? savedLocal;
   const c = item.career || item;
   const title = c.title || item.title || '—';
@@ -26,11 +28,20 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
   const cons = item.considerations || item.tradeOffs || [];
   const factors = item.factors || item.breakdown ? (Array.isArray(item.factors) ? item.factors : null) : null;
   const activity = item.activity || (c.experienceIdeas||[])[0] || 'Talk to someone doing this work.';
-  const roles = c.roles || [];
-  const responsibilities = c.responsibilities || [];
-  const objectives = c.objectives || [];
-  const skillsAndQualifications = c.skillsAndQualifications || [];
-  const preferredQualifications = c.preferredQualifications || [];
+  // Canonical JD — explicit fields > curated map > generated fallback (never empty).
+  const details = useMemo(() => getCareerDetails(c, {
+    id: item.career?.id || item.id,
+    title: item.title || c.title,
+    category: item.category || c.category,
+    skills: c.skillsToDevelop || item.foundations || [],
+    track: item.outcome?.track || item.track || '',
+    higherStudies: item.outcome?.higherStudies || [],
+  }), [c, item]);
+  const roles = details.roles?.length ? details.roles : (c.roles || []);
+  const responsibilities = details.responsibilities || [];
+  const objectives = details.objectives || [];
+  const skillsAndQualifications = details.required || [];
+  const preferredQualifications = details.preferred || [];
   const isFirst = rank === 0;
 
   useEffect(() => {
@@ -84,6 +95,26 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
         <div className="rounded-xl bg-[#fff8e8] border border-[#f0dfae] px-4 py-3.5">
           <p className="text-[0.68rem] font-bold uppercase text-[#7a5b12]">⚠ Why this may not be right</p>
           <ul className="mt-2 space-y-1.5">{cons.slice(0,3).map(m=> <li key={m} className="text-[0.82rem] text-ink-2 leading-snug">• {m}</li>)}{cons.length===0 && <li className="text-[0.82rem] text-ink-2">Needs real-world exposure before committing.</li>}</ul>
+        </div>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-line">
+        <button type="button" onClick={() => setShowPreview(v => !v)} aria-expanded={!!showPreview} aria-controls={`rec-jd-${c.id || rank}`} className="w-full flex items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-brand-700">
+          <span>Preview job description — objectives & responsibilities</span>
+          <ChevronDown className={`w-4 h-4 transition-transform ${showPreview ? 'rotate-180' : ''}`} />
+        </button>
+        <div id={`rec-jd-${c.id || rank}`} className={`grid transition-all duration-300 ${showPreview ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+          <div className="overflow-hidden"><div className="px-4 pb-4 pt-1 border-t border-line space-y-3">
+            <div>
+              <p className="text-[0.68rem] font-bold uppercase text-ink-3">Objectives of this role</p>
+              <ul className="mt-1.5 space-y-1">{objectives.slice(0,2).map(o => <li key={o} className="text-[0.82rem] text-ink-2 leading-snug">• {o}</li>)}</ul>
+            </div>
+            <div>
+              <p className="text-[0.68rem] font-bold uppercase text-ink-3">Responsibilities</p>
+              <ul className="mt-1.5 space-y-1">{responsibilities.slice(0,2).map(o => <li key={o} className="text-[0.82rem] text-ink-2 leading-snug">• {o}</li>)}</ul>
+            </div>
+            <button type="button" onClick={() => setShowDetails(true)} className="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand-700 hover:underline">See full job description in Learn more <ArrowRight className="w-3.5 h-3.5" /></button>
+          </div></div>
         </div>
       </div>
 
@@ -161,7 +192,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {responsibilities.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><ClipboardList className="w-4 h-4 text-brand-500" /> Roles & Responsibilities</h4>
+                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><ClipboardList className="w-4 h-4 text-brand-500" /> Responsibilities</h4>
                   <ul className="mt-3 space-y-2.5">
                     {responsibilities.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -181,7 +212,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {skillsAndQualifications.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Award className="w-4 h-4 text-brand-500" /> Skills and Qualifications</h4>
+                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Award className="w-4 h-4 text-brand-500" /> Required skills and qualifications</h4>
                   <ul className="mt-3 space-y-2.5">
                     {skillsAndQualifications.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -191,7 +222,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {preferredQualifications.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Star className="w-4 h-4 text-amber-500" /> Preferred Qualifications</h4>
+                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Star className="w-4 h-4 text-amber-500" /> Preferred skills and qualifications</h4>
                   <ul className="mt-3 space-y-2.5">
                     {preferredQualifications.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
