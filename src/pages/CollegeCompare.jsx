@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ALL_INSTITUTIONS, getInstitutionBySlug } from '../data/institutionsMaster';
 import { getScholarshipsForInstitution } from '../data/scholarships';
+import GatedOfficialLink from '../components/GatedOfficialLink';
 import { isScholarshipActive } from '../lib/scholarshipMatching';
 
 export default function CollegeCompare() {
@@ -336,15 +337,17 @@ export default function CollegeCompare() {
                     <td key={inst.id} className="p-4 text-slate-800">
                       <div className="flex items-center gap-2">
                         {inst.website && (
-                          <a
-                            href={inst.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <GatedOfficialLink
+                            url={inst.website}
+                            linkLabel="Official Website"
+                            section="colleges"
+                            collegeSlug={inst.slug}
+                            collegeName={inst.name}
                             className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1"
                           >
                             <span>Website</span>
                             <ExternalLink className="w-3 h-3" />
-                          </a>
+                          </GatedOfficialLink>
                         )}
                         <Link
                           to={`/colleges/${inst.slug}`}

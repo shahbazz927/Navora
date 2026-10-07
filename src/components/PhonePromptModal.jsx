@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { normalizePhone } from '../lib/officialLinks';
 
-// Collects name + phone number before the first gated official-link click
-// is logged. Email-login users usually have no phone on their profile, so
-// we ask once and keep it in UserContext + Supabase for subsequent clicks.
-// On the 2nd open the saved number is auto-filled (editable).
+// Collects name + 10-digit mobile number before opening an official link.
+// No login required. Closing / cancelling never opens the link — the caller
+// only opens it inside onSubmit.
 export default function PhonePromptModal({ open, initialName = '', initialPhone = '', linkLabel = 'Official link', onSubmit, onClose }) {
   const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState(initialPhone);
@@ -26,13 +25,13 @@ export default function PhonePromptModal({ open, initialName = '', initialPhone 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    if (!String(name || '').trim()) {
-      setError('Please enter your name.');
+    if (String(name || '').trim().length < 2) {
+      setError('Please enter your full name.');
       return;
     }
     const normalized = normalizePhone(phone);
     if (!normalized) {
-      setError('Please enter a valid phone number with country code (e.g. +91 98765 43210).');
+      setError('Please enter a valid 10-digit mobile number starting with 6-9.');
       return;
     }
     onSubmit({ name: String(name).trim(), phone: normalized });
@@ -47,7 +46,7 @@ export default function PhonePromptModal({ open, initialName = '', initialPhone 
         </div>
         <p className="text-xs text-slate-500 mb-4 leading-relaxed">
           To open <span className="font-semibold text-slate-700">{linkLabel}</span> on the official site,
-          please confirm your name and phone number. We log this visit for verification.
+          please share your name and mobile number. The link opens only after you continue.
         </p>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
@@ -66,17 +65,21 @@ export default function PhonePromptModal({ open, initialName = '', initialPhone 
           </div>
           <div>
             <label htmlFor="gated-link-phone" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
-              Phone number
+              Mobile number
             </label>
-            <input
-              id="gated-link-phone"
-              type="tel"
-              placeholder="+91 98765 43210"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm border bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 outline-none text-slate-900 placeholder:text-slate-400"
-            />
+            <div className="flex overflow-hidden rounded-xl border bg-slate-50 border-slate-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/15">
+              <span className="flex items-center bg-white px-3 text-sm font-bold text-slate-600 border-r border-slate-200">+91</span>
+              <input
+                id="gated-link-phone"
+                type="tel"
+                inputMode="numeric"
+                placeholder="98765 43210"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-3.5 py-2.5 text-sm bg-transparent outline-none text-slate-900 placeholder:text-slate-400"
+              />
+            </div>
           </div>
           {error && <p className="text-xs font-medium text-rose-600">{error}</p>}
           <button

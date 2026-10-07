@@ -28,6 +28,7 @@ import ScholarshipCard from '../components/ScholarshipCard';
 import { normalizeProfile, evaluateEligibility, PROFILE_MATCH, deadlineBucket, isScholarshipActive, getMatchLabel } from '../lib/scholarshipMatching';
 import { useUser } from '../context/UserContext';
 import { useGatedOfficialLink } from '../hooks/useGatedOfficialLink';
+import GatedOfficialLink from '../components/GatedOfficialLink';
 import PhonePromptModal from '../components/PhonePromptModal';
 
 export default function CollegeDetail() {
@@ -513,7 +514,7 @@ export default function CollegeDetail() {
                     <div className="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center">
                       <Award className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                       <p className="text-sm font-semibold text-slate-700">No scholarships catalogued yet for this institution</p>
-                      <p className="text-xs text-slate-500 mt-1">Check general government portals like <a href="https://scholarships.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">scholarships.gov.in</a> and <a href="https://telanganaepass.cgg.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">telanganaepass.cgg.gov.in</a>.</p>
+                      <p className="text-xs text-slate-500 mt-1">Check general government portals like <GatedOfficialLink url="https://scholarships.gov.in" linkLabel="Scholarships portal" section="scholarships" className="text-blue-600 hover:underline">scholarships.gov.in</GatedOfficialLink> and <GatedOfficialLink url="https://telanganaepass.cgg.gov.in" linkLabel="Telangana epass portal" section="scholarships" className="text-blue-600 hover:underline">telanganaepass.cgg.gov.in</GatedOfficialLink>.</p>
                     </div>
                   ) : filtered.length===0 ? (
                     <p className="text-xs text-slate-500 text-center py-6">No scholarships match the selected filters. <button onClick={()=>{setSchFilterFunding('All');setSchFilterEligibility('All');setSchFilterDeadline('All');setSchFilterLevel('All');setSchFilterCountry('All');setSchIndianOnly(false);}} className="text-blue-600 font-semibold hover:underline">Clear filters</button></p>

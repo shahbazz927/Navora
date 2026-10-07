@@ -72,6 +72,7 @@ import {
   buildParentClass10Result,
 } from '../data/assessmentConfig';
 import ParentClass10ResultsView from '../components/ParentClass10ResultsView';
+import ResultGate from '../components/ResultGate';
 import { saveAssessmentResult } from '../lib/assessmentResults';
 import { saveLeadCapture, summarizeRecommendation } from '../lib/leadCapture';
 
@@ -739,6 +740,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
   const rows = [['Fit Score', r=> String(r.score)+' / 100'], ['Degree', r=> r.degree.short], ['Entrance exams', r=> r.exams.map(e=>e.name).join(' \u00b7 ')], ['Skills', r=> (r.career.skillsToDevelop||[]).slice(0,3).join(', ')], ['Why it matches', r=> (r.whyMatches[0]||'-')], ['Considerations', r=> (r.considerations[0]||'-')]];
   useEffect(()=>{ if(!toast) return; const tt=setTimeout(()=>setToast(''),2600); return()=>clearTimeout(tt); },[toast]);
   return (
+    <ResultGate flowKey={flowKey} title={header?.title || 'Your Career Direction'}>
     <ResultsLayout
       onBack={onBack} header={header} context={context}
       filters={['All','Strong match','Good match','Worth exploring']} counts={counts} activeFilter={filter} onFilter={setFilter}
@@ -752,6 +754,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
       onRetake={onRetake} onSave={onSaveDashboard} toast={toast} setToast={setToast}
       compareOpen={compareOpen} setCompareOpen={setCompareOpen} compareItems={compareItems.length? compareItems: unified.slice(0,3)} compareRows={rows}
     />
+    </ResultGate>
   );
 }
 
@@ -759,6 +762,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
   if (showResult && result) {
     if (flowKey === 'parent_class10') {
       return (
+        <ResultGate flowKey={flowKey} title="Stream & Career Direction">
         <ParentClass10ResultsView
           result={result}
           answers={answers}
@@ -778,6 +782,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
           }}
           onBack={handleBack}
         />
+        </ResultGate>
       );
     }
     // Use deterministic career engine for every flow so the shared UI has scores/whys

@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { FEATURED_COLLEGES, COLLEGE_STATUS } from '../data/collegeData';
+import GatedOfficialLink from './GatedOfficialLink';
 
 export default function CollegeDiscoverySection() {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -208,14 +209,15 @@ export default function CollegeDiscoverySection() {
                   >
                     View verified details →
                   </button>
-                  <a
-                    href={college.officialWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <GatedOfficialLink
+                    url={college.officialWebsite}
+                    linkLabel="Official Portal"
+                    section="colleges"
+                    collegeName={college.name}
                     className="inline-flex items-center gap-1 text-[0.72rem] text-ink-3 hover:text-ink transition-colors"
                   >
                     Official Portal <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </GatedOfficialLink>
                 </div>
               </div>
             );
@@ -290,14 +292,15 @@ export default function CollegeDiscoverySection() {
               </div>
 
               <div className="mt-8 pt-4 border-t border-line flex items-center justify-between">
-                <a
-                  href={activeModalCollege.officialWebsite}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <GatedOfficialLink
+                  url={activeModalCollege.officialWebsite}
+                  linkLabel="Official Institutional Portal"
+                  section="colleges"
+                  collegeName={activeModalCollege.name}
                   className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-brand-600 hover:text-brand-700"
                 >
                   Visit Official Institutional Portal <ExternalLink className="w-4 h-4" />
-                </a>
+                </GatedOfficialLink>
                 <button
                   onClick={() => setActiveModalCollege(null)}
                   className="px-4 py-2 rounded-xl bg-brand-500 text-white text-xs sm:text-sm font-semibold cursor-pointer"

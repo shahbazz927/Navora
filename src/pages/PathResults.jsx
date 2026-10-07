@@ -6,6 +6,7 @@ import { useUser } from '../context/UserContext';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { resolveTwelveSummary, resolveAnswerSummary } from '../data/careerQuestionnaire';
 import { ResultsLayout, RecommendationCard } from '../components/results';
+import ResultGate from '../components/ResultGate';
 import AICareerAdvisor from '../components/ai/AICareerAdvisor';
 
 export default function PathResults() {
@@ -91,6 +92,7 @@ export default function PathResults() {
   }
 
   return (
+    <ResultGate flowKey="student_class12" title="Your Career Direction">
     <>
     <ResultsLayout
       onBack={()=> navigate(-1)}
@@ -123,5 +125,6 @@ export default function PathResults() {
     />
     <div className="max-w-7xl mx-auto px-5 sm:px-8 pb-10"><AICareerAdvisor userType="class12" /></div>
     </>
+    </ResultGate>
   );
 }

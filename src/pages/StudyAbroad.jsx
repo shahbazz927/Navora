@@ -22,6 +22,7 @@ import {
   getScholarshipCountriesWithData,
   getAbroadScholarshipsByCountry,
 } from '../data/scholarships.js';
+import GatedOfficialLink from '../components/GatedOfficialLink';
 
 const COUNTRY_HIGHLIGHTS = {
   usa: { tag: '36-Mo STEM OPT · World’s #1 Tech Ecosystem', badgeClass: 'bg-blue-50 text-blue-800 border-blue-200' },
@@ -97,7 +98,7 @@ function FlagLogo({ code, size=20 }){
 }
 function Pill({ children }) { return <span className="inline-flex items-center rounded-full bg-paper border border-line px-2.5 py-1 text-xs font-medium text-ink-2">{children}</span>; }
 function SourceBadge({ url, date }) {
-  return <span className="inline-flex items-center gap-1 text-[0.7rem] text-ink-3"><Info className="w-3 h-3"/>{date} · <a href={url} target="_blank" rel="noreferrer" className="underline hover:text-ink">source</a></span>;
+  return <span className="inline-flex items-center gap-1 text-[0.7rem] text-ink-3"><Info className="w-3 h-3"/>{date} · <GatedOfficialLink url={url} linkLabel="Official source" section="study_abroad" className="underline hover:text-ink">source</GatedOfficialLink></span>;
 }
 
 function Choice({ selected, onClick, label, desc, multi }) {
@@ -825,15 +826,15 @@ export default function StudyAbroad(){
                                       <p className="font-ui font-bold text-sm text-ink">{u.name}</p>
                                       <p className="text-xs text-ink-3">{u.city} · {u.type} · <span className="text-brand-700 font-medium">{u.reputation}</span></p>
                                     </div>
-                                    <a
-                                      href={u.website}
-                                      target="_blank"
-                                      rel="noreferrer"
+                                    <GatedOfficialLink
+                                      url={u.website}
+                                      linkLabel="Official University Website"
+                                      section="study_abroad"
                                       className="text-ink-3 hover:text-brand-600 p-1"
                                       title="Official University Website"
                                     >
                                       <ExternalLink className="w-3.5 h-3.5" />
-                                    </a>
+                                    </GatedOfficialLink>
                                   </div>
                                   <div className="text-xs text-ink-2 space-y-1">
                                     <p><strong className="text-ink font-medium">Key Programs:</strong> {u.programs.join(' · ')}</p>
@@ -850,7 +851,7 @@ export default function StudyAbroad(){
                         {/* Official Source & Verification */}
                         <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-line text-[0.75rem] text-ink-3">
                           <span>
-                            Verified official source: <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="underline font-medium hover:text-ink">{c.name} Official Immigration / Education Portal</a>
+                            Verified official source: <GatedOfficialLink url={c.sourceUrl} linkLabel="Official Immigration Portal" section="study_abroad" className="underline font-medium hover:text-ink">{c.name} Official Immigration / Education Portal</GatedOfficialLink>
                           </span>
                           <span>Last verified by NAVORA: {c.lastVerified}</span>
                         </div>
@@ -1144,16 +1145,16 @@ export default function StudyAbroad(){
                                 {s.insurance && <p><b className="text-ink">Insurance:</b> {s.insurance}</p>}
                                 {s.academic_year && <p><b className="text-ink">Cycle:</b> {s.academic_year}</p>}
                               </div>
-                              <p className="text-[0.7rem] text-ink-3">Source: {s.source_name} · last verified {s.last_verified_at} · <a href={s.official_source_url} target="_blank" rel="noreferrer" className="underline hover:text-ink">check source</a></p>
+                              <p className="text-[0.7rem] text-ink-3">Source: {s.source_name} · last verified {s.last_verified_at} · <GatedOfficialLink url={s.official_source_url} linkLabel="Official source" section="scholarships" scholarshipId={s.id} scholarshipName={s.name} className="underline hover:text-ink">check source</GatedOfficialLink></p>
                             </div>
                           )}
                           <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-line/60">
                             <button onClick={()=>setSchOpenId(isOpen ? null : s.id)} className="px-3 py-1.5 rounded-xl border border-line bg-white text-xs font-semibold text-ink-2 hover:border-brand-200 inline-flex items-center gap-1">
                               {isOpen ? <><ChevronUp className="w-3.5 h-3.5"/> Hide eligibility</> : <><ChevronDown className="w-3.5 h-3.5"/> Eligibility &amp; coverage</>}
                             </button>
-                            <a href={s.official_source_url} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold inline-flex items-center gap-1">
+                            <GatedOfficialLink url={s.official_source_url} linkLabel="Official scholarship page" section="scholarships" scholarshipId={s.id} scholarshipName={s.name} className="px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold inline-flex items-center gap-1">
                               Official page <ExternalLink className="w-3 h-3"/>
-                            </a>
+                            </GatedOfficialLink>
                             <Link to={`/scholarships/${s.id}`} className="text-xs font-semibold text-brand-700 hover:underline ml-auto">Full details &amp; profile match →</Link>
                           </div>
                         </article>
@@ -1256,7 +1257,7 @@ export default function StudyAbroad(){
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button onClick={()=> addCountry(r.country.id)} className={`text-xs font-semibold rounded-full px-3 py-1.5 border ${compareIds.includes(r.country.id)?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{compareIds.includes(r.country.id)?'Selected for compare':'Add to compare'}</button>
-                    <a href={r.country.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-ink-2 hover:text-ink">Official source <ExternalLink className="w-3 h-3"/></a>
+                    <GatedOfficialLink url={r.country.sourceUrl} linkLabel="Official source" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-ink-2 hover:text-ink">Official source <ExternalLink className="w-3 h-3"/></GatedOfficialLink>
                   </div>
                 </div>
               ))}
@@ -1389,7 +1390,7 @@ export default function StudyAbroad(){
                   <p className="text-xs text-ink-2"><b>English:</b> {u.languageRequirements}</p>
                   <p className="text-xs text-ink-3 mt-2"><b>Strengths:</b> {u.strengths.join(' · ')}</p>
                   {c && <p className="text-xs text-ink-3"><b>Est. living:</b> {c.currency} {c.monthlyLivingCost.min}–{c.monthlyLivingCost.max}/mo · <b>Post-study:</b> {c.postStudyDuration}</p>}
-                  <div className="mt-3 flex flex-wrap gap-1.5">{u.scholarships.map(s=><Pill key={s}>{s}</Pill>)}<a href={u.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></a></div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">{u.scholarships.map(s=><Pill key={s}>{s}</Pill>)}<GatedOfficialLink url={u.website} linkLabel="Official University Website" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></GatedOfficialLink></div>
                   <button onClick={()=> addUni(u.id)} className={`mt-4 w-full rounded-xl py-2.5 text-sm font-semibold border ${sel?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{sel?'Remove from compare':'Add to compare'}</button>
                   <SourceBadge url={u.sourceUrls[0]} date={u.lastVerified} />
                 </div>
@@ -1458,7 +1459,7 @@ export default function StudyAbroad(){
 
               <div>
                 <h3 className="font-ui font-semibold text-ink">Post-study work — at a glance</h3>
-                <div className="mt-3 space-y-2">{top3.map(r=><div key={r.country.id} className="border border-line rounded-xl px-4 py-3 bg-white"><p className="text-sm font-medium text-ink inline-flex items-center gap-1.5"><FlagLogo code={r.country.code} size={20} /><span aria-hidden="true" className="hidden">{flagForCountry(r.country)}</span>{r.country.name}: {r.country.postStudyRoute} — {r.country.postStudyDuration}</p><p className="text-xs text-ink-3">{r.country.postStudyEligibility} · <a href={r.country.sourceUrl} target="_blank" rel="noreferrer" className="underline">verify</a></p></div>)}</div>
+                <div className="mt-3 space-y-2">{top3.map(r=><div key={r.country.id} className="border border-line rounded-xl px-4 py-3 bg-white"><p className="text-sm font-medium text-ink inline-flex items-center gap-1.5"><FlagLogo code={r.country.code} size={20} /><span aria-hidden="true" className="hidden">{flagForCountry(r.country)}</span>{r.country.name}: {r.country.postStudyRoute} — {r.country.postStudyDuration}</p><p className="text-xs text-ink-3">{r.country.postStudyEligibility} · <GatedOfficialLink url={r.country.sourceUrl} linkLabel="Official source" section="study_abroad" className="underline">verify</GatedOfficialLink></p></div>)}</div>
                 <p className="text-xs text-warning mt-2 flex gap-1.5"><AlertTriangle className="w-4 h-4 shrink-0"/>Rules can change. Verify current requirements with the relevant government authority before making an application.</p>
               </div>
 

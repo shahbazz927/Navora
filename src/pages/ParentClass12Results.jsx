@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft, Check, ChevronDown, X, Scale, Bookmark, CalendarDays, GraduationCap } from 'lucide-react';
 import Button from '../components/Button';
+import ResultGate from '../components/ResultGate';
 import { FadeIn } from '../components/AnimatedPage';
 import { useUser } from '../context/UserContext';
 import { useScrollTop } from '../hooks/useLocalStorage';
@@ -186,6 +187,7 @@ export default function ParentClass12Results({ result, onBack, onRetake, onSaveD
   ];
   const tableCols = cmpFull.length ? cmpFull : ranked.slice(0, 3);
   return (
+    <ResultGate flowKey="parent_class12" title="Your Child's Degree and Career Direction">
     <div className="min-h-screen bg-paper-gradient">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 lg:py-10">
         <button type="button" onClick={onBack || (() => navigate(-1))} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink cursor-pointer"><ArrowLeft className="w-4 h-4" />Back to questionnaire</button>
@@ -298,5 +300,6 @@ export default function ParentClass12Results({ result, onBack, onRetake, onSaveD
         </div>
       )}
     </div>
+    </ResultGate>
   );
 }

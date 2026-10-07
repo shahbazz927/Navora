@@ -26,6 +26,7 @@ import UpgradeModal from '../components/UpgradeModal';
 import LockedFeature from '../components/LockedFeature';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { personas } from '../data/personas';
+import ResultGate from '../components/ResultGate';
 import AICareerAdvisor from '../components/ai/AICareerAdvisor';
 import { getCollegesMatchingProfile } from '../data/institutionsMaster';
 import CollegeCard from '../components/CollegeCard';
@@ -72,6 +73,7 @@ export default function Recommendations() {
   const name = onboardingData?.name?.trim();
 
   return (
+    <ResultGate flowKey={userType || 'recommendations'} title="Your Career Direction">
     <div className="min-h-screen bg-paper-gradient">
       <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
         <div className="flex items-center justify-between mb-8">
@@ -563,5 +565,6 @@ export default function Recommendations() {
         </FadeIn>
       </div>
     </div>
+    </ResultGate>
   );
 }
