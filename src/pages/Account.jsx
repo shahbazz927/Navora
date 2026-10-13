@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, Trash2, Download, LogOut, KeyRound, Mail, AlertTriangle } from 'lucide-react';
+import { Shield, Trash2, Download, LogOut, KeyRound, Mail, AlertTriangle, Crown } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { useAuthModal } from '../context/AuthModalContext';
+import { useSubscription } from '../hooks/useSubscription';
 import { supabase } from '../lib/supabase';
 import { useScrollTop } from '../hooks/useLocalStorage';
 
@@ -10,6 +11,7 @@ export default function Account() {
   useScrollTop();
   const { user, setUser, reset } = useUser();
   const { openAuthModal } = useAuthModal();
+  const { sub, isPro, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState(null);
@@ -80,6 +82,26 @@ export default function Account() {
             <h2 className="font-ui font-semibold flex items-center gap-2"><Mail className="w-4 h-4" /> Email</h2>
             <p className="text-sm text-ink-2 mt-1">{email || 'Not signed in'}</p>
             {!email && <button onClick={() => openAuthModal('login')} className="mt-3 inline-flex rounded-xl bg-brand-500 text-white px-4 py-2 text-sm font-semibold cursor-pointer">Sign in</button>}
+          </section>
+
+          {/* Current plan — server-verified, updates when user chooses Free/Pro */}
+          <section className="bg-surface border border-line rounded-2xl p-6">
+            <h2 className="font-ui font-semibold flex items-center gap-2"><Crown className="w-4 h-4" /> My Plan</h2>
+            {subLoading ? (
+              <p className="text-sm text-ink-3 mt-1">Checking your plan…</p>
+            ) : (
+              <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-sm font-bold text-ink">
+                  {isPro ? 'NAVORA Pro' : 'NAVORA Free'}
+                  {!isPro && <span className="ml-2 text-xs font-medium text-ink-3">₹0 Forever</span>}
+                </p>
+                {!isPro ? (
+                  <Link to="/pricing" className="rounded-xl bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 text-sm font-semibold">View Plans</Link>
+                ) : (
+                  <Link to="/pricing" className="rounded-xl border border-line px-4 py-2 text-sm font-medium hover:bg-paper">Manage</Link>
+                )}
+              </div>
+            )}
           </section>
 
           <section className="bg-surface border border-line rounded-2xl p-6">

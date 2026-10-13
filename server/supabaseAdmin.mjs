@@ -145,13 +145,38 @@ export async function isAdminUser(userId) {
   }
 }
 
+// ── Admin Gmail allowlist (server-side ONLY — never in frontend) ──
+// Access is granted when the verified Supabase JWT email matches this list
+// OR profiles.role == 'admin'. Env override: ADMIN_EMAILS="a@x.com,b@y.com".
+const DEFAULT_ADMIN_EMAILS = ['syedabdulazahar@gmail.com', 'shahbazabdul815@gmail.com'];
+function adminEmailList() {
+  const fromEnv = String(process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  const list = fromEnv.length ? fromEnv : DEFAULT_ADMIN_EMAILS;
+  return new Set(list.map((s) => s.toLowerCase()));
+}
+
+/** True when this (verified) email is in the admin allowlist. */
+export function isAdminEmail(email) {
+  if (!email) return false;
+  return adminEmailList().has(String(email).trim().toLowerCase());
+}
+
+/** Full admin check: allowlisted email OR profiles.role == 'admin'. */
+export async function isAdmin(userId, email) {
+  if (isAdminEmail(email)) return true;
+  return isAdminUser(userId);
+}
+
 /** Require admin or return null user info. Shared by all /api/admin/* routes. */
 export async function requireAdmin(req) {
   const token = bearerToken(req);
   if (!token) return null;
   const user = await verifySupabaseUser(token);
   if (!user) return null;
-  const admin = await isAdminUser(user.id);
+  const admin = await isAdmin(user.id, user.email);
   if (!admin) return null;
   return user;
 }

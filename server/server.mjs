@@ -38,7 +38,7 @@ import {
   getAiUsageCount, isAdminUser, isServiceRoleConfigured, upsertSubscriptionRow,
   findPaymentByProviderId, insertPaymentRow, updatePaymentStatus, activateProForPayment,
   requireAdmin, listProfilesAdmin, getSubscriptionsForUsers, countProSubscriptions,
-  adminGrantPro, adminRevokePro,
+  adminGrantPro, adminRevokePro, isAdmin,
 } from './supabaseAdmin.mjs';
 import {
   verifyRazorpaySignature, mapRazorpayToNavora, detectProvider,
@@ -1102,11 +1102,10 @@ export async function handleApiRequest(req, res) {
   }
 
   // Admin authorization probe (frontend route guard helper; mutations must re-check).
+  // Admin = allowlisted Gmail (verified JWT email) OR profiles.role == 'admin'.
   if (path === '/api/admin/check' && method === 'GET') {
-    const user = await authenticate(req);
-    if (!user) return sendJson(res, 401, { success: false, admin: false });
-    const admin = await isAdminUser(user.id);
-    if (!admin) return sendJson(res, 403, { success: false, admin: false });
+    const adminUser = await requireAdmin(req);
+    if (!adminUser) return sendJson(res, 403, { success: false, admin: false });
     return sendJson(res, 200, { success: true, admin: true });
   }
 
@@ -1210,7 +1209,7 @@ export async function handleApiRequest(req, res) {
     const user = await authenticate(req);
     if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
     const ent = await entitlementFor(user.id);
-    const admin = await isAdminUser(user.id);
+    const admin = await isAdmin(user.id, user.email);
     return sendJson(res, 200, {
       success: true,
       plan: ent.plan,
