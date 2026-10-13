@@ -28,6 +28,7 @@ import CollegeCompare from './pages/CollegeCompare';
 import SavedColleges from './pages/SavedColleges';
 import ScholarshipDetail from './pages/ScholarshipDetail';
 import AdminColleges from './pages/AdminColleges';
+import AdminUsers from './pages/AdminUsers';
 import Privacy from './pages/legal/Privacy';
 import Terms from './pages/legal/Terms';
 import CookiePolicy from './pages/legal/CookiePolicy';
@@ -109,6 +110,8 @@ function App() {
           <Route path="/colleges/:slug/scholarships/:scholarshipId" element={<Layout><ScholarshipDetail /></Layout>} />
           <Route path="/colleges/:slug" element={<Layout><CollegeDetail /></Layout>} />
           <Route path="/admin/colleges" element={<Layout><RequireAdmin><AdminColleges /></RequireAdmin></Layout>} />
+          <Route path="/admin/users" element={<Layout><RequireAdmin><AdminUsers /></RequireAdmin></Layout>} />
+          <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
           {/* Dashboard + Advisor handle their own empty states (assessment CTA via
               CareerAssessmentHero / chat prompts), so they require auth only.
               Gating on local answers here would bounce returning users whose

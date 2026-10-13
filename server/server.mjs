@@ -37,6 +37,8 @@ import {
   bearerToken, verifySupabaseUser, getSubscriptionRow, incrementAiUsage,
   getAiUsageCount, isAdminUser, isServiceRoleConfigured, upsertSubscriptionRow,
   findPaymentByProviderId, insertPaymentRow, updatePaymentStatus, activateProForPayment,
+  requireAdmin, listProfilesAdmin, getSubscriptionsForUsers, countProSubscriptions,
+  adminGrantPro, adminRevokePro,
 } from './supabaseAdmin.mjs';
 import {
   verifyRazorpaySignature, mapRazorpayToNavora, detectProvider,
@@ -1106,6 +1108,100 @@ export async function handleApiRequest(req, res) {
     const admin = await isAdminUser(user.id);
     if (!admin) return sendJson(res, 403, { success: false, admin: false });
     return sendJson(res, 200, { success: true, admin: true });
+  }
+
+  // ── Admin: users list (profiles + subscriptions merged) ──
+  // GET /api/admin/users?search=&plan=all|free|pro&limit=50&offset=0
+  if (path === '/api/admin/users' && method === 'GET') {
+    const adminUser = await requireAdmin(req);
+    if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
+    if (!isServiceRoleConfigured()) {
+      return sendJson(res, 500, { success: false, message: 'Server not configured (service role missing).' });
+    }
+    try {
+      const urlObj = new URL(req.url, 'http://localhost');
+      const search = (urlObj.searchParams.get('search') || '').slice(0, 100);
+      const planFilter = (urlObj.searchParams.get('plan') || 'all').toLowerCase();
+      const limit = Math.min(Math.max(Number(urlObj.searchParams.get('limit')) || 50, 1), 100);
+      const offset = Math.max(Number(urlObj.searchParams.get('offset')) || 0, 0);
+      const { rows: profiles, total } = await listProfilesAdmin({ search, limit, offset });
+      const subs = await getSubscriptionsForUsers(profiles.map((p) => p.user_id));
+      const subByUser = new Map(subs.map((s) => [s.user_id, s]));
+      let users = profiles.map((p) => {
+        const s = subByUser.get(p.user_id) || null;
+        const exp = s?.expires_at || s?.current_period_end || null;
+        const plan = s?.plan === 'pro' ? 'pro' : 'free';
+        const expired = exp ? new Date(exp) <= new Date() : false;
+        const effectivePlan = plan === 'pro' && (s?.status === 'expired' || expired) ? 'free' : plan;
+        return {
+          user_id: p.user_id,
+          email: p.email || null,
+          full_name: p.full_name || null,
+          phone: p.phone || null,
+          role: p.role || 'user',
+          created_at: p.created_at || null,
+          plan: effectivePlan,
+          raw_plan: s?.plan || 'free',
+          status: s?.status || 'none',
+          provider: s?.provider || null,
+          expires_at: exp,
+          started_at: s?.started_at || null,
+        };
+      });
+      if (planFilter === 'free' || planFilter === 'pro') {
+        users = users.filter((u) => u.plan === planFilter);
+      }
+      const proCount = await countProSubscriptions();
+      return sendJson(res, 200, { success: true, users, total, limit, offset, proCount });
+    } catch (err) {
+      log.err('admin users list failed', err?.message || 'unknown');
+      return sendJson(res, 500, { success: false, message: 'Could not load users.' });
+    }
+  }
+
+  // POST /api/admin/users/grant-pro { user_id, days? } — manual Pro activation
+  if (path === '/api/admin/users/grant-pro' && method === 'POST') {
+    const adminUser = await requireAdmin(req);
+    if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
+    let body = {};
+    try { body = await readBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
+    }
+    const userId = typeof body?.user_id === 'string' ? body.user_id.trim().slice(0, 64) : '';
+    const days = Math.min(Math.max(Number(body?.days) || 365, 1), 3650);
+    if (!userId) return sendJson(res, 400, { success: false, message: 'user_id is required.' });
+    if (userId === adminUser.id) {
+      // Allow self-grant but log it — prevents accidental lockout confusion.
+      log.warn('Admin granted Pro to self');
+    }
+    try {
+      const result = await adminGrantPro(userId, days);
+      log.info('Admin granted Pro');
+      return sendJson(res, 200, { success: true, plan: 'pro', expiresAt: result.expiresAt, days: result.days });
+    } catch (err) {
+      log.err('admin grant-pro failed', err?.message || 'unknown');
+      return sendJson(res, 500, { success: false, message: 'Grant failed. Check server config.' });
+    }
+  }
+
+  // POST /api/admin/users/revoke-pro { user_id } — demote to Free
+  if (path === '/api/admin/users/revoke-pro' && method === 'POST') {
+    const adminUser = await requireAdmin(req);
+    if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
+    let body = {};
+    try { body = await readBody(req); } catch {
+      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
+    }
+    const userId = typeof body?.user_id === 'string' ? body.user_id.trim().slice(0, 64) : '';
+    if (!userId) return sendJson(res, 400, { success: false, message: 'user_id is required.' });
+    try {
+      await adminRevokePro(userId);
+      log.info('Admin revoked Pro');
+      return sendJson(res, 200, { success: true, plan: 'free' });
+    } catch (err) {
+      log.err('admin revoke-pro failed', err?.message || 'unknown');
+      return sendJson(res, 500, { success: false, message: 'Revoke failed. Check server config.' });
+    }
   }
 
   // Dashboard bundle: entitlement + usage + subscription + admin in one call.

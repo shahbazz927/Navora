@@ -68,6 +68,13 @@ export default function AdminColleges() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin/users"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+            >
+              <span>Users & Plans</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
             <button
               onClick={handleExportJson}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/10 text-white hover:bg-white/20 border border-white/10 transition-colors"

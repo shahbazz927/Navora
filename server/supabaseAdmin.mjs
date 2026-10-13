@@ -145,6 +145,110 @@ export async function isAdminUser(userId) {
   }
 }
 
+/** Require admin or return null user info. Shared by all /api/admin/* routes. */
+export async function requireAdmin(req) {
+  const token = bearerToken(req);
+  if (!token) return null;
+  const user = await verifySupabaseUser(token);
+  if (!user) return null;
+  const admin = await isAdminUser(user.id);
+  if (!admin) return null;
+  return user;
+}
+
+/** Service-role: list profiles with search + pagination (admin only). */
+export async function listProfilesAdmin({ search = '', limit = 50, offset = 0 }) {
+  const base = supabaseUrl();
+  const params = new URLSearchParams();
+  params.set('select', 'user_id,email,full_name,phone,role,created_at,updated_at');
+  params.set('order', 'created_at.desc');
+  params.set('limit', String(Math.min(Math.max(Number(limit) || 50, 1), 100)));
+  params.set('offset', String(Math.max(Number(offset) || 0, 0)));
+  const q = String(search || '').trim().slice(0, 100);
+  let url = `${base}/rest/v1/profiles?${params.toString()}`;
+  if (q) {
+    const esc = q.replace(/[%(),]/g, '');
+    url += `&or=(email.ilike.*${encodeURIComponent(esc)}*,full_name.ilike.*${encodeURIComponent(esc)}*)`;
+  }
+  const res = await fetch(url, {
+    headers: { ...restHeaders(serviceKey()), Prefer: 'count=exact' },
+  });
+  if (!res.ok) throw new Error(`PROFILES_LIST_FAILED: ${res.status}`);
+  const rows = await res.json().catch(() => []);
+  const totalHeader = res.headers?.get('content-range') || '';
+  const total = Number(String(totalHeader).split('/')[1]) || (Array.isArray(rows) ? rows.length : 0);
+  return { rows: Array.isArray(rows) ? rows : [], total };
+}
+
+/** Service-role: fetch subscription rows for a batch of user ids. */
+export async function getSubscriptionsForUsers(userIds) {
+  if (!userIds?.length) return [];
+  try {
+    const ids = userIds.map((id) => encodeURIComponent(id)).join(',');
+    const res = await fetch(
+      `${supabaseUrl()}/rest/v1/subscriptions?user_id=in.(${ids})&select=user_id,plan,status,provider,current_period_end,expires_at,started_at,updated_at`,
+      { headers: restHeaders(serviceKey()) },
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return Array.isArray(rows) ? rows : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Service-role: count pro subscriptions (status active/trialing/past_due + not expired). */
+export async function countProSubscriptions() {
+  try {
+    const res = await fetch(
+      `${supabaseUrl()}/rest/v1/subscriptions?plan=eq.pro&select=user_id`,
+      { headers: { ...restHeaders(serviceKey()), Prefer: 'count=exact' } },
+    );
+    if (!res.ok) return null;
+    const range = res.headers?.get('content-range') || '';
+    const total = Number(String(range).split('/')[1]);
+    return Number.isFinite(total) ? total : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Admin manual grant: Pro for N days from server now.
+ * provider='manual', never trusts client timestamps.
+ */
+export async function adminGrantPro(userId, days = 365) {
+  if (!isServiceRoleConfigured()) throw new Error('SERVICE_ROLE_NOT_CONFIGURED');
+  const d = Math.min(Math.max(Number(days) || 365, 1), 3650);
+  const now = new Date();
+  const expires = new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
+  await upsertSubscriptionRow({
+    user_id: userId,
+    plan: 'pro',
+    status: 'active',
+    provider: 'manual',
+    started_at: now.toISOString(),
+    current_period_start: now.toISOString(),
+    current_period_end: expires.toISOString(),
+    expires_at: expires.toISOString(),
+    updated_at: now.toISOString(),
+  });
+  return { expiresAt: expires.toISOString(), days: d };
+}
+
+/** Admin manual revoke: demote to free/expired (keeps history row). */
+export async function adminRevokePro(userId) {
+  if (!isServiceRoleConfigured()) throw new Error('SERVICE_ROLE_NOT_CONFIGURED');
+  const now = new Date().toISOString();
+  await upsertSubscriptionRow({
+    user_id: userId,
+    plan: 'free',
+    status: 'expired',
+    updated_at: now,
+  });
+  return true;
+}
+
 // ---------------------------------------------------------------- payments
 /** Find a payment record by provider payment id (idempotency lookup). */
 export async function findPaymentByProviderId(paymentId) {
