@@ -220,7 +220,7 @@ export const careers = [
     educationRoutes: ['B.Arch (via NATA/JEE Paper 2)', 'Diploma Architecture → B.Arch'],
     experienceIdeas: ['Sketch your ideal small home', 'Build a scale model', 'Visit a site and document light and flow'],
     relatedCareers: ['ux-designer', 'civil-engineer', 'interior-designer'],
-    streamAffinity: ['mpc', 'arts'],
+    streamAffinity: ['mpc', 'diploma'],
     familyAffinity: ['Engineering', 'Design & Creative'],
   },
   {

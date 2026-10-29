@@ -34,7 +34,12 @@ export default function ProDashboard({ d }) {
 
       <CollegeRecs colleges={d.colleges} />
 
-      <ActionPlan userId={d.user?.id} />
+      <ActionPlan
+        userId={d.user?.id}
+        answers={d.answers}
+        userType={d.userType}
+        primaryCareer={d.unified?.[0]?.career?.title || d.unified?.[0]?.title}
+      />
 
       <AIAdvisorWidget used={d.aiUsed} />
 

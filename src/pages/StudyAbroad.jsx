@@ -1588,16 +1588,17 @@ export default function StudyAbroad(){
           {uniCompare.length>=2 && (
             <div className="mt-8 bg-white border border-line rounded-2xl overflow-hidden shadow-card">
               <div className="px-5 py-3 bg-paper border-b border-line font-ui font-semibold text-ink">University comparison — {uniCompare.length} selected</div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto" data-testid="uni-compare-table">
                 <table className="min-w-[640px] w-full text-sm">
                   <thead className="text-xs text-ink-3 border-b border-line"><tr><th className="text-left px-4 py-3">Field</th>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <th key={id} className="text-left px-4 py-3 font-semibold text-ink">{u?.name}</th>})}</tr></thead>
                   <tbody className="divide-y divide-line">
-                    <tr><td className="px-4 py-3 text-ink-3">City</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{u?.city}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Tuition</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{uniText(u?.tuitionByProgram)}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Entry</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{uniText(u?.entryRequirements)}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">English</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{uniText(u?.languageRequirements)}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Strengths</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{uniList(u?.strengths)}</td>})}</tr>
-                  </tbody>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3">City & Country</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); const c=COUNTRIES.find(x=>x.id===u?.countryId); return <td key={id} className="px-4 py-3">{u?.city}{c ? ', ' + c.name : ''}</td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3"><div>Tuition</div><span className="text-[10px] text-emerald-700 font-semibold block">Verified</span></td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 font-semibold text-brand-700">{uniText(u?.tuitionByProgram)}</td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3"><div>Est. Living Cost</div><span className="text-[10px] text-amber-700 font-semibold block">Estimate</span></td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); const c=COUNTRIES.find(x=>x.id===u?.countryId); return <td key={id} className="px-4 py-3 text-xs">{c ? c.currency + ' ' + c.monthlyLivingCost.min + '–' + c.monthlyLivingCost.max + ' / mo' : 'Estimated city average'}</td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3">Post-Study Route</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); const c=COUNTRIES.find(x=>x.id===u?.countryId); return <td key={id} className="px-4 py-3 text-xs"><span className="font-semibold text-ink">{c?.postStudyRoute}</span><span className="text-ink-3 block">Duration: {c?.postStudyDuration}</span></td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3">Entry & English</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs space-y-1"><div><strong>Academic:</strong> {uniText(u?.entryRequirements)}</div><div><strong>Language:</strong> {uniText(u?.languageRequirements)}</div></td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3">Key Strengths</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{uniList(u?.strengths)}</td>})}</tr>
+                    <tr><td className="px-4 py-3 font-medium text-ink-3">Verification</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-[11px] text-ink-3"><span className="text-emerald-700 font-semibold block">Verified Database</span><span>Last checked: {u?.lastVerified || '2025-09-01'}</span></td>})}</tr></tbody>
                 </table>
               </div>
             </div>

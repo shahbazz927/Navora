@@ -1,3 +1,4 @@
+import { evaluateEligibility } from './eligibilityRules.js';
 import { careers } from './careers.js';
 import graduationDegrees from './graduationDegreeConfig.js';
 
@@ -117,40 +118,32 @@ function workPrefMatch(profile, career) {
   return interestMatch(profile, career) * 0.9 + 0.1; // reuse
 }
 function educationCompatibility(profile, career) {
-  const stream = profile.stream; // mpc/bipc/commerce/arts
-  const family = (profile.family || '').toLowerCase();
+  const stream = profile.stream || profile.family;
   const degreeFamily = (profile.degreeFamily || '').toLowerCase();
-  const degreeLabel = (profile.degreeLabel || '').toLowerCase();
-  const specialization = (profile.specialization || '').toLowerCase();
 
-  // NOTE: per-degree eligibility (MBBS / BDS / B.Pharm / BPT / CSE vs
-  // Mechanical …) deliberately does NOT live here. Graduation results come from
-  // graduationEngine.js, where eligibility is data-driven from the selected
-  // degree's own profile. This engine only serves Class 12 / parent flows with
-  // generic stream and family affinity.
+  // If a degree family is set and career has affinities, check compatibility
+  if (degreeFamily && career.familyAffinity?.length && !career.familyAffinity.some((f) => f.toLowerCase() === degreeFamily)) {
+    return 0.05;
+  }
 
-  // Directly accessible
-  if (stream && career.streamAffinity?.includes(stream)) return 1;
-  if (degreeFamily && career.familyAffinity?.some((f) => f.toLowerCase() === degreeFamily)) return 1;
-  if (family && career.familyAffinity?.some((f) => family.includes(f.toLowerCase()) || f.toLowerCase().includes(family))) return 1;
-  // If a degree is known but the career belongs to a different field
-  // (e.g. MBBS careers for a BBA student), it's not a viable route — score low
-  // so it never surfaces in recommendations.
-  if (degreeFamily) return 0.25;
-  // If no stream/family info (e.g., parent class10), neutral
-  if (!stream && !family) return 0.7;
-  // Commerce/Arts overlap etc: allow with preparation
-  // If stream exists but career not in affinity, lower but not 0
-  if (stream) return 0.45;
-  if (family) return 0.6;
-  return 0.7;
+  const elig = evaluateEligibility(stream, career.id);
+  if (elig.status === 'eligible') return 1.0;
+  if (elig.status === 'potentially_eligible') return 0.75;
+  if (elig.status === 'additional_qualification_required') return 0.35;
+  if (elig.status === 'not_eligible') return 0.02; // Hard statutory restriction
+  return 0.7; // information_unavailable
 }
 
 function getEducationNote(profile, career, compat) {
-  if (compat >= 1) return { label: 'Directly accessible', tone: 'good' };
-  if (compat >= 0.6) return { label: 'Accessible', tone: 'light' };
-  if (compat >= 0.45) return { label: 'Possible with additional preparation', tone: 'light' };
-  return { label: 'Requires a different route', tone: 'light' };
+  const elig = evaluateEligibility(profile.stream || profile.family, career.id);
+  return {
+    label: elig.label,
+    tone: elig.badgeTone,
+    status: elig.status,
+    reason: elig.reason,
+    prerequisites: elig.prerequisites,
+    nextAction: elig.nextAction,
+  };
 }
 
 // Careers that align with each graduation "direction" answer (Q5).
@@ -293,7 +286,10 @@ export function scoreCareers(profile) {
     const relative = s.raw / topRaw;
     const relativeCurve = Math.pow(relative, 0.7) * 92; // gentler curve: mid-range matches stay "Good/Worth Exploring"
     const absolute = s.raw * 100;
-    const score = Math.round(Math.min(98, confidence * relativeCurve + (1 - confidence) * absolute));
+    const elig = evaluateEligibility(profile.stream || profile.family, s.career.id);
+    const calculatedScore = Math.round(confidence * relativeCurve + (1 - confidence) * absolute);
+    // Hard cap statutorily not_eligible careers so subjective preference never elevates them to Strong Match
+    const score = elig.status === 'not_eligible' ? Math.min(42, calculatedScore) : Math.round(Math.min(98, calculatedScore));
     const edu = getEducationNote(profile, s.career, s.breakdown.eduCompat);
     return {
       career: s.career,
@@ -302,6 +298,7 @@ export function scoreCareers(profile) {
       band: getBand(score),
       breakdown: s.breakdown,
       education: edu,
+      eligibility: elig,
     };
   });
 
@@ -322,7 +319,7 @@ function getBand(score) {
 export function diversify(scored, count = 4) {
   // Drop careers whose education route doesn't fit the user's degree/stream
   // (e.g. MBBS careers for a BBA student) — they are not relevant options.
-  const compatible = scored.filter((s) => (s.breakdown?.eduCompat ?? 1) > 0.25);
+  const compatible = scored.filter((s) => s.eligibility?.status !== 'not_eligible' && (s.breakdown?.eduCompat ?? 1) > 0.1);
   const pool = compatible.length >= 2 ? compatible : scored;
   if (profileIsUncertain(pool)) {
     // For uncertain profiles, intentionally diversify

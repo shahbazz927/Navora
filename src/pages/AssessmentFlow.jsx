@@ -752,6 +752,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
       nextSteps={steps} stepsChecked={stepsChecked} onToggleStep={(k)=> setStepsChecked(s=> ({...s, [k]: !s[k]}))}
       onRetake={onRetake} onSave={onSaveDashboard} toast={toast} setToast={setToast}
       compareOpen={compareOpen} setCompareOpen={setCompareOpen} compareItems={compareItems.length? compareItems: unified.slice(0,3)} compareRows={rows}
+      answers={answers} flowKey={flowKey} primaryCareer={primaryCareer}
     />
     </ResultGate>
   );

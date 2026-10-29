@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { useScrollTop } from '../hooks/useLocalStorage';
-import heroPhotoDesktop from '../assets/images/navora_hero_desktop_hd.jpg';
-import heroPhotoMobile from '../assets/images/navora_hero_mobile_hd.jpg';
+import heroPhoto from '../assets/images/navora_hero_desktop_hd.jpg';
+import heroPhoto2x from '../assets/images/navora_hero_desktop_2x.jpg';
 
 import CoreJourneySection from '../components/CoreJourneySection';
 import StudentExplorationSection from '../components/StudentExplorationSection';
@@ -75,20 +75,19 @@ export default function Landing() {
       <section className="relative overflow-hidden pt-[80px] sm:pt-[90px] lg:pt-[100px]">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative rounded-[28px] overflow-hidden">
-            <picture className="block w-full">
-              <source media="(min-width: 1024px)" srcSet={heroPhotoDesktop} />
-              <img
-                src={heroPhotoMobile}
-                alt=""
-                aria-hidden="true"
-                fetchPriority="high"
-                className="block w-full h-auto object-contain"
-                style={{ imageRendering: 'crisp-edges' }}
-              />
-            </picture>
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-white via-white/40 to-transparent lg:via-white/30 lg:to-transparent"></div>
-            <div className="relative z-10 h-full flex items-center">
-              <div className="w-full px-6 sm:px-10 lg:px-16 py-10 sm:py-12 lg:py-16">
+            <img
+              src={heroPhoto}
+              srcSet={`${heroPhoto} 919w, ${heroPhoto2x} 1838w`}
+              sizes="(min-width: 1440px) 1376px, (min-width: 1024px) calc(100vw - 64px), (min-width: 640px) calc(100vw - 48px), calc(100vw - 32px)"
+              alt="Two students exploring their education and career options"
+              width={919}
+              height={611}
+              fetchPriority="high"
+              decoding="async"
+              className="block w-full h-auto object-contain object-center"
+            />
+            <div className="relative z-10 flex items-center xl:absolute xl:inset-0">
+              <div className="w-full px-6 sm:px-10 lg:px-16 py-10 sm:py-12 xl:py-10">
                 <div className="max-w-xl">
                   <p className="text-xs sm:text-sm tracking-[0.32em] uppercase text-[#1f2f4d]/80 font-semibold">
                     EDUCATION / CAREER / A BRIGHTER TOMORROW
