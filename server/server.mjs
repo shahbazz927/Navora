@@ -35,15 +35,12 @@ import { HYDERABAD_INSTITUTIONS, filterInstitutions } from '../src/data/hyderaba
 import { getUserEntitlement, planFeatures } from './entitlement.mjs';
 import {
   bearerToken, verifySupabaseUser, getSubscriptionRow, incrementAiUsage,
-  getAiUsageCount, isAdminUser, isServiceRoleConfigured, upsertSubscriptionRow,
-  findPaymentByProviderId, insertPaymentRow, updatePaymentStatus, activateProForPayment,
-  requireAdmin, listProfilesAdmin, getSubscriptionsForUsers, countProSubscriptions,
-  adminGrantPro, adminRevokePro, isAdmin,
+  getAiUsageCount, isServiceRoleConfigured, upsertSubscriptionRow, updatePaymentStatus,
+  requireAdmin, listProfilesAdmin, getSubscriptionsForUsers, isAdmin,
 } from './supabaseAdmin.mjs';
 import {
   verifyRazorpaySignature, mapRazorpayToNavora, detectProvider,
-  createRazorpayOrder, verifyPaymentSignature, fetchRazorpayPayment,
-  isRazorpayConfigured, razorpayPublicKey, PRO_AMOUNT_PAISE, PRO_CURRENCY,
+  fetchRazorpayPayment,
 } from './payments.mjs';
 import { buildRoadmap } from './roadmap.mjs';
 
@@ -620,29 +617,28 @@ async function entitlementFor(userId) {
 /**
  * Server-side AI quota gate. Atomically increments usage, then compares to
  * the plan limit. Returns { allowed, used, limit, plan }.
- * Fail-safe: if the counter is unavailable, authed users are treated as free
- * with usage unknown -> allow but do not grant Pro.
+ * Paid mode is off: there is no daily cap, so this always allows.
  */
 async function checkAiQuota(userId, plan) {
-  const limit = plan === 'pro' ? 30 : 5;
+  const limit = Infinity;
   if (!userId) return { allowed: true, used: 0, limit, plan: 'free', demo: true };
   const { count } = await incrementAiUsage(userId, todayStr());
   if (count == null) {
     const used = await getAiUsageCount(userId, todayStr());
     return { allowed: true, used: used ?? 0, limit, plan, degraded: true };
   }
-  return { allowed: count <= limit, used: count, limit, plan };
+  return { allowed: true, used: count, limit, plan };
 }
 
 function quotaExceeded(res, q) {
   return sendJson(res, 429, {
     success: false,
-    message: 'AI daily limit reached. Upgrade to NAVORA Pro for a higher limit.',
+    message: 'AI daily limit reached.',
     error: 'AI daily limit reached',
     limit: q.limit,
     used: q.used,
     plan: q.plan,
-    upgradeRequired: true,
+    upgradeRequired: false,
   });
 }
 
@@ -1012,17 +1008,9 @@ export async function handleApiRequest(req, res) {
     try { body = await readBody(req); } catch { body = {}; }
     const feature = typeof body?.feature === 'string' ? body.feature.slice(0, 80) : 'default';
     const user = await authenticate(req);
-    // Fail-safe: unknown/anonymous => free (never auto-promote).
-    const ent = user ? await entitlementFor(user.id) : { plan: 'free', features: planFeatures('free') };
-    const PRO_ONLY = new Set([
-      'personalized_roadmap', 'pdf_reports', 'full_global_study',
-      'course_comparison', 'detailed_fees', 'personalized_scholarships',
-      'full_career_map', 'application_planning',
-    ]);
-    if (PRO_ONLY.has(feature) && ent.plan !== 'pro') {
-      return sendJson(res, 403, { success: false, allowed: false, plan: 'free', message: 'This feature requires NAVORA Pro. Upgrade to unlock.' });
-    }
-    return sendJson(res, 200, { success: true, allowed: true, plan: ent.plan });
+    const ent = user ? await entitlementFor(user.id) : { plan: 'free', features: planFeatures() };
+    // Paid mode is off: every feature is open to every signed-in user.
+    return sendJson(res, 200, { success: true, allowed: true, plan: ent.plan, feature });
   }
   if (path === '/api/entitlement/subscription' && method === 'GET') {
     const user = await authenticate(req);
@@ -1109,8 +1097,8 @@ export async function handleApiRequest(req, res) {
     return sendJson(res, 200, { success: true, admin: true });
   }
 
-  // ── Admin: users list (profiles + subscriptions merged) ──
-  // GET /api/admin/users?search=&plan=all|free|pro&limit=50&offset=0
+  // ── Admin: users list (profiles + subscription history merged) ──
+  // GET /api/admin/users?search=&limit=50&offset=0
   if (path === '/api/admin/users' && method === 'GET') {
     const adminUser = await requireAdmin(req);
     if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
@@ -1120,18 +1108,14 @@ export async function handleApiRequest(req, res) {
     try {
       const urlObj = new URL(req.url, 'http://localhost');
       const search = (urlObj.searchParams.get('search') || '').slice(0, 100);
-      const planFilter = (urlObj.searchParams.get('plan') || 'all').toLowerCase();
       const limit = Math.min(Math.max(Number(urlObj.searchParams.get('limit')) || 50, 1), 100);
       const offset = Math.max(Number(urlObj.searchParams.get('offset')) || 0, 0);
       const { rows: profiles, total } = await listProfilesAdmin({ search, limit, offset });
       const subs = await getSubscriptionsForUsers(profiles.map((p) => p.user_id));
       const subByUser = new Map(subs.map((s) => [s.user_id, s]));
-      let users = profiles.map((p) => {
+      const users = profiles.map((p) => {
         const s = subByUser.get(p.user_id) || null;
         const exp = s?.expires_at || s?.current_period_end || null;
-        const plan = s?.plan === 'pro' ? 'pro' : 'free';
-        const expired = exp ? new Date(exp) <= new Date() : false;
-        const effectivePlan = plan === 'pro' && (s?.status === 'expired' || expired) ? 'free' : plan;
         return {
           user_id: p.user_id,
           email: p.email || null,
@@ -1139,68 +1123,42 @@ export async function handleApiRequest(req, res) {
           phone: p.phone || null,
           role: p.role || 'user',
           created_at: p.created_at || null,
-          plan: effectivePlan,
-          raw_plan: s?.plan || 'free',
+          // Paid mode is off: every account has full access.
+          plan: 'free',
+          access: 'full',
           status: s?.status || 'none',
           provider: s?.provider || null,
           expires_at: exp,
           started_at: s?.started_at || null,
         };
       });
-      if (planFilter === 'free' || planFilter === 'pro') {
-        users = users.filter((u) => u.plan === planFilter);
-      }
-      const proCount = await countProSubscriptions();
-      return sendJson(res, 200, { success: true, users, total, limit, offset, proCount });
+      return sendJson(res, 200, { success: true, users, total, limit, offset });
     } catch (err) {
       log.err('admin users list failed', err?.message || 'unknown');
       return sendJson(res, 500, { success: false, message: 'Could not load users.' });
     }
   }
 
-  // POST /api/admin/users/grant-pro { user_id, days? } — manual Pro activation
+  // POST /api/admin/users/grant-pro — disabled while paid mode is off.
   if (path === '/api/admin/users/grant-pro' && method === 'POST') {
     const adminUser = await requireAdmin(req);
     if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
-    let body = {};
-    try { body = await readBody(req); } catch {
-      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
-    }
-    const userId = typeof body?.user_id === 'string' ? body.user_id.trim().slice(0, 64) : '';
-    const days = Math.min(Math.max(Number(body?.days) || 365, 1), 3650);
-    if (!userId) return sendJson(res, 400, { success: false, message: 'user_id is required.' });
-    if (userId === adminUser.id) {
-      // Allow self-grant but log it — prevents accidental lockout confusion.
-      log.warn('Admin granted Pro to self');
-    }
-    try {
-      const result = await adminGrantPro(userId, days);
-      log.info('Admin granted Pro');
-      return sendJson(res, 200, { success: true, plan: 'pro', expiresAt: result.expiresAt, days: result.days });
-    } catch (err) {
-      log.err('admin grant-pro failed', err?.message || 'unknown');
-      return sendJson(res, 500, { success: false, message: 'Grant failed. Check server config.' });
-    }
+    return sendJson(res, 503, {
+      success: false,
+      paymentsPaused: true,
+      message: 'Paid mode is currently off — every account already has full access.',
+    });
   }
 
-  // POST /api/admin/users/revoke-pro { user_id } — demote to Free
+  // POST /api/admin/users/revoke-pro — disabled while paid mode is off.
   if (path === '/api/admin/users/revoke-pro' && method === 'POST') {
     const adminUser = await requireAdmin(req);
     if (!adminUser) return sendJson(res, 403, { success: false, message: 'Admin access required.' });
-    let body = {};
-    try { body = await readBody(req); } catch {
-      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
-    }
-    const userId = typeof body?.user_id === 'string' ? body.user_id.trim().slice(0, 64) : '';
-    if (!userId) return sendJson(res, 400, { success: false, message: 'user_id is required.' });
-    try {
-      await adminRevokePro(userId);
-      log.info('Admin revoked Pro');
-      return sendJson(res, 200, { success: true, plan: 'free' });
-    } catch (err) {
-      log.err('admin revoke-pro failed', err?.message || 'unknown');
-      return sendJson(res, 500, { success: false, message: 'Revoke failed. Check server config.' });
-    }
+    return sendJson(res, 503, {
+      success: false,
+      paymentsPaused: true,
+      message: 'Paid mode is currently off — every account already has full access.',
+    });
   }
 
   // Dashboard bundle: entitlement + usage + subscription + admin in one call.
@@ -1216,21 +1174,17 @@ export async function handleApiRequest(req, res) {
       status: ent.status,
       features: ent.features,
       aiUsed: ent.used ?? 0,
-      aiLimit: ent.plan === 'pro' ? 30 : 5,
+      aiLimit: Infinity,
       expiresAt: ent.expiresAt || ent.currentPeriodEnd || null,
       admin,
     });
   }
 
-  // Personalized roadmap — PRO ONLY. Answers are posted (already completed
-  // client-side); entitlement is verified before anything is returned.
+  // Personalized roadmap. Answers are posted (already completed client-side).
+  // Paid mode is off: the roadmap is open to every signed-in user.
   if (path === '/api/roadmap' && method === 'POST') {
     const user = await authenticate(req);
     if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
-    const ent = await entitlementFor(user.id);
-    if (ent.plan !== 'pro') {
-      return sendJson(res, 403, { success: false, allowed: false, plan: 'free', message: 'Personalized roadmap requires NAVORA Pro. Upgrade to unlock.' });
-    }
     let body = {};
     try { body = await readBody(req); } catch {
       return sendJson(res, 400, { success: false, message: 'Invalid request.' });
@@ -1246,85 +1200,25 @@ export async function handleApiRequest(req, res) {
     return sendJson(res, 200, { success: true, roadmap: buildRoadmap(answers, userType) });
   }
 
-  // ── Razorpay payments (one-time annual Pro, ₹999 = 99900 paise) ──
+  // ── Razorpay payments — PAUSED (paid mode is off) ──
+  // Every feature is currently free for every user, so no order is created.
+  // The handler stays in place so the paid tier can be switched back on.
   if (path === '/api/payments/create-pro-order' && method === 'POST') {
     const user = await authenticate(req);
     if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
-    const ent = await entitlementFor(user.id);
-    if (ent.plan === 'pro') {
-      return sendJson(res, 200, {
-        success: true, alreadyPro: true, plan: 'pro',
-        expiresAt: ent.expiresAt || ent.currentPeriodEnd || null,
-        message: 'You already have NAVORA Pro.',
-      });
-    }
-    if (!isRazorpayConfigured()) {
-      return sendJson(res, 503, {
-        success: false, configured: false,
-        message: 'Payments are not configured yet. Set RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET (Test Mode).',
-      });
-    }
-    try {
-      const order = await createRazorpayOrder({
-        receipt: `navora_${user.id.slice(0, 12)}_${Date.now()}`.slice(0, 40),
-        notes: { user_id: user.id, product: 'navora_pro_annual' },
-      });
-      try {
-        await insertPaymentRow({
-          user_id: user.id,
-          provider: 'razorpay',
-          provider_order_id: order.id,
-          provider_payment_id: null,
-          amount: order.amount ?? PRO_AMOUNT_PAISE,
-          currency: order.currency || PRO_CURRENCY,
-          status: 'created',
-        });
-      } catch (e) { log.warn('order audit insert failed', e?.message || ''); }
-      return sendJson(res, 200, {
-        success: true,
-        orderId: order.id,
-        amount: order.amount ?? PRO_AMOUNT_PAISE,
-        currency: order.currency || PRO_CURRENCY,
-        keyId: razorpayPublicKey(),
-      });
-    } catch (err) {
-      log.err('create-pro-order failed', err?.message || 'unknown');
-      return sendJson(res, 502, { success: false, message: 'Could not start checkout. Please try again.' });
-    }
+    return sendJson(res, 503, {
+      success: false, configured: false, paymentsPaused: true,
+      message: 'Payments are paused right now — every NAVORA feature is free for all users.',
+    });
   }
 
   if (path === '/api/payments/verify-pro-payment' && method === 'POST') {
     const user = await authenticate(req);
     if (!user) return sendJson(res, 401, { success: false, message: 'Sign in required.' });
-    let body = {};
-    try { body = await readBody(req); } catch {
-      return sendJson(res, 400, { success: false, message: 'Invalid request.' });
-    }
-    const orderId = typeof body?.razorpay_order_id === 'string' ? body.razorpay_order_id.trim() : '';
-    const paymentId = typeof body?.razorpay_payment_id === 'string' ? body.razorpay_payment_id.trim() : '';
-    const signature = typeof body?.razorpay_signature === 'string' ? body.razorpay_signature.trim() : '';
-    if (!orderId || !paymentId || !signature || orderId.length > 64 || paymentId.length > 64 || signature.length > 256) {
-      return sendJson(res, 400, { success: false, message: 'Invalid payment details.' });
-    }
-    // ONLY a valid cryptographic signature activates Pro — never checkout closure.
-    if (!verifyPaymentSignature(orderId, paymentId, signature)) {
-      await updatePaymentStatus(paymentId, 'failed');
-      return sendJson(res, 400, { success: false, message: 'Your payment could not be completed.' });
-    }
-    try {
-      const result = await activateProForPayment({
-        userId: user.id, orderId, paymentId, amount: PRO_AMOUNT_PAISE, currency: PRO_CURRENCY,
-      });
-      log.info('Pro activated via verified payment');
-      return sendJson(res, 200, {
-        success: true, plan: 'pro', expiresAt: result.expiresAt,
-        alreadyActive: result.alreadyActive === true,
-        message: 'Welcome to NAVORA Pro. Your Pro access is now active.',
-      });
-    } catch (err) {
-      log.err('verify-pro-payment activation failed', err?.message || 'unknown');
-      return sendJson(res, 500, { success: false, message: 'Payment verified but activation failed. Contact support.' });
-    }
+    return sendJson(res, 503, {
+      success: false, paymentsPaused: true,
+      message: 'Payments are paused right now — every NAVORA feature is free for all users.',
+    });
   }
 
   // Razorpay payment webhook (payment.captured etc.). Idempotent: same payment
@@ -1364,16 +1258,13 @@ export async function handleApiRequest(req, res) {
         return sendJson(res, 200, { success: true, ignored: true });
       }
       try {
-        await activateProForPayment({
-          userId,
-          orderId: entity.order_id || null,
-          paymentId: entity.id,
-          amount: entity.amount ?? PRO_AMOUNT_PAISE,
-          currency: (entity.currency || PRO_CURRENCY).toUpperCase(),
-        });
-        return sendJson(res, 200, { success: true });
+        // Paid mode is off: record the payment for reconciliation, but do not
+        // grant any plan. Every user already has full access.
+        await updatePaymentStatus(entity.id, 'captured');
+        log.info('Razorpay webhook: payment captured while paid mode is off (no plan granted)');
+        return sendJson(res, 200, { success: true, ignored: true });
       } catch (err) {
-        log.err('Razorpay webhook activation failed', err?.message || 'unknown');
+        log.err('Razorpay webhook update failed', err?.message || 'unknown');
         return sendJson(res, 500, { success: false, message: 'Update failed.' });
       }
     }

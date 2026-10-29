@@ -1,19 +1,71 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── NAVORA ink / text ─────────────────────────────── */
+  /* ═══════════════════════════════════════════════════════════════════
+     NAVORA DESIGN SYSTEM — v1 (Task 4)
+     ───────────────────────────────────────────────────────────────────
+     CANONICAL TOKENS (use these in new / updated code):
+       backgrounds : --color-background / --color-background-subtle
+       text        : --color-text / --color-text-secondary (+ ink aliases)
+       borders     : --color-border / --color-border-strong
+       actions     : --color-primary / -hover / -active / --color-primary-soft
+       focus ring  : --color-focus
+       status      : --color-success / --color-warning / --color-error (+ -soft)
+       journey accent (RESERVED): --color-teal / --color-teal-strong / -soft
+         → teal is for progress indicators, journey milestones and
+           selected states ONLY. Never decorative, never brand CTAs.
+     LEGACY ALIASES (kept for compatibility — prefer canonical above):
+       ink, ink-2/3/4 · paper, paper-deep · surface · line, line-strong
+       brand-50…950 · spark-50…700 · navy · blue · ice
+     TYPE: Public Sans (body, --font-sans) + Archivo (UI/headings,
+        --font-ui and --font-display). No decorative serif italic.
+        Use .type-display/.type-h1/.type-h2/.type-h3/.type-card-title/
+       .type-body/.type-support/.type-label/.type-meta — never ad-hoc sizes.
+     SPACING: 4pt rhythm (Tailwind scale). Page sections → .section /
+       .section-sm. Content width → .container-site (max 76rem).
+     RADII: --radius-control 8px (small controls) · --radius-button 10px
+       (buttons/inputs) · --radius-card 12px (standard cards) ·
+       --radius-panel 18px (large feature panels). Pills (rounded-full)
+       are for BADGES ONLY.
+     SHADOWS: borders first (default surface = 1px border, no shadow).
+       Shadows only for elevation: xs/sm (controls), card/card-lg
+       (raised panels), brand (primary buttons), glow (spotlight only).
+     ═══════════════════════════════════════════════════════════════════ */
+
+  /* ── Canonical text ──────────────────────────────── */
+  --color-text: #0F172A;
+  --color-text-secondary: #475569;
+
+  /* ── NAVORA ink / text (legacy aliases — kept) ───── */
   --color-ink: #0A1638;
   --color-ink-2: #344265;
   --color-ink-3: #647496;
   --color-ink-4: #9baac9;
 
-  /* ── NAVORA surfaces ───────────────────────────────── */
-  --color-paper: #F5F6FB;
+  /* ── Canonical surfaces ──────────────────────────── */
+  --color-background: #FFFFFF;
+  --color-background-subtle: #F8FAFC;
+
+  /* ── NAVORA surfaces (legacy aliases — kept) ──────── */
+  --color-paper: #F8FAFC;
   --color-paper-deep: #ebf0f8;
   --color-surface: #FFFFFF;
 
-  --color-line: #e2e8f4;
+  /* ── Canonical borders ───────────────────────────── */
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+
+  --color-line: #E2E8F0;
   --color-line-strong: #cbd5e8;
+
+  /* ── Canonical primary action ────────────────────── */
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-active: #1E40AF;
+  --color-primary-soft: #EFF6FF;
+
+  /* ── Keyboard focus (AA-visible on light + dark) ─── */
+  --color-focus: #2563EB;
 
   /* ── NAVORA primary blue scale ─────────────────────── */
   --color-brand-50: #F0F4FC;
@@ -39,7 +91,7 @@
   --color-spark-700: #1d4ed8;
 
   /* ── NAVORA palette accents ────────────────────────── */
-  --color-navy: #0b1e3d;
+  --color-navy: #101D35;
   --color-indigo: #1e40af;
   --color-blue: #2563eb;
   --color-purple: #1e40af;
@@ -67,16 +119,32 @@
   --color-pt: #1e3a8a;
   --color-pt-soft: #e8eefb;
 
-  --color-success: #0d8f7e;
-  --color-warning: #b4751a;
-  --color-error: #d04a3a;
-  --color-error-soft: #fbeae7;
+  /* ── Journey accent — RESERVED (progress / milestones / selected) ── */
+  --color-teal: #0D9488;
+  --color-teal-strong: #0F766E;
+  --color-teal-soft: #E6F7F4;
+
+  /* ── Status (text-safe on white: success 5.9:1, warning 4.9:1, error 5.9:1) */
+  --color-success: #15803D;
+  --color-success-soft: #E7F6EC;
+  --color-warning: #B45309;
+  --color-warning-soft: #FEF3C7;
+  --color-error: #B91C1C;
+  --color-error-soft: #FDECEA;
 
   --color-brand-soft: #eff6ff;
 
-  --font-display: 'Fraunces', 'Georgia', serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-ui: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  /* Typography: Archivo (headings + UI labels, matches the geometric
+     NAVORA wordmark) paired with Public Sans (body, built for readability). */
+  --font-display: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+
+  /* ── Radius system (purposeful, limited) ─────────────── */
+  --radius-control: 8px;   /* small controls, chips, thumbnails */
+  --radius-button: 10px;   /* buttons + text inputs */
+  --radius-card: 12px;     /* standard cards, panels, modals */
+  --radius-panel: 18px;    /* large feature panels, previews */
 
   --shadow-xs: 0 1px 2px rgba(11, 30, 61, 0.05);
   --shadow-sm: 0 1px 2px rgba(11, 30, 61, 0.04), 0 1px 3px rgba(11, 30, 61, 0.06);
@@ -142,10 +210,349 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-brand-500);
+    outline: 3px solid color-mix(in srgb, var(--color-focus) 45%, transparent);
     outline-offset: 2px;
     border-radius: 4px;
   }
+}
+
+@layer components {
+  /* ══ Buttons — canonical variants (see Button.jsx) ══
+     Heights meet 44px touch targets at md and above.
+     Pills are NOT used for buttons (radius-button = 10px). */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--radius-button);
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease,
+      box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .btn:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--color-focus) 45%, transparent);
+    outline-offset: 2px;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+  }
+  .btn-sm { min-height: 2.25rem; padding-inline: 1rem; font-size: 0.82rem; }
+  .btn-md { min-height: 2.75rem; padding-inline: 1.5rem; font-size: 0.875rem; }
+  .btn-lg { min-height: 3.25rem; padding-inline: 1.75rem; font-size: 0.95rem; }
+  .btn-xl { min-height: 3.5rem; padding-inline: 2.25rem; font-size: 1rem; }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: var(--shadow-brand);
+  }
+  .btn-primary:hover { background: var(--color-primary-hover); box-shadow: var(--shadow-brand-lg); }
+  .btn-primary:active { background: var(--color-primary-active); }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-xs);
+  }
+  .btn-secondary:hover { border-color: var(--color-brand-400); background: var(--color-primary-soft); }
+  .btn-secondary:active { background: var(--color-brand-100); }
+
+  .btn-tertiary {
+    background: transparent;
+    color: var(--color-brand-700);
+    padding-inline: 0.75rem;
+  }
+  .btn-tertiary:hover { background: var(--color-primary-soft); }
+  .btn-tertiary:active { background: var(--color-brand-100); }
+
+  .btn-destructive {
+    background: var(--color-error);
+    color: #fff;
+    box-shadow: var(--shadow-xs);
+  }
+  .btn-destructive:hover { background: #991B1B; }
+  .btn-destructive:active { background: #7F1D1D; }
+  .btn-destructive:focus-visible {
+    outline-color: color-mix(in srgb, var(--color-error) 45%, transparent);
+  }
+
+  /* ══ Form controls ══ */
+  .field-label {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+  .input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding-inline: 0.875rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-button);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .input::placeholder { color: var(--color-ink-3); }
+  .input:hover { border-color: var(--color-ink-4); }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+  .input:disabled {
+    background: var(--color-background-subtle);
+    color: var(--color-ink-3);
+    cursor: not-allowed;
+  }
+  .input-error { border-color: var(--color-error); }
+  .input-error:focus {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 16%, transparent);
+  }
+  .field-hint { font-size: 0.75rem; color: var(--color-ink-3); line-height: 1.5; }
+  .field-error { font-size: 0.75rem; font-weight: 500; color: var(--color-error); line-height: 1.5; }
+
+  /* ══ Surfaces — subtle border first, shadow only for elevation ══ */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 1.25rem;
+  }
+  @media (min-width: 640px) { .card { padding: 1.5rem; } }
+
+  .card-feature {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-panel);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-card);
+  }
+  @media (min-width: 640px) { .card-feature { padding: 2rem; } }
+
+  .card-interactive { transition: box-shadow 0.25s ease, border-color 0.25s ease; }
+  .card-interactive:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Structured data / dashboard tables stay scannable: no row rounding. */
+  .table-shell {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  /* ══ Badges — the ONE place pills (rounded-full) are allowed ══ */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .badge-info { background: var(--color-primary-soft); color: var(--color-primary-active); border-color: var(--color-brand-200); }
+  .badge-teal { background: var(--color-teal-soft); color: var(--color-teal-strong); border-color: color-mix(in srgb, var(--color-teal) 30%, transparent); }
+  .badge-success { background: var(--color-success-soft); color: var(--color-success); border-color: color-mix(in srgb, var(--color-success) 25%, transparent); }
+  .badge-warning { background: var(--color-warning-soft); color: var(--color-warning); border-color: color-mix(in srgb, var(--color-warning) 25%, transparent); }
+  .badge-error { background: var(--color-error-soft); color: var(--color-error); border-color: color-mix(in srgb, var(--color-error) 22%, transparent); }
+  .badge-neutral { background: var(--color-background-subtle); color: var(--color-text-secondary); border-color: var(--color-border); }
+
+  /* ══ Journey / progress — teal reserved for these ══ */
+  .journey-track {
+    width: 100%;
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: var(--color-paper-deep);
+    overflow: hidden;
+  }
+  .journey-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--color-teal);
+    transition: width 0.5s ease-out;
+  }
+
+  /* ══ Page structure — controlled widths + breathing room ══ */
+  .section { padding-block: clamp(3.5rem, 8vw, 6rem); }
+  .section-sm { padding-block: clamp(2.5rem, 5vw, 4rem); }
+
+  /* ══ Type scale — one heading voice (Archivo) + readable body (Public Sans) ══ */
+  .type-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.25rem, 5vw, 3.4rem);
+    line-height: 1.06;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+  .type-h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.875rem, 3.5vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.024em;
+    text-wrap: balance;
+  }
+  .type-h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .type-h3 {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 1.25rem;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+  }
+  .type-card-title {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+  .type-body { font-size: 1rem; line-height: 1.6; color: var(--color-text-secondary); }
+  .type-support { font-size: 0.9375rem; line-height: 1.6; color: var(--color-text-secondary); }
+  .type-meta { font-size: 0.75rem; line-height: 1.5; color: var(--color-ink-3); }
+
+  /* ══ Liquid glass ══
+     One blur layer per surface. The bar filters the page scrolling beneath
+     it; the nav track and the travelling lens ride on that blur instead of
+     stacking their own backdrop-filter (nested blur is the mobile perf
+     killer). Every glass surface keeps a solid fallback for browsers
+     without backdrop-filter and for users who ask for reduced transparency. */
+  .glass-bar {
+    position: relative;
+    isolation: isolate;
+    background:
+      linear-gradient(
+        170deg,
+        rgba(255, 255, 255, 0.82) 0%,
+        rgba(255, 255, 255, 0.68) 46%,
+        rgba(255, 255, 255, 0.60) 100%
+      );
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+    backdrop-filter: blur(26px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.32),
+      0 18px 40px -18px rgba(10, 22, 56, 0.55),
+      0 3px 10px -6px rgba(10, 22, 56, 0.28);
+  }
+  /* Specular sheen — the diagonal light catch that reads as "glass" rather
+     than "frosted rectangle". Sits under the bar's content (z-index -1) and
+     never intercepts clicks. */
+  .glass-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        118deg,
+        rgba(255, 255, 255, 0.6) 0%,
+        rgba(255, 255, 255, 0.14) 26%,
+        rgba(255, 255, 255, 0) 46%,
+        rgba(255, 255, 255, 0) 74%,
+        rgba(255, 255, 255, 0.2) 100%
+      );
+  }
+  .glass-bar--scrolled {
+    background:
+      linear-gradient(
+        170deg,
+        rgba(255, 255, 255, 0.86) 0%,
+        rgba(255, 255, 255, 0.70) 46%,
+        rgba(255, 255, 255, 0.60) 100%
+      );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.98),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+      0 22px 46px -20px rgba(10, 22, 56, 0.6),
+      0 4px 12px -6px rgba(10, 22, 56, 0.3);
+  }
+  /* The wordmark is dark artwork on a transparent plate now — a white halo
+     keeps it legible when dark page content scrolls beneath the glass. */
+  .glass-logo {
+    filter:
+      drop-shadow(0 1px 1px rgba(255, 255, 255, 0.92))
+      drop-shadow(0 2px 7px rgba(10, 22, 56, 0.16));
+  }
+  .glass-track {
+    background: rgba(255, 255, 255, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+      0 10px 24px -18px rgba(10, 22, 56, 0.6);
+  }
+  .glass-lens {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(243, 248, 255, 0.7) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.5),
+      0 8px 20px -12px rgba(10, 22, 56, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.45);
+  }
+  .glass-panel {
+    background:
+      linear-gradient(
+        170deg,
+        rgba(255, 255, 255, 0.84) 0%,
+        rgba(255, 255, 255, 0.68) 100%
+      );
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.62);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 28px 56px -30px rgba(10, 22, 56, 0.6);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-bar,
+  .glass-bar--scrolled { background: rgba(255, 255, 255, 0.97); }
+  .glass-bar::after { display: none; }
+  .glass-panel { background: rgba(255, 255, 255, 0.98); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-bar,
+  .glass-bar--scrolled { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass-bar::after { display: none; }
+  .glass-panel { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .glass-track { background: #f4f7fc; }
+  .glass-lens { background: #fff; }
 }
 
 @layer utilities {
@@ -162,45 +569,30 @@
     font-family: var(--font-ui);
   }
 
+  /* Quiet section label — not a decorative pill/eyebrow badge. */
   .eyebrow {
     font-family: var(--font-ui);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
   }
 
-  /* NAVORA brand gradient — deep blue → accent blue */
-  .text-gradient {
-    background: linear-gradient(115deg, var(--color-brand-700) 5%, var(--color-brand-500) 55%, var(--color-brand-400) 105%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
+  /* Retained as solid brand tones: gradient text is not used. */
+  .text-gradient,
   .text-gradient-blue {
-    background: linear-gradient(115deg, var(--color-brand-700), var(--color-brand-400));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-brand-700);
   }
 
   .text-gradient-ink {
-    background: linear-gradient(180deg, var(--color-ink) 30%, #43547a 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-ink);
   }
 
   .bg-paper-gradient {
-    background:
-      radial-gradient(1200px 520px at 82% -12%, rgba(37, 99, 235, 0.12), transparent 60%),
-      radial-gradient(900px 420px at 8% 112%, rgba(59, 130, 246, 0.08), transparent 55%),
-      var(--color-paper);
+    background: var(--color-paper);
   }
 
   .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+    background-image: none;
   }
 
   .hairline-t {
@@ -228,145 +620,48 @@
     background-size: 100% 2px;
   }
 
+  /* Flat, neutral surfaces. No decorative mesh gradients or texture. */
   .bg-mesh {
-    background:
-      radial-gradient(1100px 520px at 84% -10%, rgba(37, 99, 235, 0.14), transparent 60%),
-      radial-gradient(900px 440px at 2% 110%, rgba(59, 130, 246, 0.09), transparent 55%),
-      radial-gradient(760px 340px at 55% 120%, rgba(30, 64, 175, 0.05), transparent 60%),
-      var(--color-paper);
+    background: var(--color-paper);
   }
 
   .bg-mesh-dark {
-    background:
-      radial-gradient(1000px 460px at 80% -10%, rgba(37, 99, 235, 0.32), transparent 62%),
-      radial-gradient(760px 400px at 6% 112%, rgba(59, 130, 246, 0.16), transparent 58%),
-      radial-gradient(600px 320px at 60% 18%, rgba(30, 64, 175, 0.14), transparent 60%),
-      var(--color-brand-950);
+    background: var(--color-brand-950);
   }
 
-  .glass {
-    background: rgba(255, 255, 255, 0.82);
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-  }
-
+  .glass,
   .glass-dark {
-    background: rgba(11, 30, 61, 0.72);
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    background: var(--color-surface);
   }
 
-  /* ── Premium glass panel ─────────────────────────── */
   .glass-premium {
-    position: relative;
-    background: rgba(255, 255, 255, 0.6);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 2px 6px rgba(11, 30, 61, 0.06),
-      0 12px 40px rgba(11, 30, 61, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    transition:
-      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.4s ease;
-  }
-
-  .glass-premium:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      0 2px 6px rgba(11, 30, 61, 0.05),
-      0 24px 64px rgba(11, 30, 61, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card);
   }
 
   .card-lift {
-    transition:
-      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-      box-shadow 0.3s ease,
-      border-color 0.3s ease;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
   }
 
   .card-lift:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-card-lg);
+    border-color: var(--color-brand-200);
+    box-shadow: var(--shadow-card);
   }
 
   .premium-card {
-    position: relative;
     background: var(--color-surface);
-    border: 1px solid transparent;
-    background-clip: padding-box;
+    border: 1px solid var(--color-border);
   }
 
-  .premium-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      140deg,
-      rgba(37, 99, 235, 0.5),
-      rgba(30, 64, 175, 0.32) 45%,
-      rgba(11, 30, 61, 0.06) 72%
-    );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-
-  .btn-shine {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  .btn-shine::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -70%;
-    width: 45%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.65s ease;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  .btn-shine:hover::after {
-    left: 130%;
-  }
-
-  .glow-dot {
-    position: relative;
-  }
-
-  .glow-dot::before {
-    content: '';
-    position: absolute;
-    inset: -5px;
-    border-radius: 9999px;
-    background: currentColor;
-    opacity: 0.25;
-    filter: blur(6px);
-    z-index: -1;
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-float-slow {
-    animation: float 9s ease-in-out infinite;
-  }
-
+  /* Retained as no-ops so legacy call-sites stay harmless. */
+  .btn-shine,
+  .glow-dot,
+  .animate-float,
+  .animate-float-slow,
   .animate-pulse-glow {
-    animation: pulseGlow 4s ease-in-out infinite;
+    animation: none;
   }
 
   .scrollbar-thin {
@@ -391,6 +686,10 @@
   .container-site {
     max-width: 76rem;
     margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .container-site { padding-inline: 2rem; }
   }
 
   .nav-underline {
@@ -413,6 +712,139 @@
   .nav-underline:hover::after,
   .nav-underline.is-active::after {
     width: 100%;
+  }
+
+  /* ── NAVORA hero — reference composition, scoped ──
+     Deep navy + white accents only. Left text / right wavy photo. */
+  .navora-hero {
+    background:
+      radial-gradient(52rem 30rem at 18% -8%, rgba(56, 120, 220, 0.28), transparent 62%),
+      radial-gradient(40rem 26rem at 78% 8%, rgba(37, 99, 235, 0.20), transparent 60%),
+      linear-gradient(180deg, #0d2247 0%, #0a1638 58%, #081128 100%);
+  }
+  .navora-hero__inner { position: relative; z-index: 1; }
+  .navora-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--font-ui);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #fff;
+  }
+  .navora-hero__dash {
+    display: inline-block;
+    width: 2.4rem;
+    height: 4px;
+    border-radius: 9999px;
+    background: #fff;
+  }
+  .navora-hero__title {
+    margin-top: 1.1rem;
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  .navora-hero__title-main {
+    display: block;
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5.2vw, 3.9rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+  .navora-hero__title-sub {
+    display: block;
+    margin-top: 0.55rem;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .navora-hero__btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding-inline: 1.75rem;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0a1638;
+    background: #fff;
+    border: 1px solid #fff;
+    border-radius: 9999px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+  }
+  .navora-hero__btn-primary:hover { background: rgba(255, 255, 255, 0.88); }
+  .navora-hero__btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.25rem;
+    padding-inline: 1.75rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .navora-hero__btn-outline:hover { background: rgba(255, 255, 255, 0.12); border-color: #fff; }
+  .navora-hero__media {
+    position: relative;
+    min-height: 24rem;
+    border-radius: 9999px 9999px 0 0;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-bottom: 0;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  }
+  .navora-hero__media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgba(10, 22, 56, 0.12) 0%, rgba(10, 22, 56, 0) 34%, rgba(10, 22, 56, 0.24) 100%);
+    pointer-events: none;
+  }
+  .navora-hero__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+  .navora-hero__media-card {
+    position: absolute;
+    z-index: 2;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-card-lg);
+    padding: 1rem 1.1rem;
+  }
+  @media (min-width: 640px) {
+    .navora-hero__media { min-height: 28rem; }
+    .navora-hero__media-card { left: 1.25rem; right: auto; width: 23rem; }
+  }
+  @media (min-width: 1024px) {
+    .navora-hero__media {
+      min-height: 34rem;
+      height: 100%;
+      border-radius: 46% 46% 0 0 / 30% 30% 0 0;
+      margin-bottom: 0;
+    }
   }
 }
 
@@ -447,5 +879,78 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   NAVORA SPLASH SCREEN — premium one-time entry animation
+   Clean white background, centred existing logo, subtle scale + fade.
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+.navora-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.navora-splash[data-phase="exit"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navora-splash__logo {
+  display: block;
+  width: auto;
+  height: 132px;
+  max-height: 28vh;
+  max-width: 82vw;
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navora-splash[data-phase="logo"] .navora-splash__logo,
+.navora-splash[data-phase="logo-settled"] .navora-splash__logo,
+.navora-splash[data-phase="tagline"] .navora-splash__logo {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.navora-splash__tagline {
+  margin-top: 16px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: #0A1638;
+  letter-spacing: -0.015em;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navora-splash[data-phase="tagline"] .navora-splash__tagline {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .navora-splash__logo {
+    height: 100px;
+    max-height: 22vh;
+  }
+  .navora-splash__tagline {
+    font-size: 1rem;
+    margin-top: 14px;
   }
 }

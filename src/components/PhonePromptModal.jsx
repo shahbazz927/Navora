@@ -38,7 +38,7 @@ export default function PhonePromptModal({ open, initialName = '', initialPhone 
   };
 
   return (
-    <div className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
         <div className="flex items-center gap-2 mb-1">
           <ShieldCheck className="w-5 h-5 text-blue-600" />

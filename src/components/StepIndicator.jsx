@@ -1,4 +1,6 @@
-export default function StepIndicator({ currentStep, totalSteps, labels = [], accentClass = 'bg-brand-500' }) {
+/* Progress uses the reserved journey accent (teal) per the design system.
+   Pass accentClass explicitly to override for a one-off context. */
+export default function StepIndicator({ currentStep, totalSteps, labels = [], accentClass = 'journey-fill' }) {
   const pct = totalSteps === 0 ? 0 : (currentStep / (totalSteps - 1)) * 100;
 
   return (
@@ -11,7 +13,7 @@ export default function StepIndicator({ currentStep, totalSteps, labels = [], ac
           <span className="text-sm font-medium text-ink-2">{labels[currentStep]}</span>
         )}
       </div>
-      <div className="relative w-full h-1.5 bg-paper-deep rounded-full overflow-hidden">
+      <div className="journey-track relative w-full" role="progressbar" aria-valuenow={currentStep + 1} aria-valuemin={1} aria-valuemax={totalSteps}>
         <div
           className={`h-full ${accentClass} rounded-full transition-all duration-500 ease-out`}
           style={{ width: `${pct}%` }}

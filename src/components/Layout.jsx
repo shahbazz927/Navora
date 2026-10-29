@@ -8,7 +8,7 @@ export default function Layout({ children, showHeader = true, showFooter = true 
     <div className="min-h-screen flex flex-col">
       {showHeader && <Header />}
       {showHeader && <OfflineBanner />}
-      <main className={`flex-1 ${showHeader ? 'pt-[4.25rem]' : ''}`}>
+      <main className={`flex-1 ${showHeader ? 'pt-[5.25rem]' : ''}`}>
         <AnimatedPage>{children}</AnimatedPage>
       </main>
       {showFooter && <Footer />}

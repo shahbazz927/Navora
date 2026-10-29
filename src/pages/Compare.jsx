@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Scale, Trash2, Plus } from 'lucide-react';
 import Button from '../components/Button';
 import BackLink from '../components/BackLink';
-import LockedFeature from '../components/LockedFeature';
-import UpgradeModal from '../components/UpgradeModal';
 import { FadeIn } from '../components/AnimatedPage';
 import { useUser } from '../context/UserContext';
-import { useSubscription } from '../hooks/useSubscription';
 import { useScrollTop } from '../hooks/useLocalStorage';
 
 const rows = [
@@ -21,16 +17,10 @@ const rows = [
 export default function Compare() {
   useScrollTop();
   const { userType, comparisonItems, setComparisonItems, answers, setAnswers } = useUser();
-  const { isPro } = useSubscription();
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const navigate = useNavigate();
   const recPath = userType ? `/recommendations/${userType}` : '/get-started';
 
-  // Free compares the top 3 side by side; Pro compares everything saved.
-  // (Course data itself is public/static — the Pro gate is on comparison depth,
-  // consistent with the top-3 Free recommendation limit.)
-  const visibleItems = isPro ? comparisonItems : comparisonItems.slice(0, 3);
-  const lockedCount = comparisonItems.length - visibleItems.length;
+  const visibleItems = comparisonItems;
 
   const handleSaveAndContinue = () => {
     setAnswers({ ...answers, lastSavedAt: new Date().toISOString() });
@@ -44,9 +34,9 @@ export default function Compare() {
 
   if (comparisonItems.length === 0) {
     return (
-      <div className="min-h-screen bg-paper-gradient flex items-center justify-center py-16">
+      <div className="min-h-screen bg-surface flex items-center justify-center py-16">
         <FadeIn className="text-center max-w-md mx-auto px-5">
-          <span className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 items-center justify-center mb-6 shadow-brand">
+          <span className="inline-flex w-16 h-16 rounded-2xl bg-brand-600 items-center justify-center mb-6">
             <Scale className="w-7 h-7 text-white" strokeWidth={1.5} />
           </span>
           <h1 className="font-ui font-bold text-3xl text-ink tracking-[-0.03em]">
@@ -75,7 +65,7 @@ export default function Compare() {
   }
 
   return (
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
         <div className="flex items-center justify-between mb-8">
           <BackLink />
@@ -147,20 +137,6 @@ export default function Compare() {
             </div>
           </div>
         </FadeIn>
-
-        {lockedCount > 0 && !isPro && (
-          <FadeIn delay={0.12}>
-            <div className="mt-6">
-              <LockedFeature
-                title={`Compare all ${comparisonItems.length} courses with Pro`}
-                desc={`Free compares up to 3 courses side by side. ${lockedCount} more saved course${lockedCount === 1 ? ' is' : 's are'} waiting — upgrade to unlock full comparison.`}
-                cta="Unlock with Pro"
-                onUnlock={() => setShowUpgrade(true)}
-              />
-            </div>
-          </FadeIn>
-        )}
-        <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} feature="course_comparison" />
 
         <FadeIn delay={0.15} className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button size="lg" fullWidth className="sm:w-auto" onClick={handleSaveAndContinue}>

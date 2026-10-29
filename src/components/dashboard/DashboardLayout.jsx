@@ -2,23 +2,12 @@ import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import {
   Menu, X, Home, Compass, BookOpen, Building2, MessageCircle, User,
-  Settings, Sparkles, GitCompare, Map, FileText, Users, Award, Globe,
+  Settings, GitCompare, Map, FileText, Users, Award, Globe,
 } from 'lucide-react';
 import Logo from '../Logo';
 import { useUser } from '../../context/UserContext';
 
-const FREE_NAV = [
-  { to: '/dashboard', label: 'Home', icon: Home, end: true },
-  { to: '/get-started', label: 'Career Explorer', icon: Compass },
-  { to: '/compare', label: 'Courses', icon: BookOpen },
-  { to: '/colleges', label: 'Colleges', icon: Building2 },
-  { to: '/scholarships', label: 'Scholarships', icon: Award },
-  { to: '/study-abroad', label: 'Global Study', icon: Globe },
-  { to: '/advisor', label: 'AI Advisor', icon: MessageCircle },
-  { to: '/account', label: 'My Profile', icon: User },
-];
-
-const PRO_NAV = [
+const DASHBOARD_NAV = [
   { to: '/dashboard', label: 'Home', icon: Home, end: true },
   { to: '/account', label: 'My Profile', icon: User },
   { to: '/get-started', label: 'Career Explorer', icon: Compass },
@@ -33,8 +22,7 @@ const PRO_NAV = [
   { to: '/parents', label: 'Parent Summary', icon: Users },
 ];
 
-function SidebarBody({ isPro, onNavigate }) {
-  const nav = isPro ? PRO_NAV : FREE_NAV;
+function SidebarBody({ onNavigate }) {
   const linkCls = ({ isActive }) =>
     `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[0.88rem] font-medium transition-colors ${
       isActive ? 'bg-white/10 text-white' : 'text-white/65 hover:text-white hover:bg-white/5'
@@ -43,14 +31,9 @@ function SidebarBody({ isPro, onNavigate }) {
     <div className="flex flex-col h-full">
       <Link to="/" className="flex items-center gap-2.5 px-4 pt-5 pb-6" onClick={onNavigate} aria-label="NAVORA home">
         <span className="inline-flex items-center rounded-xl bg-white px-3 py-1.5"><Logo size="sm" /></span>
-        {isPro && (
-          <span className="ml-auto inline-flex items-center gap-1 text-[0.65rem] font-bold tracking-[0.12em] uppercase bg-gradient-to-r from-violet-500 to-brand-500 text-white rounded-full px-2.5 py-1">
-            <Sparkles className="w-3 h-3" /> Pro
-          </span>
-        )}
       </Link>
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto" aria-label="Dashboard">
-        {nav.map((l) => (
+        {DASHBOARD_NAV.map((l) => (
           <NavLink key={l.to + l.label} to={l.to} end={l.end} className={linkCls} onClick={onNavigate}>
             <l.icon className="w-[1.1rem] h-[1.1rem] shrink-0" aria-hidden="true" />
             {l.label}
@@ -58,15 +41,6 @@ function SidebarBody({ isPro, onNavigate }) {
         ))}
       </nav>
       <div className="p-3 pt-4 border-t border-white/10 space-y-1">
-        {!isPro && (
-          <Link
-            to="/pricing"
-            onClick={onNavigate}
-            className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-brand-500 hover:from-violet-500 hover:to-brand-400 text-white font-semibold text-[0.85rem] px-4 py-2.5 transition-all"
-          >
-            <Sparkles className="w-4 h-4" /> Upgrade to Pro
-          </Link>
-        )}
         <NavLink
           to="/account"
           onClick={onNavigate}
@@ -80,7 +54,7 @@ function SidebarBody({ isPro, onNavigate }) {
   );
 }
 
-export default function DashboardLayout({ isPro, user, children }) {
+export default function DashboardLayout({ user, children }) {
   const [drawer, setDrawer] = useState(false);
   const location = useLocation();
   const initial = (user?.user_metadata?.full_name || user?.email || '?').charAt(0).toUpperCase();
@@ -90,7 +64,7 @@ export default function DashboardLayout({ isPro, user, children }) {
       {/* Desktop sidebar */}
       <aside className="hidden lg:block w-[250px] shrink-0">
         <div className="fixed inset-y-0 w-[250px] bg-[#0A192F] text-white">
-          <SidebarBody isPro={isPro} />
+          <SidebarBody />
         </div>
       </aside>
 
@@ -134,7 +108,7 @@ export default function DashboardLayout({ isPro, user, children }) {
               </button>
             </div>
             <div className="flex-1 min-h-0">
-              <SidebarBody isPro={isPro} onNavigate={() => setDrawer(false)} />
+              <SidebarBody onNavigate={() => setDrawer(false)} />
             </div>
           </div>
         </div>

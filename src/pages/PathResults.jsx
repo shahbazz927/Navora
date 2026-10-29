@@ -78,7 +78,7 @@ export default function PathResults() {
 
   if (!summary) {
     return (
-      <div className="min-h-screen bg-paper-gradient">
+      <div className="min-h-screen bg-surface">
         <div className="max-w-2xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
           <div className="bg-white border border-line rounded-[1.6rem] shadow-card p-8 sm:p-10 text-center">
             <span className="inline-flex w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 items-center justify-center mb-6"><Compass className="w-7 h-7" strokeWidth={1.75} /></span>
@@ -110,7 +110,7 @@ export default function PathResults() {
         <RecommendationCard key={item.career.id} item={item} rank={unified.indexOf(item)} compared={compareIds.includes(item.career.id)} cantAdd={compareIds.length>=3} onToggleCompare={()=> toggleCompare(item.career.id)} open={openId===item.career.id} onToggleDetail={()=> setOpenId(openId===item.career.id? null: item.career.id)} onSave={()=> setToast('Saved \u2713')} />
       )}
       sidebarExams={exams}
-      sidebarNextColleges={<section className="rounded-[14px] p-5 text-white shadow-card" style={{background:'linear-gradient(135deg,#0f1f4d,#0a1638)'}}><h2 className="flex items-center gap-2 text-[0.72rem] font-bold uppercase text-white/70">Next: colleges</h2><p className="mt-2 text-sm text-white/85">Shortlist colleges for the recommended degree.</p><div className="mt-4"><Button size="md" className="w-full" onClick={()=> navigate('/recommendations/graduate')}>View colleges</Button></div></section>}
+      sidebarNextColleges={<section className="rounded-card p-5 text-white bg-brand-950"><h2 className="flex items-center gap-2 text-xs font-semibold text-white/70">Next: colleges</h2><p className="mt-2 text-sm text-white/85">Shortlist colleges for the recommended degree.</p><div className="mt-4"><Button size="md" className="w-full" onClick={()=> navigate('/recommendations/graduate')}>View colleges</Button></div></section>}
       nextSteps={steps}
       stepsChecked={stepsChecked}
       onToggleStep={(k)=> setStepsChecked(s=> ({...s, [k]: !s[k]}))}

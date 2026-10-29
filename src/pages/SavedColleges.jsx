@@ -71,7 +71,7 @@ export default function SavedColleges() {
         {savedInstitutions.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-ink-2">
                 {savedInstitutions.length} Saved {savedInstitutions.length === 1 ? 'Institution' : 'Institutions'}
               </span>
             </div>

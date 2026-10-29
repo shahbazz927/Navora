@@ -9,13 +9,11 @@ import {
   MessageSquare,
   Scale,
   Search,
-  Sparkles,
   Target,
   Users,
 } from 'lucide-react';
 import Button from '../components/Button';
 import Logo from '../components/Logo';
-import Swoosh from '../components/Swoosh';
 import { FadeIn } from '../components/AnimatedPage';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import { ABOUT_IMAGES } from './About';
@@ -159,36 +157,24 @@ export default function HowItWorks() {
             </p>
           </FadeIn>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {FRAMEWORK_PILLARS.map((pillar) => {
-              const Icon = pillar.icon;
-              return (
-                <div
-                  key={pillar.title}
-                  className="relative flex flex-col justify-between p-6 sm:p-7 rounded-[1.6rem] bg-paper border border-line hover:border-brand-200 transition-all card-lift"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600">
-                        <Icon className="w-5 h-5" />
-                      </span>
-                      <span className="font-display italic text-2xl font-bold text-brand-200">
-                        {pillar.step}
-                      </span>
-                    </div>
-                    <h3 className="font-ui font-bold text-xl text-ink tracking-tight">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-1 text-sm font-semibold text-brand-700">
-                      {pillar.subtitle}
-                    </p>
-                    <p className="mt-3 text-xs text-ink-2 leading-relaxed">
-                      {pillar.desc}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+            {FRAMEWORK_PILLARS.map((pillar) => (
+              <div
+                key={pillar.title}
+                className="border-t border-line pt-5"
+              >
+                <p className="font-ui text-xs font-semibold text-ink-3">{pillar.step}</p>
+                <h3 className="mt-1.5 font-ui font-bold text-xl text-ink tracking-tight">
+                  {pillar.title}
+                </h3>
+                <p className="mt-1 text-sm font-semibold text-brand-700">
+                  {pillar.subtitle}
+                </p>
+                <p className="mt-3 text-sm text-ink-2 leading-relaxed">
+                  {pillar.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -239,20 +225,15 @@ export default function HowItWorks() {
                     loading="lazy"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-950/70 via-brand-950/10 to-transparent" />
 
-                  <div className="absolute bottom-3 left-3 right-3 p-3.5 rounded-xl bg-white/95 backdrop-blur-md border border-white/60 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center shrink-0">
-                        <Sparkles className="w-4 h-4" />
-                      </span>
-                      <div>
-                        <p className="eyebrow text-brand-700 text-[0.62rem]">Objective Assessment</p>
-                        <p className="text-xs font-semibold text-ink">Personalized fit based on real constraints</p>
-                      </div>
+                  <div className="absolute bottom-3 left-3 right-3 p-3.5 rounded-card bg-white border border-line flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[0.68rem] font-semibold text-brand-700">Questionnaire first</p>
+                      <p className="text-xs font-semibold text-ink">Your answers set the priorities</p>
                     </div>
-                    <span className="text-[0.68rem] px-2 py-1 rounded-md bg-paper border border-line text-ink-2 font-semibold">
-                      Decision-Ready
+                    <span className="text-[0.68rem] px-2 py-1 rounded-control bg-paper border border-line text-ink-2 font-semibold">
+                      Step by step
                     </span>
                   </div>
                 </div>
@@ -356,10 +337,6 @@ export default function HowItWorks() {
 
       {/* ── 6. FINAL CTA ────────────────────────────────── */}
       <section className="bg-brand-950 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-mesh-dark opacity-90" />
-        <div className="absolute inset-0 bg-noise opacity-60" />
-        <Swoosh variant="dark" />
-
         <div className="relative max-w-4xl mx-auto px-5 sm:px-8 py-20 lg:py-28 text-center">
           <FadeIn>
             <Logo size="md" tone="light" onSurface className="mb-7 inline-flex" />

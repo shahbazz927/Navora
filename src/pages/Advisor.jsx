@@ -5,7 +5,6 @@ import { ArrowUp, Sparkles, Compass, MessageSquarePlus } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import { sendAdvisorChat, buildAdvicePayload } from '../lib/aiAdvisor';
 import { useSubscription } from '../hooks/useSubscription';
-import UpgradeModal from '../components/UpgradeModal';
 import { aiAdvisorResponses } from '../data/recommendations';
 import { getStudentContext } from '../data/streamConfig';
 import { useScrollTop } from '../hooks/useLocalStorage';
@@ -55,10 +54,7 @@ export default function Advisor() {
   const textareaRef = useRef(null);
   const prevHistoryLenRef = useRef(chatHistory.length);
 
-  const { plan, aiUsed, aiLimit, fetchRemote } = useSubscription();
-  const [showUpgrade, setShowUpgrade] = useState(false);
-  // Server is authoritative for quota; hook value is display-only and refreshes after each send.
-  const aiRemaining = Math.max(0, aiLimit - aiUsed);
+  const { aiUsed, fetchRemote } = useSubscription();
   const context = userType ? getStudentContext(userType, answers) : null;
 
   // Pre-fill input if passed from results view
@@ -125,8 +121,6 @@ export default function Advisor() {
   const handleSend = async (message = input) => {
     const trimmed = String(message || '').trim().slice(0, 500);
     if (!trimmed) return;
-    // Client-side hint only — server enforces the real quota (401/429).
-    if (aiRemaining <= 0) { setShowUpgrade(true); return; }
     const now = Date.now();
     if (now - lastSendRef.current < 1200) return; // rate-limit (F5)
     if (isTyping) return;
@@ -164,10 +158,7 @@ export default function Advisor() {
       fetchRemote();
       addChatMessage({ role: 'assistant', content: data.content, timestamp: new Date() });
     } catch (err) {
-      if (err?.status === 429) {
-        setShowUpgrade(true);
-        fetchRemote();
-      } else if (err?.status === 401) {
+      if (err?.status === 429 || err?.status === 401) {
         fetchRemote();
       }
       addChatMessage({
@@ -221,9 +212,9 @@ export default function Advisor() {
   }, [userType, answers]);
 
   return (
-    <div className="h-screen h-[100dvh] bg-paper-gradient flex flex-col overflow-hidden">
+    <div className="h-screen h-[100dvh] bg-surface flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-white/85 backdrop-blur-xl border-b border-line shrink-0 z-30">
+      <div className="bg-white border-b border-line shrink-0 z-30">
         <div className="max-w-3xl mx-auto px-5 sm:px-8 py-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -232,19 +223,19 @@ export default function Advisor() {
               <div>
                 <h1 className="font-ui font-semibold text-ink leading-tight">NAVORA advisor</h1>
                 <p className="text-xs text-ink-3 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 glow-dot" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   PERSONALIZED EDUCATION &amp; CAREER GUIDANCE — supporting your assessment
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-ink-3 bg-paper border border-line rounded-full px-3 py-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-brand-600" />
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-ink-3 bg-paper border border-line rounded-control px-3 py-1.5">
+                <Compass className="w-3.5 h-3.5 text-brand-600" />
                 {contextLabel} · plain-language guidance
               </span>
               <button
                 onClick={startNewChat}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-full px-3 py-1.5 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-control px-3 py-1.5 transition-all cursor-pointer"
               >
                 <MessageSquarePlus className="w-3.5 h-3.5" />
                 New Chat
@@ -354,7 +345,7 @@ export default function Advisor() {
       </div>
 
       {/* Input Container — Pinned at bottom without shifting */}
-      <div className="bg-white/95 backdrop-blur-xl border-t border-line shrink-0 z-30">
+      <div className="bg-white border-t border-line shrink-0 z-30">
         <div className="max-w-3xl mx-auto px-5 sm:px-8 py-3.5 sm:py-4">
           <div className="flex items-end gap-2.5">
             <div className="flex-1 relative">
@@ -384,10 +375,8 @@ export default function Advisor() {
             </motion.button>
           </div>
           <p className="text-xs text-center mt-2">
-            <span className={aiRemaining===0 ? 'text-amber-600 font-semibold' : 'text-ink-3'}>{aiRemaining===0 ? "You've reached today's Free AI Advisor limit. " : `${aiRemaining} of ${aiLimit} AI messages remaining today · `}Guidance for thinking, not a substitute for professional counselling.</span>
-            {aiRemaining===0 && <button onClick={()=>setShowUpgrade(true)} className="text-brand-600 font-semibold underline ml-1">Continue with NAVORA Pro</button>}
+            <span className="text-ink-3">Unlimited AI Advisor messages{aiUsed ? ` · ${aiUsed} sent today` : ''} · Guidance for thinking, not a substitute for professional counselling.</span>
           </p>
-          <UpgradeModal open={showUpgrade} onClose={()=>setShowUpgrade(false)} feature="ai_limit" />
         </div>
       </div>
     </div>

@@ -139,16 +139,13 @@ export default function ResultGate({ children, flowKey = 'unknown', title = 'You
           aria-label={`Unlock ${title}`}
         >
           {/* Dim backdrop — results stay faintly visible but unreadable */}
-          <div className="absolute inset-0 bg-ink/55 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-ink/60" />
 
-          <div className="relative w-full max-w-md overflow-hidden rounded-[1.6rem] border border-line bg-white shadow-card-lg">
+          <div className="relative w-full max-w-md overflow-hidden rounded-panel border border-line bg-white">
             {/* Top banner */}
-            <div
-              className="px-6 pb-5 pt-6 text-white"
-              style={{ background: 'linear-gradient(135deg,#0f1f4d,#0a1638)' }}
-            >
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-white/80">
-                <Lock className="h-3 w-3" />
+            <div className="px-6 pb-5 pt-6 text-white bg-brand-950">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70">
+                <Lock className="h-3.5 w-3.5" aria-hidden="true" />
                 Your career direction match
               </span>
               <h2 className="mt-3 font-ui text-2xl font-bold tracking-[-0.02em]">
@@ -164,7 +161,7 @@ export default function ResultGate({ children, flowKey = 'unknown', title = 'You
               <div>
                 <label
                   htmlFor="result-gate-name"
-                  className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.1em] text-ink-3"
+                  className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-ink-3"
                 >
                   <User className="h-3.5 w-3.5" /> Full name
                 </label>
@@ -187,7 +184,7 @@ export default function ResultGate({ children, flowKey = 'unknown', title = 'You
               <div>
                 <label
                   htmlFor="result-gate-phone"
-                  className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.1em] text-ink-3"
+                  className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-ink-3"
                 >
                   <Phone className="h-3.5 w-3.5" /> Mobile number
                 </label>

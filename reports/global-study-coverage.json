@@ -1,0 +1,925 @@
+{
+  "generatedAt": "2026-10-22",
+  "countryCount": 18,
+  "totalUniversities": 598,
+  "added": 395,
+  "updated": 0,
+  "skipped": 183,
+  "deduplicated": 183,
+  "skippedDetails": [
+    {
+      "name": "University of California, Berkeley",
+      "reason": "duplicate of usa-university-of-california-berkeley"
+    },
+    {
+      "name": "University of California, Los Angeles",
+      "reason": "duplicate of usa-university-of-california-los-angeles"
+    },
+    {
+      "name": "University of California, San Diego",
+      "reason": "duplicate of usa-university-of-california-san-diego"
+    },
+    {
+      "name": "University of California, Davis",
+      "reason": "duplicate of usa-university-of-california-davis"
+    },
+    {
+      "name": "University of California, Irvine",
+      "reason": "duplicate of usa-university-of-california-irvine"
+    },
+    {
+      "name": "University of California, Santa Barbara",
+      "reason": "duplicate of usa-university-of-california-santa-barbara"
+    },
+    {
+      "name": "University of Virginia",
+      "reason": "duplicate of usa-university-of-virginia"
+    },
+    {
+      "name": "University of North Carolina at Chapel Hill",
+      "reason": "duplicate of usa-university-of-north-carolina-at-chapel-hill"
+    },
+    {
+      "name": "University of Wisconsin-Madison",
+      "reason": "duplicate of usa-university-of-wisconsin-madison"
+    },
+    {
+      "name": "University of Illinois Urbana-Champaign",
+      "reason": "duplicate of usa-university-of-illinois-urbana-champaign"
+    },
+    {
+      "name": "University of Texas at Austin",
+      "reason": "duplicate of usa-university-of-texas-at-austin"
+    },
+    {
+      "name": "University of Washington",
+      "reason": "duplicate of usa-university-of-washington"
+    },
+    {
+      "name": "University of Florida",
+      "reason": "duplicate of usa-university-of-florida"
+    },
+    {
+      "name": "Ohio State University",
+      "reason": "duplicate of usa-ohio-state-university"
+    },
+    {
+      "name": "Pennsylvania State University",
+      "reason": "duplicate of usa-pennsylvania-state-university"
+    },
+    {
+      "name": "Purdue University",
+      "reason": "duplicate of usa-purdue-university"
+    },
+    {
+      "name": "University of Maryland, College Park",
+      "reason": "duplicate of usa-university-of-maryland-college-park"
+    },
+    {
+      "name": "University of Minnesota",
+      "reason": "duplicate of usa-university-of-minnesota"
+    },
+    {
+      "name": "Texas A&M University",
+      "reason": "duplicate of usa-texas-a-and-m-university"
+    },
+    {
+      "name": "University of Arizona",
+      "reason": "duplicate of usa-university-of-arizona"
+    },
+    {
+      "name": "Harvard University",
+      "reason": "duplicate of usa-harvard-university"
+    },
+    {
+      "name": "Massachusetts Institute of Technology",
+      "reason": "duplicate of usa-massachusetts-institute-of-technology"
+    },
+    {
+      "name": "Stanford University",
+      "reason": "duplicate of usa-stanford-university"
+    },
+    {
+      "name": "Princeton University",
+      "reason": "duplicate of usa-princeton-university"
+    },
+    {
+      "name": "Yale University",
+      "reason": "duplicate of usa-yale-university"
+    },
+    {
+      "name": "Columbia University",
+      "reason": "duplicate of usa-columbia-university"
+    },
+    {
+      "name": "University of Chicago",
+      "reason": "duplicate of usa-university-of-chicago"
+    },
+    {
+      "name": "University of Pennsylvania",
+      "reason": "duplicate of usa-university-of-pennsylvania"
+    },
+    {
+      "name": "California Institute of Technology",
+      "reason": "duplicate of usa-california-institute-of-technology"
+    },
+    {
+      "name": "Johns Hopkins University",
+      "reason": "duplicate of usa-johns-hopkins-university"
+    },
+    {
+      "name": "Northwestern University",
+      "reason": "duplicate of usa-northwestern-university"
+    },
+    {
+      "name": "Duke University",
+      "reason": "duplicate of usa-duke-university"
+    },
+    {
+      "name": "Cornell University",
+      "reason": "duplicate of usa-cornell-university"
+    },
+    {
+      "name": "Brown University",
+      "reason": "duplicate of usa-brown-university"
+    },
+    {
+      "name": "Dartmouth College",
+      "reason": "duplicate of usa-dartmouth-college"
+    },
+    {
+      "name": "Rice University",
+      "reason": "duplicate of usa-rice-university"
+    },
+    {
+      "name": "Vanderbilt University",
+      "reason": "duplicate of usa-vanderbilt-university"
+    },
+    {
+      "name": "University of Notre Dame",
+      "reason": "duplicate of usa-university-of-notre-dame"
+    },
+    {
+      "name": "Georgetown University",
+      "reason": "duplicate of usa-georgetown-university"
+    },
+    {
+      "name": "Carnegie Mellon University",
+      "reason": "duplicate of usa-carnegie-mellon-university"
+    },
+    {
+      "name": "University of Oxford",
+      "reason": "duplicate of uk-university-of-oxford"
+    },
+    {
+      "name": "University of Cambridge",
+      "reason": "duplicate of uk-university-of-cambridge"
+    },
+    {
+      "name": "Imperial College London",
+      "reason": "duplicate of uk-imperial-college-london"
+    },
+    {
+      "name": "University College London",
+      "reason": "duplicate of uk-university-college-london"
+    },
+    {
+      "name": "London School of Economics and Political Science",
+      "reason": "duplicate of uk-london-school-of-economics-and-political-science"
+    },
+    {
+      "name": "King's College London",
+      "reason": "duplicate of uk-king-s-college-london"
+    },
+    {
+      "name": "University of Manchester",
+      "reason": "duplicate of uk-university-of-manchester"
+    },
+    {
+      "name": "University of Bristol",
+      "reason": "duplicate of uk-university-of-bristol"
+    },
+    {
+      "name": "University of Warwick",
+      "reason": "duplicate of uk-university-of-warwick"
+    },
+    {
+      "name": "University of Glasgow",
+      "reason": "duplicate of uk-university-of-glasgow"
+    },
+    {
+      "name": "University of Birmingham",
+      "reason": "duplicate of uk-university-of-birmingham"
+    },
+    {
+      "name": "University of Leeds",
+      "reason": "duplicate of uk-university-of-leeds"
+    },
+    {
+      "name": "University of Sheffield",
+      "reason": "duplicate of uk-university-of-sheffield"
+    },
+    {
+      "name": "University of Nottingham",
+      "reason": "duplicate of uk-university-of-nottingham"
+    },
+    {
+      "name": "University of Southampton",
+      "reason": "duplicate of uk-university-of-southampton"
+    },
+    {
+      "name": "University of St Andrews",
+      "reason": "duplicate of uk-university-of-st-andrews"
+    },
+    {
+      "name": "Durham University",
+      "reason": "duplicate of uk-durham-university"
+    },
+    {
+      "name": "University of Bath",
+      "reason": "duplicate of uk-university-of-bath"
+    },
+    {
+      "name": "University of Exeter",
+      "reason": "duplicate of uk-university-of-exeter"
+    },
+    {
+      "name": "University of York",
+      "reason": "duplicate of uk-university-of-york"
+    },
+    {
+      "name": "University of Buckingham",
+      "reason": "duplicate of uk-university-of-buckingham"
+    },
+    {
+      "name": "Richmond American University London",
+      "reason": "duplicate of uk-richmond-american-university-london"
+    },
+    {
+      "name": "Regent's University London",
+      "reason": "duplicate of uk-regent-s-university-london"
+    },
+    {
+      "name": "Arden University",
+      "reason": "duplicate of uk-arden-university"
+    },
+    {
+      "name": "BPP University",
+      "reason": "duplicate of uk-bpp-university"
+    },
+    {
+      "name": "The University of Law",
+      "reason": "duplicate of uk-the-university-of-law"
+    },
+    {
+      "name": "University of British Columbia",
+      "reason": "duplicate of canada-university-of-british-columbia"
+    },
+    {
+      "name": "McGill University",
+      "reason": "duplicate of canada-mcgill-university"
+    },
+    {
+      "name": "McMaster University",
+      "reason": "duplicate of canada-mcmaster-university"
+    },
+    {
+      "name": "University of Alberta",
+      "reason": "duplicate of canada-university-of-alberta"
+    },
+    {
+      "name": "Universite de Montreal",
+      "reason": "duplicate of canada-universite-de-montreal"
+    },
+    {
+      "name": "University of Waterloo",
+      "reason": "duplicate of canada-university-of-waterloo"
+    },
+    {
+      "name": "Western University",
+      "reason": "duplicate of canada-western-university"
+    },
+    {
+      "name": "University of Calgary",
+      "reason": "duplicate of canada-university-of-calgary"
+    },
+    {
+      "name": "Queen's University",
+      "reason": "duplicate of canada-queen-s-university"
+    },
+    {
+      "name": "University of Ottawa",
+      "reason": "duplicate of canada-university-of-ottawa"
+    },
+    {
+      "name": "Dalhousie University",
+      "reason": "duplicate of canada-dalhousie-university"
+    },
+    {
+      "name": "University of Victoria",
+      "reason": "duplicate of canada-university-of-victoria"
+    },
+    {
+      "name": "Simon Fraser University",
+      "reason": "duplicate of canada-simon-fraser-university"
+    },
+    {
+      "name": "University of Manitoba",
+      "reason": "duplicate of canada-university-of-manitoba"
+    },
+    {
+      "name": "University of Saskatchewan",
+      "reason": "duplicate of canada-university-of-saskatchewan"
+    },
+    {
+      "name": "Universite Laval",
+      "reason": "duplicate of canada-universite-laval"
+    },
+    {
+      "name": "University of Guelph",
+      "reason": "duplicate of canada-university-of-guelph"
+    },
+    {
+      "name": "Carleton University",
+      "reason": "duplicate of canada-carleton-university"
+    },
+    {
+      "name": "York University",
+      "reason": "duplicate of canada-york-university"
+    },
+    {
+      "name": "University of Windsor",
+      "reason": "duplicate of canada-university-of-windsor"
+    },
+    {
+      "name": "Trinity Western University",
+      "reason": "duplicate of canada-trinity-western-university"
+    },
+    {
+      "name": "Redeemer University",
+      "reason": "duplicate of canada-redeemer-university"
+    },
+    {
+      "name": "Crandall University",
+      "reason": "duplicate of canada-crandall-university"
+    },
+    {
+      "name": "Booth University College",
+      "reason": "duplicate of canada-booth-university-college"
+    },
+    {
+      "name": "Tyndale University",
+      "reason": "duplicate of canada-tyndale-university"
+    },
+    {
+      "name": "Briercrest College and Seminary",
+      "reason": "duplicate of canada-briercrest-college-and-seminary"
+    },
+    {
+      "name": "Canadian Mennonite University",
+      "reason": "duplicate of canada-canadian-mennonite-university"
+    },
+    {
+      "name": "The King's University",
+      "reason": "duplicate of canada-the-king-s-university"
+    },
+    {
+      "name": "Concordia University of Edmonton",
+      "reason": "duplicate of canada-concordia-university-of-edmonton"
+    },
+    {
+      "name": "St. Mary's University",
+      "reason": "duplicate of canada-st-mary-s-university"
+    },
+    {
+      "name": "University Canada West",
+      "reason": "duplicate of canada-university-canada-west"
+    },
+    {
+      "name": "Yorkville University",
+      "reason": "duplicate of canada-yorkville-university"
+    },
+    {
+      "name": "Fairleigh Dickinson University Vancouver",
+      "reason": "duplicate of canada-fairleigh-dickinson-university-vancouver"
+    },
+    {
+      "name": "Northeastern University Vancouver",
+      "reason": "duplicate of canada-northeastern-university-vancouver"
+    },
+    {
+      "name": "New York Institute of Technology Vancouver",
+      "reason": "duplicate of canada-new-york-institute-of-technology-vancouver"
+    },
+    {
+      "name": "University of Melbourne",
+      "reason": "duplicate of australia-university-of-melbourne"
+    },
+    {
+      "name": "Australian National University",
+      "reason": "duplicate of australia-australian-national-university"
+    },
+    {
+      "name": "University of Sydney",
+      "reason": "duplicate of australia-university-of-sydney"
+    },
+    {
+      "name": "University of Queensland",
+      "reason": "duplicate of australia-university-of-queensland"
+    },
+    {
+      "name": "Monash University",
+      "reason": "duplicate of australia-monash-university"
+    },
+    {
+      "name": "University of Western Australia",
+      "reason": "duplicate of australia-university-of-western-australia"
+    },
+    {
+      "name": "University of Adelaide",
+      "reason": "duplicate of australia-university-of-adelaide"
+    },
+    {
+      "name": "University of Technology Sydney",
+      "reason": "duplicate of australia-university-of-technology-sydney"
+    },
+    {
+      "name": "University of Wollongong",
+      "reason": "duplicate of australia-university-of-wollongong"
+    },
+    {
+      "name": "University of Newcastle",
+      "reason": "duplicate of australia-university-of-newcastle"
+    },
+    {
+      "name": "University of Tasmania",
+      "reason": "duplicate of australia-university-of-tasmania"
+    },
+    {
+      "name": "Griffith University",
+      "reason": "duplicate of australia-griffith-university"
+    },
+    {
+      "name": "Deakin University",
+      "reason": "duplicate of australia-deakin-university"
+    },
+    {
+      "name": "RMIT University",
+      "reason": "duplicate of australia-rmit-university"
+    },
+    {
+      "name": "University of South Australia",
+      "reason": "duplicate of australia-university-of-south-australia"
+    },
+    {
+      "name": "Curtin University",
+      "reason": "duplicate of australia-curtin-university"
+    },
+    {
+      "name": "Queensland University of Technology",
+      "reason": "duplicate of australia-queensland-university-of-technology"
+    },
+    {
+      "name": "Macquarie University",
+      "reason": "duplicate of australia-macquarie-university"
+    },
+    {
+      "name": "La Trobe University",
+      "reason": "duplicate of australia-la-trobe-university"
+    },
+    {
+      "name": "University of Canberra",
+      "reason": "duplicate of australia-university-of-canberra"
+    },
+    {
+      "name": "Bond University",
+      "reason": "duplicate of australia-bond-university"
+    },
+    {
+      "name": "Torrens University Australia",
+      "reason": "duplicate of australia-torrens-university-australia"
+    },
+    {
+      "name": "University of Notre Dame Australia",
+      "reason": "duplicate of australia-university-of-notre-dame-australia"
+    },
+    {
+      "name": "Avondale University",
+      "reason": "duplicate of australia-avondale-university"
+    },
+    {
+      "name": "Alphacrucis University College",
+      "reason": "duplicate of australia-alphacrucis-university-college"
+    },
+    {
+      "name": "Christian Heritage College",
+      "reason": "duplicate of australia-christian-heritage-college"
+    },
+    {
+      "name": "Excelsia University College",
+      "reason": "duplicate of australia-excelsia-university-college"
+    },
+    {
+      "name": "Campion College",
+      "reason": "duplicate of australia-campion-college"
+    },
+    {
+      "name": "University of Divinity",
+      "reason": "duplicate of australia-university-of-divinity"
+    },
+    {
+      "name": "Heidelberg University",
+      "reason": "duplicate of germany-heidelberg-university"
+    },
+    {
+      "name": "Humboldt University of Berlin",
+      "reason": "duplicate of germany-humboldt-university-of-berlin"
+    },
+    {
+      "name": "Free University of Berlin",
+      "reason": "duplicate of germany-free-university-of-berlin"
+    },
+    {
+      "name": "University of Bonn",
+      "reason": "duplicate of germany-university-of-bonn"
+    },
+    {
+      "name": "University of Hamburg",
+      "reason": "duplicate of germany-university-of-hamburg"
+    },
+    {
+      "name": "Ludwig Maximilian University of Munich",
+      "reason": "duplicate of germany-ludwig-maximilian-university-of-munich"
+    },
+    {
+      "name": "University of Freiburg",
+      "reason": "duplicate of germany-university-of-freiburg"
+    },
+    {
+      "name": "University of Gottingen",
+      "reason": "duplicate of germany-university-of-gottingen"
+    },
+    {
+      "name": "University of Tubingen",
+      "reason": "duplicate of germany-university-of-tubingen"
+    },
+    {
+      "name": "University of Mannheim",
+      "reason": "duplicate of germany-university-of-mannheim"
+    },
+    {
+      "name": "University of Cologne",
+      "reason": "duplicate of germany-university-of-cologne"
+    },
+    {
+      "name": "Goethe University Frankfurt",
+      "reason": "duplicate of germany-goethe-university-frankfurt"
+    },
+    {
+      "name": "University of Stuttgart",
+      "reason": "duplicate of germany-university-of-stuttgart"
+    },
+    {
+      "name": "Karlsruhe Institute of Technology",
+      "reason": "duplicate of germany-karlsruhe-institute-of-technology"
+    },
+    {
+      "name": "Technical University of Berlin",
+      "reason": "duplicate of germany-technical-university-of-berlin"
+    },
+    {
+      "name": "TU Dresden",
+      "reason": "duplicate of germany-tu-dresden"
+    },
+    {
+      "name": "University of Munster",
+      "reason": "duplicate of germany-university-of-munster"
+    },
+    {
+      "name": "University of Wurzburg",
+      "reason": "duplicate of germany-university-of-wurzburg"
+    },
+    {
+      "name": "University of Erlangen-Nuremberg",
+      "reason": "duplicate of germany-university-of-erlangen-nuremberg"
+    },
+    {
+      "name": "University of Leipzig",
+      "reason": "duplicate of germany-university-of-leipzig"
+    },
+    {
+      "name": "Constructor University",
+      "reason": "duplicate of germany-constructor-university"
+    },
+    {
+      "name": "ESMT Berlin",
+      "reason": "duplicate of germany-esmt-berlin"
+    },
+    {
+      "name": "Frankfurt School of Finance and Management",
+      "reason": "duplicate of germany-frankfurt-school-of-finance-and-management"
+    },
+    {
+      "name": "Hertie School",
+      "reason": "duplicate of germany-hertie-school"
+    },
+    {
+      "name": "EBS University",
+      "reason": "duplicate of germany-ebs-university"
+    },
+    {
+      "name": "WHU Otto Beisheim School of Management",
+      "reason": "duplicate of germany-whu-otto-beisheim-school-of-management"
+    },
+    {
+      "name": "Zeppelin University",
+      "reason": "duplicate of germany-zeppelin-university"
+    },
+    {
+      "name": "Bucerius Law School",
+      "reason": "duplicate of germany-bucerius-law-school"
+    },
+    {
+      "name": "HHL Leipzig Graduate School of Management",
+      "reason": "duplicate of germany-hhl-leipzig-graduate-school-of-management"
+    },
+    {
+      "name": "Karlshochschule International University",
+      "reason": "duplicate of germany-karlshochschule-international-university"
+    },
+    {
+      "name": "Berlin International University of Applied Sciences",
+      "reason": "duplicate of germany-berlin-international-university-of-applied-sciences"
+    },
+    {
+      "name": "SRH University",
+      "reason": "duplicate of germany-srh-university"
+    },
+    {
+      "name": "IU International University of Applied Sciences",
+      "reason": "duplicate of germany-iu-international-university-of-applied-sciences"
+    },
+    {
+      "name": "Fresenius University of Applied Sciences",
+      "reason": "duplicate of germany-fresenius-university-of-applied-sciences"
+    },
+    {
+      "name": "HMKW University of Applied Sciences",
+      "reason": "duplicate of germany-hmkw-university-of-applied-sciences"
+    },
+    {
+      "name": "Macromedia University",
+      "reason": "duplicate of germany-macromedia-university"
+    },
+    {
+      "name": "Mediadesign University",
+      "reason": "duplicate of germany-mediadesign-university"
+    },
+    {
+      "name": "University of Europe for Applied Sciences",
+      "reason": "duplicate of germany-university-of-europe-for-applied-sciences"
+    },
+    {
+      "name": "Bard College Berlin",
+      "reason": "duplicate of germany-bard-college-berlin"
+    },
+    {
+      "name": "Touro College Berlin",
+      "reason": "duplicate of germany-touro-college-berlin"
+    },
+    {
+      "name": "Jagiellonian Business School",
+      "reason": "duplicate of poland-jagiellonian-university"
+    },
+    {
+      "name": "Riga Technical University",
+      "reason": "duplicate of rtu"
+    },
+    {
+      "name": "University of Malaya",
+      "reason": "duplicate of um"
+    },
+    {
+      "name": "Universiti Teknologi Malaysia",
+      "reason": "duplicate of utm"
+    },
+    {
+      "name": "Taylor's University",
+      "reason": "duplicate of taylors"
+    },
+    {
+      "name": "National University of Singapore",
+      "reason": "duplicate of nus"
+    },
+    {
+      "name": "Nanyang Technological University",
+      "reason": "duplicate of ntu"
+    },
+    {
+      "name": "Singapore Management University",
+      "reason": "duplicate of smu"
+    },
+    {
+      "name": "Singapore University of Technology and Design",
+      "reason": "duplicate of sutd"
+    },
+    {
+      "name": "United Arab Emirates University",
+      "reason": "duplicate of uaeu"
+    },
+    {
+      "name": "Khalifa University",
+      "reason": "duplicate of khalifa"
+    },
+    {
+      "name": "Heriot-Watt University Dubai",
+      "reason": "duplicate of hw-dubai"
+    },
+    {
+      "name": "University of Birmingham Dubai",
+      "reason": "duplicate of birmingham-dubai"
+    }
+  ],
+  "countries": [
+    {
+      "countryId": "usa",
+      "country": "United States",
+      "total": 42,
+      "public": 22,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true
+    },
+    {
+      "countryId": "uk",
+      "country": "United Kingdom",
+      "total": 27,
+      "public": 21,
+      "private": 6,
+      "publicShortfall": 0,
+      "privateShortfall": 14,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "canada",
+      "country": "Canada",
+      "total": 36,
+      "public": 21,
+      "private": 15,
+      "publicShortfall": 0,
+      "privateShortfall": 5,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "australia",
+      "country": "Australia",
+      "total": 30,
+      "public": 21,
+      "private": 9,
+      "publicShortfall": 0,
+      "privateShortfall": 11,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "germany",
+      "country": "Germany",
+      "total": 42,
+      "public": 22,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true
+    },
+    {
+      "countryId": "france",
+      "country": "France",
+      "total": 49,
+      "public": 24,
+      "private": 25,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true
+    },
+    {
+      "countryId": "netherlands",
+      "country": "Netherlands",
+      "total": 36,
+      "public": 25,
+      "private": 11,
+      "publicShortfall": 0,
+      "privateShortfall": 9,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "italy",
+      "country": "Italy",
+      "total": 45,
+      "public": 25,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true
+    },
+    {
+      "countryId": "ireland",
+      "country": "Ireland",
+      "total": 13,
+      "public": 12,
+      "private": 1,
+      "publicShortfall": 8,
+      "privateShortfall": 19,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "sweden",
+      "country": "Sweden",
+      "total": 32,
+      "public": 24,
+      "private": 8,
+      "publicShortfall": 0,
+      "privateShortfall": 12,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "norway",
+      "country": "Norway",
+      "total": 28,
+      "public": 16,
+      "private": 12,
+      "publicShortfall": 4,
+      "privateShortfall": 8,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "belgium",
+      "country": "Belgium",
+      "total": 35,
+      "public": 17,
+      "private": 18,
+      "publicShortfall": 3,
+      "privateShortfall": 2,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "spain",
+      "country": "Spain",
+      "total": 41,
+      "public": 21,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true
+    },
+    {
+      "countryId": "poland",
+      "country": "Poland",
+      "total": 38,
+      "public": 21,
+      "private": 17,
+      "publicShortfall": 0,
+      "privateShortfall": 3,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "latvia",
+      "country": "Latvia",
+      "total": 16,
+      "public": 11,
+      "private": 5,
+      "publicShortfall": 9,
+      "privateShortfall": 15,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "malaysia",
+      "country": "Malaysia",
+      "total": 38,
+      "public": 16,
+      "private": 22,
+      "publicShortfall": 4,
+      "privateShortfall": 0,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "singapore",
+      "country": "Singapore",
+      "total": 17,
+      "public": 6,
+      "private": 11,
+      "publicShortfall": 14,
+      "privateShortfall": 9,
+      "meetsTarget": false
+    },
+    {
+      "countryId": "uae",
+      "country": "UAE / Dubai",
+      "total": 33,
+      "public": 8,
+      "private": 25,
+      "publicShortfall": 12,
+      "privateShortfall": 0,
+      "meetsTarget": false
+    }
+  ]
+}

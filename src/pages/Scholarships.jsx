@@ -49,7 +49,7 @@ export default function Scholarships() {
   const abroadCount = SCHOLARSHIPS.length - indiaCount;
 
   return (
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
         <p className="inline-flex items-center gap-2 eyebrow text-brand-600 mb-3">
           <Award className="w-4 h-4" /> Scholarships

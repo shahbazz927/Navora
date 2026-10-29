@@ -38,10 +38,7 @@ export default function CollegeDiscoverySection() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-12">
-          <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-xs font-semibold text-brand-700 uppercase tracking-wider mb-3">
-            <Building2 className="w-3.5 h-3.5" />
-            Accredited Institution Discovery
-          </span>
+          <p className="eyebrow text-brand-700 mb-3">College discovery</p>
           <h2 className="font-ui font-bold text-3xl sm:text-4xl lg:text-5xl text-ink tracking-tight">
             Institutional clarity. <br className="hidden sm:inline" />
             <span className="text-brand-500">Official cutoffs & verified data.</span>
@@ -226,7 +223,7 @@ export default function CollegeDiscoverySection() {
 
         {/* Modal for full verified data */}
         {activeModalCollege && (
-          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 shadow-2xl border border-line">
               <div className="flex items-start justify-between gap-4 border-b border-line pb-4 mb-6">
                 <div>

@@ -666,7 +666,7 @@ export default function AssessmentFlow() {
 
   if (!flowKey) {
     return (
-      <div className="min-h-screen bg-paper-gradient">
+      <div className="min-h-screen bg-surface">
         <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 lg:py-24">
           <div className="max-w-2xl mx-auto text-center mb-12">
             <p className="inline-flex items-center gap-2 eyebrow text-brand-600 mb-5">
@@ -692,8 +692,7 @@ export default function AssessmentFlow() {
                 whileTap={{ scale: 0.985 }}
                 className="group w-full text-left bg-white border border-line rounded-2xl p-7 sm:p-8 hover:shadow-card hover:border-brand-200 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
               >
-                <span className="inline-flex w-11 h-11 items-center justify-center rounded-xl bg-brand-50 border border-brand-100 text-xl" aria-hidden="true">{opt.emoji}</span>
-                <h2 className="mt-5 font-ui font-bold text-[1.35rem] text-ink leading-tight tracking-[-0.015em]">{opt.title}</h2>
+                <h2 className="font-ui font-bold text-[1.35rem] text-ink leading-tight tracking-[-0.015em]">{opt.title}</h2>
                 <p className="mt-2.5 text-[0.9rem] text-ink-2 leading-relaxed">{opt.description}</p>
                 <span className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide uppercase text-ink-3 group-hover:text-brand-700 transition-colors">
                   Continue
@@ -749,7 +748,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
         <RecommendationCard key={item.career.id} item={item} rank={unified.indexOf(item)} compared={compareIds.includes(item.career.id)} cantAdd={compareIds.length>=3} onToggleCompare={()=> toggleCompare(item.career)} open={openId===item.career.id} onToggleDetail={()=> setOpenId(openId===item.career.id? null: item.career.id)} onSave={()=> { setToast('Saved \u2713'); }} />
       )}
       sidebarExams={exams}
-      sidebarNextColleges={<section className="rounded-[14px] p-5 text-white shadow-card" style={{background:'linear-gradient(135deg,#0f1f4d,#0a1638)'}}><h2 className="flex items-center gap-2 text-[0.72rem] font-bold uppercase text-white/70">Next: colleges</h2><p className="mt-2 text-sm text-white/85">Shortlist colleges for the recommended degree with eligibility and fees.</p><div className="mt-4"><Button size="md" className="w-full" onClick={onSaveDashboard}>View colleges</Button></div></section>}
+      sidebarNextColleges={<section className="rounded-card p-5 text-white bg-brand-950"><h2 className="flex items-center gap-2 text-xs font-semibold text-white/70">Next: colleges</h2><p className="mt-2 text-sm text-white/85">Shortlist colleges for the recommended degree with eligibility and fees.</p><div className="mt-4"><Button size="md" className="w-full" onClick={onSaveDashboard}>View colleges</Button></div></section>}
       nextSteps={steps} stepsChecked={stepsChecked} onToggleStep={(k)=> setStepsChecked(s=> ({...s, [k]: !s[k]}))}
       onRetake={onRetake} onSave={onSaveDashboard} toast={toast} setToast={setToast}
       compareOpen={compareOpen} setCompareOpen={setCompareOpen} compareItems={compareItems.length? compareItems: unified.slice(0,3)} compareRows={rows}
@@ -813,7 +812,7 @@ function UnifiedResults({ flowKey, answers, result, unified, header, context, on
   const bridgeLine = TRANSITIONS[flowKey]?.[step];
 
   return (
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-3xl mx-auto px-5 sm:px-8 py-12 lg:py-16">
         <div className="mb-8">
           <div className="flex flex-wrap items-center gap-3 mb-4">

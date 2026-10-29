@@ -1,37 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Globe,
-  Sparkles,
-  Layers,
-  Eye,
   ArrowRight,
   Plane,
   Compass,
-  CheckCircle2,
-  Maximize2
+  CheckCircle2
 } from 'lucide-react';
-import indiaWhiteMap1 from '../assets/images/white_clean_map_no_lines_1789745181194.jpg';
-import indiaWhiteMap2 from '../assets/images/white_map_minimal_clean_1789745195958.jpg';
-
-const WHITE_VARIATIONS = [
-  {
-    id: 'white-clean',
-    title: 'Pure White Map (No Lines)',
-    subtitle: 'Crisp solid white canvas with soft silver continent silhouettes and zero lines',
-    image: indiaWhiteMap1,
-    tag: 'Clean Minimalist 16:9',
-    description: 'Pristine white background completely free of any lines, flight arcs, grids, text, or borders.'
-  },
-  {
-    id: 'white-vector',
-    title: 'Vector Silhouettes (Line-Free)',
-    subtitle: 'Refined slate-gray continent contours on clean white background',
-    image: indiaWhiteMap2,
-    tag: 'Banner Variation',
-    description: 'Ultra-clean digital cartography on white with no pre-drawn lines or overlays.'
-  }
-];
+import indiaWhiteMap from '../assets/images/white_clean_map_no_lines_1789745181194.jpg';
 
 // Coordinate mapping on 1000 x 562.5 viewBox (16:9 aspect ratio)
 const INDIA_COORDS = { x: 685, y: 258, name: 'India (Origin)' };
@@ -180,11 +155,8 @@ const CORRIDORS = [
 ];
 
 export default function GlobalStudyMapGallery({ onExploreCountry, onStartQuiz }) {
-  const [selectedVar, setSelectedVar] = useState(WHITE_VARIATIONS[0].id);
   const [selectedCorridor, setSelectedCorridor] = useState('germany');
-  const [showCleanView, setShowCleanView] = useState(false);
 
-  const activeVariation = WHITE_VARIATIONS.find(v => v.id === selectedVar) || WHITE_VARIATIONS[0];
   const activeCorridor = CORRIDORS.find(c => c.id === selectedCorridor) || CORRIDORS[0];
 
   return (
@@ -192,10 +164,6 @@ export default function GlobalStudyMapGallery({ onExploreCountry, onStartQuiz })
       <div className="max-w-7xl mx-auto px-5 sm:px-8 relative z-10">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 px-3.5 py-1 text-xs font-semibold text-brand-700 tracking-wider uppercase mb-3 shadow-xs">
-            <Globe className="w-3.5 h-3.5 text-brand-600" />
-            Interactive Study Destinations · White Canvas
-          </span>
           <h2 className="font-ui font-bold text-2xl sm:text-3xl lg:text-4xl text-slate-900 tracking-[-0.03em] leading-tight">
             Transcontinental Pathways from India
           </h2>
@@ -204,231 +172,179 @@ export default function GlobalStudyMapGallery({ onExploreCountry, onStartQuiz })
           </p>
         </div>
 
-        {/* Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 bg-slate-50 p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5 mr-1 pl-1">
-              <Layers className="w-3.5 h-3.5 text-brand-600" /> Clean White Variations:
+        {/* Interactive Country Selection Bar */}
+        <div className="mb-4">
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin pb-2">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+              Select to Light Up:
             </span>
-            {WHITE_VARIATIONS.map(v => (
-              <button
-                key={v.id}
-                onClick={() => setSelectedVar(v.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  selectedVar === v.id
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
-                }`}
-              >
-                <span>{v.title}</span>
-                <span className="text-[0.65rem] opacity-80 font-normal">({v.tag})</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCleanView(!showCleanView)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
-                showCleanView
-                  ? 'bg-brand-50 border-brand-300 text-brand-700'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-              }`}
-              title="Toggle to view only the pure white map without any icons or pins"
-            >
-              <Eye className="w-3.5 h-3.5 text-brand-600" />
-              {showCleanView ? 'Showing Pure Artwork' : 'Pure Art View'}
-            </button>
-            <a
-              href={activeVariation.image}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 transition-colors"
-            >
-              <Maximize2 className="w-3 h-3 text-slate-400" /> High-Res
-            </a>
+            {CORRIDORS.map(corridor => {
+              const isSelected = selectedCorridor === corridor.id;
+              return (
+                <button
+                  key={corridor.id}
+                  onClick={() => setSelectedCorridor(corridor.id)}
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                    isSelected
+                      ? 'bg-slate-900 text-white shadow-sm font-semibold scale-[1.03]'
+                      : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                  }`}
+                >
+                  <span className="text-sm">{corridor.flag}</span>
+                  <span>{corridor.name}</span>
+                  {isSelected && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
-
-        {/* Interactive Country Selection Bar */}
-        {!showCleanView && (
-          <div className="mb-4">
-            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin pb-2">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
-                Select to Light Up:
-              </span>
-              {CORRIDORS.map(corridor => {
-                const isSelected = selectedCorridor === corridor.id;
-                return (
-                  <button
-                    key={corridor.id}
-                    onClick={() => setSelectedCorridor(corridor.id)}
-                    className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                      isSelected
-                        ? 'bg-slate-900 text-white shadow-sm font-semibold scale-[1.03]'
-                        : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                    }`}
-                  >
-                    <span className="text-sm">{corridor.flag}</span>
-                    <span>{corridor.name}</span>
-                    {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* Main Map Display Stage (Pure White Canvas with No Blue Lines) */}
         <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-lg">
           <div className="relative aspect-[16/9] w-full overflow-hidden bg-white">
             {/* Flat digital background map on clean white with NO lines */}
             <img
-              src={activeVariation.image}
+              src={indiaWhiteMap}
               alt="Clean flat digital map on white background without lines or text"
               className="w-full h-full object-cover object-center select-none"
               referrerPolicy="no-referrer"
             />
 
             {/* SVG Light-Up Overlay: ZERO background blue lines. ONLY the clicked country illuminates */}
-            {!showCleanView && (
-              <svg
-                viewBox="0 0 1000 562.5"
-                className="absolute inset-0 w-full h-full pointer-events-none"
-                preserveAspectRatio="xMidYMid slice"
-              >
-                <defs>
-                  {/* Glowing Filter for the Active Lit-up Country */}
-                  <filter id="beaconGlow" x="-60%" y="-60%" width="220%" height="220%">
-                    <feGaussianBlur stdDeviation="5" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
+            <svg
+              viewBox="0 0 1000 562.5"
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              preserveAspectRatio="xMidYMid slice"
+            >
+              <defs>
+                {/* Glowing Filter for the Active Lit-up Country */}
+                <filter id="beaconGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
 
-                {/* 1. India Origin Hub Beacon */}
-                <g transform={`translate(${INDIA_COORDS.x}, ${INDIA_COORDS.y})`}>
-                  <circle r="16" fill="#F59E0B" fillOpacity="0.18" className="animate-ping" style={{ animationDuration: '3s' }} />
-                  <circle r="9" fill="#F59E0B" fillOpacity="0.35" />
-                  <circle r="5" fill="#D97706" />
-                  <circle r="2" fill="#FFFFFF" />
+              {/* 1. India Origin Hub Beacon */}
+              <g transform={`translate(${INDIA_COORDS.x}, ${INDIA_COORDS.y})`}>
+                <circle r="16" fill="#F59E0B" fillOpacity="0.18" className="animate-ping" style={{ animationDuration: '3s' }} />
+                <circle r="9" fill="#F59E0B" fillOpacity="0.35" />
+                <circle r="5" fill="#D97706" />
+                <circle r="2" fill="#FFFFFF" />
+              </g>
+
+              {/* 2. THE ONE LINE: Exclusively connects India to the currently clicked country */}
+              {activeCorridor && activeCorridor.arcControl && (
+                <g key={`single-line-${activeCorridor.id}`}>
+                  {/* Subtle glow halo for the single line */}
+                  <path
+                    d={`M ${INDIA_COORDS.x} ${INDIA_COORDS.y} Q ${activeCorridor.arcControl.x} ${activeCorridor.arcControl.y} ${activeCorridor.coords.x} ${activeCorridor.coords.y}`}
+                    fill="none"
+                    stroke={activeCorridor.accentColor}
+                    strokeWidth="6"
+                    strokeOpacity="0.2"
+                    filter="url(#beaconGlow)"
+                  />
+                  {/* Main crisp illuminated line */}
+                  <path
+                    d={`M ${INDIA_COORDS.x} ${INDIA_COORDS.y} Q ${activeCorridor.arcControl.x} ${activeCorridor.arcControl.y} ${activeCorridor.coords.x} ${activeCorridor.coords.y}`}
+                    fill="none"
+                    stroke={activeCorridor.accentColor}
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
                 </g>
+              )}
 
-                {/* 2. THE ONE LINE: Exclusively connects India to the currently clicked country */}
-                {activeCorridor && activeCorridor.arcControl && (
-                  <g key={`single-line-${activeCorridor.id}`}>
-                    {/* Subtle glow halo for the single line */}
-                    <path
-                      d={`M ${INDIA_COORDS.x} ${INDIA_COORDS.y} Q ${activeCorridor.arcControl.x} ${activeCorridor.arcControl.y} ${activeCorridor.coords.x} ${activeCorridor.coords.y}`}
-                      fill="none"
-                      stroke={activeCorridor.accentColor}
-                      strokeWidth="6"
-                      strokeOpacity="0.2"
-                      filter="url(#beaconGlow)"
-                    />
-                    {/* Main crisp illuminated line */}
-                    <path
-                      d={`M ${INDIA_COORDS.x} ${INDIA_COORDS.y} Q ${activeCorridor.arcControl.x} ${activeCorridor.arcControl.y} ${activeCorridor.coords.x} ${activeCorridor.coords.y}`}
-                      fill="none"
-                      stroke={activeCorridor.accentColor}
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-                  </g>
-                )}
+              {/* 3. Destination Nodes: ONLY the clicked country lights up with radiant pulsing rings */}
+              {CORRIDORS.map(corridor => {
+                const isSelected = selectedCorridor === corridor.id;
+                const { x, y } = corridor.coords;
 
-                {/* 3. Destination Nodes: ONLY the clicked country lights up with radiant pulsing rings */}
-                {CORRIDORS.map(corridor => {
-                  const isSelected = selectedCorridor === corridor.id;
-                  const { x, y } = corridor.coords;
-
-                  if (isSelected) {
-                    return (
-                      <g
-                        key={`node-${corridor.id}`}
-                        transform={`translate(${x}, ${y})`}
-                        filter="url(#beaconGlow)"
-                        className="pointer-events-auto cursor-pointer"
-                        onClick={() => setSelectedCorridor(corridor.id)}
-                      >
-                        {/* Lit-up radiant expanding halos */}
-                        <circle
-                          r="26"
-                          fill={corridor.accentColor}
-                          fillOpacity="0.18"
-                          className="animate-ping"
-                          style={{ animationDuration: '1.8s' }}
-                        />
-                        <circle r="18" fill={corridor.accentColor} fillOpacity="0.28" />
-                        <circle r="11" fill={corridor.accentColor} stroke="#FFFFFF" strokeWidth="2.5" />
-                        <circle r="4" fill="#FFFFFF" />
-                      </g>
-                    );
-                  }
-
-                  // Non-selected countries: faint, subtle neutral point
+                if (isSelected) {
                   return (
                     <g
                       key={`node-${corridor.id}`}
                       transform={`translate(${x}, ${y})`}
-                      className="pointer-events-auto cursor-pointer group"
+                      filter="url(#beaconGlow)"
+                      className="pointer-events-auto cursor-pointer"
                       onClick={() => setSelectedCorridor(corridor.id)}
                     >
-                      <circle r="10" fill="transparent" />
+                      {/* Lit-up radiant expanding halos */}
                       <circle
-                        r="3"
-                        fill="#CBD5E1"
-                        className="transition-all group-hover:scale-150 group-hover:fill-slate-500"
+                        r="26"
+                        fill={corridor.accentColor}
+                        fillOpacity="0.18"
+                        className="animate-ping"
+                        style={{ animationDuration: '1.8s' }}
                       />
+                      <circle r="18" fill={corridor.accentColor} fillOpacity="0.28" />
+                      <circle r="11" fill={corridor.accentColor} stroke="#FFFFFF" strokeWidth="2.5" />
+                      <circle r="4" fill="#FFFFFF" />
                     </g>
                   );
-                })}
-              </svg>
-            )}
+                }
+
+                // Non-selected countries: faint, subtle neutral point
+                return (
+                  <g
+                    key={`node-${corridor.id}`}
+                    transform={`translate(${x}, ${y})`}
+                    className="pointer-events-auto cursor-pointer group"
+                    onClick={() => setSelectedCorridor(corridor.id)}
+                  >
+                    <circle r="10" fill="transparent" />
+                    <circle
+                      r="3"
+                      fill="#CBD5E1"
+                      className="transition-all group-hover:scale-150 group-hover:fill-slate-500"
+                    />
+                  </g>
+                );
+              })}
+            </svg>
 
             {/* Clickable Overlay Hotspots (Badges) */}
-            {!showCleanView && (
-              <div className="absolute inset-0 pointer-events-none">
-                {/* India Origin Label */}
-                <div
-                  className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-full mb-1"
-                  style={{ left: '68.5%', top: '45%' }}
-                >
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/95 border border-amber-300 text-[0.65rem] font-bold text-amber-900 shadow-sm whitespace-nowrap">
-                    🇮🇳 India (Origin Hub)
-                  </span>
-                </div>
+            <div className="absolute inset-0 pointer-events-none">
+              {/* India Origin Label */}
+              <div
+                className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-full mb-1"
+                style={{ left: '68.5%', top: '45%' }}
+              >
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/95 border border-amber-300 text-[0.65rem] font-bold text-amber-900 shadow-sm whitespace-nowrap">
+                  🇮🇳 India (Origin Hub)
+                </span>
+              </div>
 
-                {/* Lit-up Destination Callout Badge (Only for active clicked country) */}
-                {activeCorridor && (
-                  <motion.div
-                    key={activeCorridor.id}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-full mb-3"
+              {/* Lit-up Destination Callout Badge (Only for active clicked country) */}
+              {activeCorridor && (
+                <motion.div
+                  key={activeCorridor.id}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="absolute pointer-events-auto transform -translate-x-1/2 -translate-y-full mb-3"
+                  style={{
+                    left: `${(activeCorridor.coords.x / 1000) * 100}%`,
+                    top: `${(activeCorridor.coords.y / 562.5) * 100}%`
+                  }}
+                >
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold shadow-lg whitespace-nowrap border text-white"
                     style={{
-                      left: `${(activeCorridor.coords.x / 1000) * 100}%`,
-                      top: `${(activeCorridor.coords.y / 562.5) * 100}%`
+                      backgroundColor: activeCorridor.accentColor,
+                      borderColor: '#FFFFFF'
                     }}
                   >
-                    <span
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold shadow-lg whitespace-nowrap border text-white"
-                      style={{
-                        backgroundColor: activeCorridor.accentColor,
-                        borderColor: '#FFFFFF'
-                      }}
-                    >
-                      <span>{activeCorridor.flag}</span>
-                      <span>{activeCorridor.name} (Lit Up)</span>
-                    </span>
-                  </motion.div>
-                )}
-              </div>
-            )}
+                    <span>{activeCorridor.flag}</span>
+                    <span>{activeCorridor.name} (Lit Up)</span>
+                  </span>
+                </motion.div>
+              )}
+            </div>
           </div>
 
           {/* Active Corridor Insights Drawer on Clean White Theme */}

@@ -334,44 +334,7 @@ export const COUNTRIES = [
   },
 ];
 
-export const UNIVERSITIES = [
-  { id: 'tum', name: 'Technical University of Munich', countryId: 'germany', city: 'Munich', type: 'Public', website: 'https://www.tum.de', reputation: 'Top technical', strengths: ['Mechanical', 'Automotive', 'AI', 'Electrical'], programs: ['BSc Mechanical Engineering','MSc Automotive Engineering','MSc Data Engineering'], tuitionByProgram: 'Public — semester contribution ~€200–600', entryRequirements: 'Strong academics; German B2 for German-taught, IELTS 6.5+ for English', languageRequirements: 'IELTS 6.5 / TOEFL 88+ (English track)', scholarships: ['DAAD','Deutschlandstipendium'], sourceUrls: ['https://www.tum.de'], lastVerified: '2025-09-01' },
-  { id: 'rwth', name: 'RWTH Aachen University', countryId: 'germany', city: 'Aachen', type: 'Public', website: 'https://www.rwth-aachen.de', reputation: 'Elite engineering', strengths: ['Mechanical','Automotive','Electrical'], programs: ['BSc Mechanical','MSc Automotive Systems'], tuitionByProgram: 'No tuition (public) — semester fee ~€300', entryRequirements: 'Strong STEM grades', languageRequirements: 'IELTS 6.0+', scholarships: ['DAAD'], sourceUrls: ['https://www.rwth-aachen.de'], lastVerified: '2025-09-01' },
-  { id: 'tudelft', name: 'TU Delft', countryId: 'netherlands', city: 'Delft', type: 'Public', website: 'https://www.tudelft.nl', reputation: 'Top engineering EU', strengths: ['Engineering','Renewable Energy','CS'], programs: ['MSc Aerospace','MSc Computer Science'], tuitionByProgram: '€18k–21k/year (non-EEA)', entryRequirements: 'Relevant Bachelor, 75%+', languageRequirements: 'IELTS 6.5', scholarships: ['Justus & Louise van Effen'], sourceUrls: ['https://www.tudelft.nl'], lastVerified: '2025-09-01' },
-  { id: 'uoe', name: 'University of Edinburgh', countryId: 'uk', city: 'Edinburgh', type: 'Public', website: 'https://www.ed.ac.uk', reputation: 'World Top 30', strengths: ['AI','Finance','Engineering'], programs: ['MSc Artificial Intelligence','MSc Finance'], tuitionByProgram: '£28k–35k/year', entryRequirements: 'First-class / strong 2:1 equivalent', languageRequirements: 'IELTS 7.0', scholarships: ['Chevening'], sourceUrls: ['https://www.ed.ac.uk'], lastVerified: '2025-09-01' },
-  { id: 'uoft', name: 'University of Toronto', countryId: 'canada', city: 'Toronto', type: 'Public', website: 'https://www.utoronto.ca', reputation: 'World Top 20', strengths: ['CS','Engineering','Business'], programs: ['BASc Engineering','MSc Computer Science'], tuitionByProgram: 'CAD 38k–60k/year', entryRequirements: 'High secondary / Bachelor GPA', languageRequirements: 'IELTS 6.5–7.0', scholarships: ['Lester B. Pearson'], sourceUrls: ['https://www.utoronto.ca'], lastVerified: '2025-09-01' },
-  { id: 'unsw', name: 'UNSW Sydney', countryId: 'australia', city: 'Sydney', type: 'Public', website: 'https://www.unsw.edu.au', reputation: 'Go8', strengths: ['Engineering','Renewable','CS'], programs: ['BEng Renewable Energy','MSc IT'], tuitionByProgram: 'AUD 42k–55k/year', entryRequirements: 'Strong academics', languageRequirements: 'IELTS 6.5', scholarships: ['International Scientia'], sourceUrls: ['https://www.unsw.edu.au'], lastVerified: '2025-09-01' },
-  { id: 'polimi', name: 'Politecnico di Milano', countryId: 'italy', city: 'Milan', type: 'Public', website: 'https://www.polimi.it', reputation: 'Top design & engineering EU', strengths: ['Design','Architecture','Engineering','Automotive'], programs: ['MSc Automotive Engineering','MSc Design'], tuitionByProgram: '€3.9k/year', entryRequirements: 'Relevant Bachelor', languageRequirements: 'IELTS 6.0', scholarships: ['DSU'], sourceUrls: ['https://www.polimi.it'], lastVerified: '2025-09-01' },
-  { id: 'kth', name: 'KTH Royal Institute of Technology', countryId: 'sweden', city: 'Stockholm', type: 'Public', website: 'https://www.kth.se', reputation: 'Top engineering', strengths: ['Sustainability','Engineering','Energy'], programs: ['MSc Sustainable Energy','MSc Machine Learning'], tuitionByProgram: 'SEK 155k/year', entryRequirements: 'Relevant Bachelor 75%+', languageRequirements: 'IELTS 6.5', scholarships: ['KTH Scholarship'], sourceUrls: ['https://www.kth.se'], lastVerified: '2025-09-01' },
-  { id: 'tcd', name: 'Trinity College Dublin', countryId: 'ireland', city: 'Dublin', type: 'Public', website: 'https://www.tcd.ie', reputation: 'Top in Ireland', strengths: ['CS','Pharma','Business'], programs: ['MSc Computer Science','MSc Finance'], tuitionByProgram: '€19k–25k/year', entryRequirements: '2:1 equivalent', languageRequirements: 'IELTS 6.5', scholarships: ['Global Excellence'], sourceUrls: ['https://www.tcd.ie'], lastVerified: '2025-09-01' },
-  { id: 'georgiatech-usa', name: 'Georgia Tech', countryId: 'usa', city: 'Atlanta', type: 'Public', website: 'https://www.gatech.edu', reputation: 'Top engineering US', strengths: ['CS','Engineering','Robotics'], programs: ['MS Computer Science','MS Mechanical'], tuitionByProgram: '$30k–52k/year', entryRequirements: 'Strong GPA, GRE optional', languageRequirements: 'IELTS 7.0 / TOEFL 90', scholarships: ['Graduate assistantships'], sourceUrls: ['https://www.gatech.edu'], lastVerified: '2025-09-01' },
-  { id: 'eth-like-usa2', name: 'University of Michigan', countryId: 'usa', city: 'Ann Arbor', type: 'Public', website: 'https://umich.edu', reputation: 'World Top 25', strengths: ['Automotive','Engineering','Business'], programs: ['MS Automotive Engineering','MBA'], tuitionByProgram: '$52k–58k/year', entryRequirements: 'Strong academics', languageRequirements: 'IELTS 6.5+', scholarships: ['Merit aid'], sourceUrls: ['https://umich.edu'], lastVerified: '2025-09-01' },
-  { id: 'hecf', name: 'HEC Paris', countryId: 'france', city: 'Paris', type: 'Grande École', website: 'https://www.hec.edu', reputation: 'Elite business', strengths: ['Finance','Consulting','Luxury'], programs: ['MSc Finance','MBA'], tuitionByProgram: '€42k–72k/year', entryRequirements: 'High Bachelor GPA, GMAT', languageRequirements: 'IELTS 7.0', scholarships: ['Eiffel'], sourceUrls: ['https://www.hec.edu'], lastVerified: '2025-09-01' },
-  { id: 'ku-leuven', name: 'KU Leuven', countryId: 'belgium', city: 'Leuven', type: 'Public', website: 'https://www.kuleuven.be', reputation: 'Top research EU', strengths: ['Engineering','Biotech','Business'], programs: ['MSc Engineering','MSc Business'], tuitionByProgram: '€4k–7k/year', entryRequirements: 'Relevant Bachelor', languageRequirements: 'IELTS 6.5', scholarships: ['VLIR-UOS'], sourceUrls: ['https://www.kuleuven.be'], lastVerified: '2025-09-01' },
-  { id: 'uwarsaw', name: 'University of Warsaw', countryId: 'poland', city: 'Warsaw', type: 'Public', website: 'https://www.uw.edu.pl', reputation: 'Top in Poland', strengths: ['CS','Business','Engineering'], programs: ['BSc Computer Science','MSc Data Science'], tuitionByProgram: 'PLN 12k–18k/year', entryRequirements: 'Secondary completion', languageRequirements: 'IELTS 6.0', scholarships: ['NAWA'], sourceUrls: ['https://www.uw.edu.pl'], lastVerified: '2025-09-01' },
-  { id: 'rtu', name: 'Riga Technical University', countryId: 'latvia', city: 'Riga', type: 'Public', website: 'https://www.rtu.lv', reputation: 'Leading technical Baltics', strengths: ['Engineering','IT'], programs: ['BSc Computer Systems','MSc Mechanical'], tuitionByProgram: '€3k–5k/year', entryRequirements: 'Secondary completion', languageRequirements: 'IELTS 5.5–6.0', scholarships: ['State scholarship'], sourceUrls: ['https://www.rtu.lv'], lastVerified: '2025-09-01' },
-  { id: 'ub', name: 'University of Barcelona', countryId: 'spain', city: 'Barcelona', type: 'Public', website: 'https://www.ub.edu', reputation: 'Top in Spain', strengths: ['Business','Engineering'], programs: ['MSc Business','MSc Renewable Energy'], tuitionByProgram: '€3k–6k/year', entryRequirements: 'Relevant Bachelor', languageRequirements: 'IELTS 6.0–6.5', scholarships: ['MAEC'], sourceUrls: ['https://www.ub.edu'], lastVerified: '2025-09-01' },
-  { id: 'ntnu', name: 'Norwegian University of Science & Technology (NTNU)', countryId: 'norway', city: 'Trondheim', type: 'Public', website: 'https://www.ntnu.edu', reputation: 'Top technical & research Norway', strengths: ['Energy / Maritime', 'Engineering', 'Environmental'], programs: ['MSc Sustainable Energy', 'MSc Marine Technology'], tuitionByProgram: 'NOK 130k–180k/year (non-EEA)', entryRequirements: 'Relevant Bachelor with strong grades', languageRequirements: 'IELTS 6.5', scholarships: ['Erasmus+ waivers'], sourceUrls: ['https://www.ntnu.edu'], lastVerified: '2025-09-01' },
-  // Malaysia
-  { id: 'um', name: 'University of Malaya (UM)', countryId: 'malaysia', city: 'Kuala Lumpur', type: 'Public', website: 'https://www.um.edu.my', reputation: 'Top in Malaysia — QS Top 70', strengths: ['Computer Science','Electrical','Biotechnology','Finance','Healthcare'], programs: ['BSc Computer Science','MSc Data Science','BEng Electrical Engineering','MBA','BSc Biotechnology'], tuitionByProgram: 'MYR 14k–28k/year (international)', entryRequirements: 'Strong secondary / Bachelor 3.0+ CGPA', languageRequirements: 'IELTS 6.0 / MUET Band 4', scholarships: ['MIS','UM scholarships'], sourceUrls: ['https://www.um.edu.my'], lastVerified: '2026-09-24' },
-  { id: 'utm', name: 'Universiti Teknologi Malaysia (UTM)', countryId: 'malaysia', city: 'Johor Bahru', type: 'Public', website: 'https://www.utm.my', reputation: 'Top engineering', strengths: ['Electrical','Mechanical','Semiconductor','Software Engineering','Mechatronics'], programs: ['BEng Electrical & Electronics','BSc Software Engineering','MSc Artificial Intelligence','BEng Mechatronics'], tuitionByProgram: 'MYR 15k–30k/year', entryRequirements: 'Strong STEM grades', languageRequirements: 'IELTS 6.0', scholarships: ['MIS'], sourceUrls: ['https://www.utm.my'], lastVerified: '2026-09-24' },
-  { id: 'monash-my', name: 'Monash University Malaysia', countryId: 'malaysia', city: 'Subang Jaya', type: 'International branch campus', website: 'https://www.monash.edu.my', reputation: 'Australian Go8 branch', strengths: ['Computer Science','AI','Business Analytics','Biotechnology','Supply Chain'], programs: ['BSc Computer Science','BEng Mechatronics','MSc Data Science','BCom Finance'], tuitionByProgram: 'MYR 32k–38k/year', entryRequirements: 'A-Levels / 75%+ or equivalent', languageRequirements: 'IELTS 6.5', scholarships: ['Monash Malaysia merit'], sourceUrls: ['https://www.monash.edu.my'], lastVerified: '2026-09-24' },
-  { id: 'taylors', name: "Taylor's University", countryId: 'malaysia', city: 'Subang Jaya', type: 'Private', website: 'https://university.taylors.edu.my', reputation: 'Top private Malaysia', strengths: ['Hospitality & Tourism','Business','Computer Science','Healthcare'], programs: ['BA Hospitality & Tourism','BSc Computer Science','BBA Business Analytics','BSc Biotechnology'], tuitionByProgram: 'MYR 28k–36k/year', entryRequirements: 'Secondary completion 65%+', languageRequirements: 'IELTS 5.5–6.0', scholarships: ['Merit awards'], sourceUrls: ['https://university.taylors.edu.my'], lastVerified: '2026-09-24' },
-  { id: 'apu', name: 'Asia Pacific University (APU)', countryId: 'malaysia', city: 'Kuala Lumpur', type: 'Private', website: 'https://www.apu.edu.my', reputation: 'Tech-focused private', strengths: ['Cybersecurity','AI','Software Engineering','Data Science','Finance'], programs: ['BSc Cybersecurity','BSc Artificial Intelligence','BSc Software Engineering','MSc Data Science'], tuitionByProgram: 'MYR 22k–30k/year', entryRequirements: 'Secondary 60%+', languageRequirements: 'IELTS 6.0', scholarships: ['APU merit'], sourceUrls: ['https://www.apu.edu.my'], lastVerified: '2026-09-24' },
-  // Singapore
-  { id: 'nus', name: 'National University of Singapore (NUS)', countryId: 'singapore', city: 'Singapore', type: 'Public', website: 'https://www.nus.edu.sg', reputation: 'World Top 10', strengths: ['Computer Science','AI','Semiconductor','Finance','Biomedical','Business Analytics'], programs: ['BComp Computer Science','MSc Artificial Intelligence','MComp Data Science','BEng Electrical Engineering','MBA'], tuitionByProgram: 'S$30k–42k/year (international, before Tuition Grant)', entryRequirements: 'High standing 85%+ / A-Levels AAA', languageRequirements: 'IELTS 6.5 / TOEFL 92', scholarships: ['SINGA','NUS Global Merit'], sourceUrls: ['https://www.nus.edu.sg'], lastVerified: '2026-09-24' },
-  { id: 'ntu', name: 'Nanyang Technological University (NTU)', countryId: 'singapore', city: 'Singapore', type: 'Public', website: 'https://www.ntu.edu.sg', reputation: 'World Top 30', strengths: ['Engineering','AI','Semiconductor','Cybersecurity','Biotechnology'], programs: ['BSc Computer Science','MSc Data Science','MSc Cybersecurity','BEng Electrical & Electronics','MSc FinTech'], tuitionByProgram: 'S$28k–40k/year', entryRequirements: 'High standing 85%+', languageRequirements: 'IELTS 6.5', scholarships: ['SINGA','NTU scholarships'], sourceUrls: ['https://www.ntu.edu.sg'], lastVerified: '2026-09-24' },
-  { id: 'smu', name: 'Singapore Management University (SMU)', countryId: 'singapore', city: 'Singapore', type: 'Public', website: 'https://www.smu.edu.sg', reputation: 'Top business & computing', strengths: ['Finance','FinTech','Business Analytics','Software Engineering'], programs: ['BSc Business Analytics','MSc FinTech','MBA','BSc Computer Science'], tuitionByProgram: 'S$32k–38k/year', entryRequirements: 'Strong academics', languageRequirements: 'IELTS 7.0', scholarships: ['SMU merit'], sourceUrls: ['https://www.smu.edu.sg'], lastVerified: '2026-09-24' },
-  { id: 'sutd', name: 'Singapore University of Technology and Design (SUTD)', countryId: 'singapore', city: 'Singapore', type: 'Public', website: 'https://www.sutd.edu.sg', reputation: 'Specialist design & engineering', strengths: ['Computer Engineering','AI','Electrical','Design'], programs: ['BEng Computer Engineering','MSc Security by Design'], tuitionByProgram: 'S$28k–36k/year', entryRequirements: 'Strong STEM', languageRequirements: 'IELTS 6.5', scholarships: ['SUTD awards'], sourceUrls: ['https://www.sutd.edu.sg'], lastVerified: '2026-09-24' },
-  { id: 'sit', name: 'Singapore Institute of Technology (SIT)', countryId: 'singapore', city: 'Singapore', type: 'Public', website: 'https://www.singaporetech.edu.sg', reputation: 'Applied university', strengths: ['Engineering','Computing','Healthcare'], programs: ['BEng Applied Computing','BSc Digital Supply Chain'], tuitionByProgram: 'S$18k–28k/year', entryRequirements: 'Polytechnic / Secondary strong', languageRequirements: 'IELTS 6.0', scholarships: ['SIT scholarships'], sourceUrls: ['https://www.singaporetech.edu.sg'], lastVerified: '2026-09-24' },
-  // UAE / Dubai
-  { id: 'khalifa', name: 'Khalifa University', countryId: 'uae', city: 'Abu Dhabi', type: 'Public', website: 'https://www.ku.ac.ae', reputation: 'Top in UAE — research intensive', strengths: ['AI','Electrical','Mechanical','Renewable Energy','Aviation'], programs: ['BSc Computer Science','MSc Artificial Intelligence','BEng Aerospace Engineering','MSc Sustainable Energy'], tuitionByProgram: 'AED 68k–80k/year (scholarships widely available)', entryRequirements: 'Strong STEM 80%+', languageRequirements: 'IELTS 6.5 / TOEFL 91', scholarships: ['Khalifa scholarship','MBZUAI'], sourceUrls: ['https://www.ku.ac.ae'], lastVerified: '2026-09-24' },
-  { id: 'uaeu', name: 'United Arab Emirates University (UAEU)', countryId: 'uae', city: 'Al Ain', type: 'Public', website: 'https://www.uaeu.ac.ae', reputation: 'National flagship public', strengths: ['Engineering','Business','Healthcare','IT'], programs: ['BSc Software Engineering','MBA','BSc Mechanical Engineering'], tuitionByProgram: 'AED 50k–60k/year', entryRequirements: '75%+ secondary / 3.0 GPA', languageRequirements: 'IELTS 5.5–6.5', scholarships: ['UAEU graduate aid'], sourceUrls: ['https://www.uaeu.ac.ae'], lastVerified: '2026-09-24' },
-  { id: 'hw-dubai', name: 'Heriot-Watt University Dubai', countryId: 'uae', city: 'Dubai', type: 'International branch campus', website: 'https://www.hw.ac.uk/dubai', reputation: 'UK branch — KHDA licensed', strengths: ['AI','Data Science','Finance','Supply Chain','Mechanical'], programs: ['BSc Computer Science (AI)','MSc Data Science','MBA','BEng Mechanical'], tuitionByProgram: 'AED 65k–78k/year', entryRequirements: 'UK A-Level equivalent / 70%+', languageRequirements: 'IELTS 6.0–6.5', scholarships: ['HW Dubai merit'], sourceUrls: ['https://www.hw.ac.uk/dubai'], lastVerified: '2026-09-24' },
-  { id: 'uowd', name: 'University of Wollongong in Dubai (UOWD)', countryId: 'uae', city: 'Dubai', type: 'International branch campus', website: 'https://www.uowdubai.ac.ae', reputation: 'Australian branch — KHDA licensed', strengths: ['Computer Science','Cybersecurity','Business Analytics','Finance','Supply Chain'], programs: ['BSc Computer Science','MSc Cybersecurity','MBA Business Analytics'], tuitionByProgram: 'AED 55k–72k/year', entryRequirements: '60–70%+ secondary', languageRequirements: 'IELTS 6.0', scholarships: ['UOWD bursaries'], sourceUrls: ['https://www.uowdubai.ac.ae'], lastVerified: '2026-09-24' },
-  { id: 'birmingham-dubai', name: 'University of Birmingham Dubai', countryId: 'uae', city: 'Dubai', type: 'International branch campus', website: 'https://www.birmingham.ac.uk/dubai', reputation: 'UK Russell Group branch', strengths: ['Computer Science','AI','Finance','Business'], programs: ['BSc Computer Science','MSc Artificial Intelligence','BSc Finance'], tuitionByProgram: 'AED 70k–85k/year', entryRequirements: 'A-Levels / 75%+', languageRequirements: 'IELTS 6.0–6.5', scholarships: ['Birmingham Dubai scholarships'], sourceUrls: ['https://www.birmingham.ac.uk/dubai'], lastVerified: '2026-09-24' },
-  { id: 'aus', name: 'American University of Sharjah (AUS)', countryId: 'uae', city: 'Sharjah', type: 'Private', website: 'https://www.aus.edu', reputation: 'Leading private UAE', strengths: ['Engineering','Business','Architecture','Computer Science'], programs: ['BSc Computer Engineering','MBA','BSc Civil Engineering'], tuitionByProgram: 'AED 60k–75k/year', entryRequirements: '70%+ secondary / GPA 3.0', languageRequirements: 'IELTS 6.5 / TOEFL 80', scholarships: ['AUS merit'], sourceUrls: ['https://www.aus.edu'], lastVerified: '2026-09-24' },
-];
+export { UNIVERSITIES } from './globalUniversities.js';
 
 // Course → country affinity (0-10)
 export const FIELD_MATRIX = {
@@ -423,3 +386,115 @@ export function degreeCostINR(country, years=2){
   const c = annualCostINR(country);
   return c * years;
 }
+
+// ── Intake calendar ───────────────────────────────────────
+// Typical application intakes per destination. The FIRST entry for a country
+// is its main intake (widest course + scholarship choice); the rest are the
+// secondary intakes. `month` = the month the academic year begins.
+const INTAKE_CALENDAR = {
+  usa:        [{ id:'fall',   month:8, label:'Fall — August / September' }, { id:'spring', month:1, label:'Spring — January' }, { id:'summer', month:5, label:'Summer — May / June' }],
+  uk:         [{ id:'autumn', month:9, label:'Autumn — September' }, { id:'spring', month:1, label:'Spring — January' }],
+  canada:     [{ id:'fall',   month:9, label:'Fall — September' }, { id:'winter', month:1, label:'Winter — January' }, { id:'summer', month:5, label:'Summer — May' }],
+  australia:  [{ id:'autumn', month:8, label:'Semester 1 — August' }, { id:'sem2',  month:2, label:'Semester 2 — February' }],
+  germany:    [{ id:'winter', month:10, label:'Winter semester — October' }, { id:'summer', month:4, label:'Summer semester — April' }],
+  france:    [{ id:'sept',   month:9, label:'September intake' }, { id:'jan',   month:1, label:'January / February intake' }],
+  netherlands:[{ id:'sept',   month:9, label:'September intake' }, { id:'feb',   month:2, label:'February intake' }],
+  italy:     [{ id:'sept',   month:9, label:'September / October intake' }, { id:'feb', month:2, label:'February / March intake' }],
+  ireland:   [{ id:'sept',   month:9, label:'September intake' }, { id:'jan',   month:1, label:'January / February intake' }],
+  sweden:    [{ id:'autumn', month:8, label:'Autumn — August / September' }, { id:'spring', month:1, label:'Spring — January' }],
+  norway:    [{ id:'autumn', month:8, label:'Autumn — August / September' }, { id:'spring', month:1, label:'Spring — January' }],
+  belgium:   [{ id:'sept',   month:9, label:'September / October intake' }, { id:'feb', month:2, label:'February intake' }],
+  spain:     [{ id:'sept',   month:9, label:'September / October intake' }, { id:'feb', month:2, label:'February / March intake' }],
+  poland:    [{ id:'oct',    month:10, label:'October intake' }, { id:'feb', month:2, label:'February / March intake' }],
+  latvia:    [{ id:'sept',   month:9, label:'September / October intake' }, { id:'feb', month:2, label:'February / March intake' }],
+  malaysia:  [{ id:'sept',   month:9, label:'September intake' }, { id:'jan', month:1, label:'January / February intake' }],
+  singapore: [{ id:'aug',    month:8, label:'August intake' }, { id:'jan', month:1, label:'January intake' }],
+  uae:       [{ id:'sept',   month:9, label:'September intake' }, { id:'jan', month:1, label:'January / February intake' }],
+};
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// ── Where the student travels from ─────────────────────────
+// Indian student-origin hubs. The recommended one for a destination is the hub
+// with the most direct flights and usually the lowest fares to that country.
+export const ORIGIN_CITIES = [
+  { id:'mumbai',   name:'Mumbai',      state:'Maharashtra' },
+  { id:'delhi',    name:'Delhi NCR',   state:'Delhi' },
+  { id:'bengaluru',name:'Bengaluru',   state:'Karnataka' },
+  { id:'hyderabad',name:'Hyderabad',   state:'Telangana' },
+  { id:'chennai',  name:'Chennai',     state:'Tamil Nadu' },
+  { id:'pune',     name:'Pune',        state:'Maharashtra' },
+  { id:'kolkata',  name:'Kolkata',     state:'West Bengal' },
+  { id:'ahmedabad',name:'Ahmedabad',   state:'Gujarat' },
+  { id:'jaipur',   name:'Jaipur',      state:'Rajasthan' },
+  { id:'kochi',    name:'Kochi',       state:'Kerala' },
+  { id:'lucknow',  name:'Lucknow',     state:'Uttar Pradesh' },
+  { id:'indore',   name:'Indore',      state:'Madhya Pradesh' },
+];
+
+const ORIGIN_HUB = {
+  usa:'delhi', canada:'delhi', australia:'delhi',
+  uk:'mumbai', germany:'mumbai', france:'mumbai', netherlands:'mumbai', italy:'mumbai',
+  ireland:'mumbai', sweden:'mumbai', norway:'mumbai', belgium:'mumbai', spain:'mumbai',
+  poland:'mumbai', latvia:'mumbai',
+  singapore:'chennai', malaysia:'chennai', uae:'mumbai',
+};
+
+/**
+ * Upcoming intakes for a destination, newest-first by start date, each with a
+ * concrete month/year and a "recommended" flag.
+ * Lead time is longer for undergraduates (boards first) than for post-grads.
+ */
+export function intakesFor(countryId, studyLevel = '', from = new Date()) {
+  const cal = INTAKE_CALENDAR[countryId] || INTAKE_CALENDAR.uk;
+  const leadMonths = /Bachelor|Class 12|exploring/i.test(studyLevel) ? 9 : 3;
+  const now = new Date(from.getFullYear(), from.getMonth(), 1);
+  const out = [];
+
+  for (const intake of cal) {
+    for (let y = now.getFullYear(); y <= now.getFullYear() + 2; y++) {
+      const start = new Date(y, intake.month - 1, 1);
+      if (start <= now) continue;
+      out.push({
+        id: `${intake.id}-${y}`,
+        type: intake.id,
+        label: intake.label,
+        startDate: start,
+        startLabel: `${MONTH_NAMES[intake.month - 1]} ${y}`,
+        leadMonths: Math.round((start - now) / (1000 * 60 * 60 * 24 * 30.44)),
+        isMain: intake === cal[0],
+      });
+      break; // only the next occurrence of each intake type
+    }
+  }
+  out.sort((a, b) => a.startDate - b.startDate);
+
+  // Recommended = the country's main intake that still leaves enough time to
+  // apply; otherwise the earliest intake with any workable lead time.
+  const recommended =
+    out.find((o) => o.isMain && o.leadMonths >= leadMonths) ||
+    out.find((o) => o.leadMonths >= leadMonths) ||
+    out.find((o) => o.leadMonths >= 2) ||
+    out[0];
+
+  return out.map((o) => ({
+    ...o,
+    recommended: recommended ? o.id === recommended.id : false,
+    reason: recommended && o.id === recommended.id
+      ? (o.isMain
+          ? 'Main intake — widest course and scholarship choice.'
+          : 'Gives you enough time to apply after your current exams.')
+      : null,
+  }));
+}
+
+/** Indian origin cities for a destination, with the best-connected hub flagged. */
+export function originCitiesFor(countryId) {
+  const hub = ORIGIN_HUB[countryId] || 'mumbai';
+  return ORIGIN_CITIES.map((c) => ({
+    ...c,
+    recommended: c.id === hub,
+    reason: c.id === hub ? 'Best direct flights to this destination — usually the lowest fares.' : null,
+  }));
+}
+

@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import loginLogo from '../assets/login-logo.png';
 import AuthCard from '../components/auth/AuthCard';
 import BackgroundEffects from '../components/auth/BackgroundEffects';
 import ForgotPasswordModal from '../components/auth/ForgotPasswordModal';
-import { soundFx } from '../utils/soundFx';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
 
@@ -14,24 +12,10 @@ export default function Login() {
   const location = useLocation();
   const { setUser, answers } = useUser();
 
-  const [isAnimating, setIsAnimating] = useState(true);
   const [authMode, setAuthMode] = useState('login');
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Entrance animation + sound
-  useEffect(() => {
-    soundFx.enabled = true;
-    soundFx.playWhoosh();
-    const shimmerTimer = setTimeout(() => soundFx.playShimmer(), 450);
-    const finishTimer = setTimeout(() => setIsAnimating(false), 1100);
-    return () => {
-      clearTimeout(shimmerTimer);
-      clearTimeout(finishTimer);
-    };
-  }, []);
-
-  // On load, restore any existing Supabase session and hydrate context
   useEffect(() => {
     let mounted = true;
     async function checkAuthSession() {
@@ -42,7 +26,11 @@ export default function Login() {
           let profilePhone = '';
           let profileName = '';
           try {
-            const { data: profile } = await supabase.from('profiles').select('phone, full_name').eq('user_id', user.id).maybeSingle();
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('phone, full_name')
+              .eq('user_id', user.id)
+              .maybeSingle();
             if (profile?.phone) profilePhone = profile.phone;
             if (profile?.full_name) profileName = profile.full_name;
           } catch {
@@ -73,77 +61,42 @@ export default function Login() {
   const handleLoginSuccess = (session) => {
     setUser(session);
     const from = location.state?.from;
-    // Prevent open redirect — only same-origin absolute paths
+    // Only same-origin absolute paths, to avoid open redirects.
     const safeFrom = typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') ? from : null;
     if (safeFrom) navigate(safeFrom, { replace: true });
-    // Returning users with a completed questionnaire resume where they left
-    // off; everyone else starts the guided flow. Never re-ask unnecessarily.
+    // Returning users with a completed questionnaire resume where they left off.
     else if (answers && Object.keys(answers).length > 0) navigate('/dashboard', { replace: true });
     else navigate('/get-started', { replace: true });
   };
 
   return (
-    <div className="min-h-screen w-full relative flex flex-col items-center justify-center p-4 sm:p-6 overflow-x-hidden bg-gradient-to-b from-slate-50 via-sky-50/25 to-slate-100 text-slate-900">
-      {/* Cinematic Ambient Atmosphere Background */}
-      <BackgroundEffects theme="light" animationActive={isAnimating} />
+    <div className="min-h-screen w-full relative flex flex-col items-center justify-center p-4 sm:p-6 overflow-x-hidden bg-paper text-ink">
+      <BackgroundEffects theme="light" />
 
-      {/* Main Stage */}
       <main className="w-full max-w-md mx-auto py-8 flex flex-col items-center justify-center z-10">
-        <AnimatePresence mode="wait">
-          {isCheckingAuth ? (
-            <motion.div
-              key="auth-checking"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="w-10 h-10 border-2 border-blue-500/30 border-t-blue-600 rounded-full animate-spin"
-            />
-          ) : (
-            <div key="auth-stage">
-              {/* Brand / Logo Entrance */}
-              <div className="relative flex flex-col items-center mb-6">
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2, duration: 0.4 }}
-                  className="mb-2"
-                >
-                  <img
-                    src={loginLogo}
-                    alt="NAVORA"
-                    className="h-12 w-auto object-contain"
-                  />
-                </motion.div>
-                <motion.h1
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28, duration: 0.4 }}
-                  className="font-display text-2xl sm:text-3xl font-bold tracking-tight"
-                >
-                  Welcome to <span className="text-brand-600">NAVORA</span>
-                </motion.h1>
-              </div>
-
-              {/* Staggered form reveal */}
-              <motion.div
-                initial={{ opacity: 0, y: 32, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 0.35, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full flex justify-center"
-              >
-                <AuthCard
-                  mode={authMode}
-                  onModeChange={setAuthMode}
-                  onOpenForgotPassword={() => setIsForgotModalOpen(true)}
-                  onLoginSuccess={handleLoginSuccess}
-                />
-              </motion.div>
+        {isCheckingAuth ? (
+          <div className="w-9 h-9 border-2 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+        ) : (
+          <div className="w-full">
+            <div className="flex flex-col items-center mb-6">
+              <img src={loginLogo} alt="NAVORA" className="h-12 w-auto object-contain mb-2" />
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">
+                Welcome to <span className="text-brand-700">NAVORA</span>
+              </h1>
             </div>
-          )}
-        </AnimatePresence>
+
+            <div className="w-full flex justify-center">
+              <AuthCard
+                mode={authMode}
+                onModeChange={setAuthMode}
+                onOpenForgotPassword={() => setIsForgotModalOpen(true)}
+                onLoginSuccess={handleLoginSuccess}
+              />
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Password Reset Modal */}
       <ForgotPasswordModal
         isOpen={isForgotModalOpen}
         onClose={() => setIsForgotModalOpen(false)}

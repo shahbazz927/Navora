@@ -61,28 +61,28 @@ function CareerCard(p) {
       </div>
       <div className="mt-4 grid sm:grid-cols-3 gap-3">
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Recommended degree</p>
+          <p className="text-xs font-semibold text-ink-3">Recommended degree</p>
           <p className="mt-1 text-sm font-semibold text-ink">{item.degree.short || 'See route'}</p>
           <p className="mt-0.5 text-xs text-ink-3">{item.degree.full || 'Multiple routes.'}</p>
         </div>
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Entrance exams</p>
+          <p className="text-xs font-semibold text-ink-3">Entrance exams</p>
           <p className="mt-1 text-sm font-semibold text-ink">{item.exams.map((e) => e.name).join(' · ')}</p>
           <p className="mt-0.5 text-xs text-ink-3">Typical periods — check notices.</p>
         </div>
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Foundations to build</p>
+          <p className="text-xs font-semibold text-ink-3">Foundations to build</p>
           <p className="mt-1 text-sm font-semibold text-ink">{(c.skillsToDevelop || []).slice(0, 2).join(', ')}</p>
           <p className="mt-0.5 text-xs text-ink-3">Strengthen alongside subjects.</p>
         </div>
       </div>
       <div className="mt-3 grid sm:grid-cols-2 gap-3">
         <div className="rounded-xl bg-[#eaf7ef] px-4 py-3.5">
-          <p className="text-[0.68rem] font-bold uppercase text-[#1c8a4b]">Why it matches</p>
+          <p className="text-xs font-semibold text-[#1c8a4b]">Why it matches</p>
           <ul className="mt-2 space-y-1.5">{item.matches.map((m) => <li key={m} className="text-[0.82rem] text-ink-2">{m}</li>)}</ul>
         </div>
         <div className="rounded-xl bg-[#fff8e8] border border-[#f0dfae] px-4 py-3.5">
-          <p className="text-[0.68rem] font-bold uppercase text-[#7a5b12]">Why this may not be right</p>
+          <p className="text-xs font-semibold text-[#7a5b12]">Why this may not be right</p>
           <ul className="mt-2 space-y-1.5">{item.considerations.map((m) => <li key={m} className="text-[0.82rem] text-ink-2">{m}</li>)}</ul>
         </div>
       </div>
@@ -101,7 +101,7 @@ function CareerCard(p) {
               </li>))}
             </ul>
             <div className="mt-3 rounded-lg bg-brand-50 border border-brand-100 px-3.5 py-3">
-              <p className="text-[0.68rem] font-bold uppercase text-brand-700">Try this month</p>
+              <p className="text-xs font-semibold text-brand-700">Try this month</p>
               <p className="mt-1 text-sm text-ink-2">{act}</p>
             </div>
           </div></div>
@@ -188,7 +188,7 @@ export default function ParentClass12Results({ result, onBack, onRetake, onSaveD
   const tableCols = cmpFull.length ? cmpFull : ranked.slice(0, 3);
   return (
     <ResultGate flowKey="parent_class12" title="Your Child's Degree and Career Direction">
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8 lg:py-10">
         <button type="button" onClick={onBack || (() => navigate(-1))} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink cursor-pointer"><ArrowLeft className="w-4 h-4" />Back to questionnaire</button>
         <FadeIn>
@@ -249,14 +249,14 @@ export default function ParentClass12Results({ result, onBack, onRetake, onSaveD
           </div>
           <aside className="space-y-4 lg:sticky lg:top-24">
             <section aria-labelledby="pc12-exams" className="bg-white border border-line rounded-[14px] p-5 shadow-card">
-              <h2 id="pc12-exams" className="flex items-center gap-2 text-[0.72rem] font-bold uppercase text-ink-3"><CalendarDays className="w-4 h-4" />Entrance exam calendar</h2>
+              <h2 id="pc12-exams" className="flex items-center gap-2 text-xs font-semibold text-ink-3"><CalendarDays className="w-4 h-4" />Entrance exam calendar</h2>
               <ul className="mt-3 divide-y divide-line">
                 {topExams.map((e) => (<li key={e.name} className="py-2.5 flex items-center justify-between gap-3"><span className="text-sm font-semibold text-ink">{e.name}</span><span className="text-xs text-ink-3">{e.period}</span></li>))}
               </ul>
               <p className="mt-2 text-[0.72rem] text-ink-3">Typical periods only — verify official notices.</p>
             </section>
-            <section aria-labelledby="pc12-col" className="rounded-[14px] p-5 text-white shadow-card" style={{ background: 'linear-gradient(135deg, #0f1f4d, #0a1638)' }}>
-              <h2 id="pc12-col" className="flex items-center gap-2 text-[0.72rem] font-bold uppercase text-white/70"><GraduationCap className="w-4 h-4" />Next: colleges</h2>
+            <section aria-labelledby="pc12-col" className="rounded-card p-5 text-white bg-brand-950">
+              <h2 id="pc12-col" className="flex items-center gap-2 text-xs font-semibold text-white/70"><GraduationCap className="w-4 h-4" />Next: colleges</h2>
               <p className="mt-2 text-sm text-white/85">We can shortlist colleges for the recommended degree with eligibility, fees and placement context.</p>
               <div className="mt-4"><Button size="md" className="w-full" onClick={() => navigate('/recommendations/parent')}>View colleges<ArrowRight className="w-4 h-4" /></Button></div>
             </section>

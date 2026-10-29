@@ -1,42 +1,47 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight, LogOut, ChevronDown, Building2, Scale, Bookmark, GraduationCap, Globe, Award } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import Logo from './Logo';
 import { useUser } from '../context/UserContext';
-import { useAuthModal } from '../context/AuthModalContext';
 import { supabase } from '../lib/supabase';
 
-const exploreLinks = [
-  { to: '/colleges', icon: Building2, label: 'All Colleges', desc: 'Browse the full directory' },
-  { to: '/colleges?level=UG', icon: GraduationCap, label: 'UG Colleges', desc: 'Pathways after Class 12' },
-  { to: '/colleges?level=PG', icon: GraduationCap, label: 'PG Colleges', desc: 'Pathways after graduation' },
-  { to: '/study-abroad', icon: Globe, label: 'Global Study', desc: 'Countries & universities abroad' },
-  { to: '/scholarships', icon: Award, label: 'Scholarships', desc: 'Verified India + abroad aid' },
-  { to: '/colleges/compare', icon: Scale, label: 'Compare Colleges', desc: 'Decide side by side' },
-  { to: '/colleges/saved', icon: Bookmark, label: 'Saved', desc: 'Your shortlist' },
+// Navigation aligned to NAVORA hero reference
+const NAV_LINKS = [
+  {
+    to: '/get-started',
+    label: 'Explore',
+    isActive: (pathname) => pathname.startsWith('/get-started') || pathname.startsWith('/career-guidance'),
+  },
+  {
+    to: '/colleges',
+    label: 'Courses',
+    isActive: (pathname) => pathname.startsWith('/colleges') && !pathname.startsWith('/colleges/compare'),
+  },
+  {
+    to: '/career-guidance',
+    label: 'Careers',
+    isActive: (pathname) => pathname.startsWith('/career-guidance'),
+  },
+  {
+    to: '/colleges',
+    label: 'Institutes',
+    isActive: (pathname) => pathname.startsWith('/colleges'),
+  },
+  {
+    to: '/how-it-works',
+    label: 'Resources',
+    isActive: (pathname) => pathname.startsWith('/how-it-works') || pathname.startsWith('/about'),
+  },
 ];
 
-const primaryLinks = [
-  { to: '/about', label: 'About' },
-  { to: '/how-it-works', label: 'How It Works' },
-  { to: '/pricing', label: 'Pricing' },
-  { to: '/parents', label: 'For Parents' },
-];
-
-const appLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/advisor', label: 'AI Advisor' },
-];
+const CTA_TO = '/get-started';
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [exploreOpen, setExploreOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { user, setUser } = useUser();
-  const { openAuthModal } = useAuthModal();
+  const menuButtonRef = useRef(null);
 
   const handleLogout = async () => {
     await supabase.auth.signOut().catch(() => {});
@@ -50,311 +55,141 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Close the mobile menu on every successful navigation.
   useEffect(() => {
     setMobileOpen(false);
-    setExploreOpen(false);
   }, [location.pathname]);
 
+  // Allow Escape to close the mobile menu and return focus to the trigger.
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setExploreOpen(false);
+    if (!mobileOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        menuButtonRef.current?.focus();
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [mobileOpen]);
 
-  const isActive = (to) => {
-    const [path] = to.split('?');
-    return path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
-  };
-  const isExploreActive =
-    location.pathname.startsWith('/colleges') || location.pathname.startsWith('/study-abroad') || location.pathname.startsWith('/global-study') || location.pathname.startsWith('/scholarships');
-
-  const linkCls = (active) =>
-    `relative px-1 py-2 text-[0.9rem] font-medium tracking-[-0.01em] transition-colors ${
-      active ? 'text-ink' : 'text-ink-2 hover:text-ink'
-    }`;
-
-  const ActiveBar = () => (
-    <motion.span
-      layoutId="nav-active"
-      className="absolute -bottom-[1px] left-0 right-0 h-[2px] rounded-full bg-brand-500"
-      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-    />
-  );
+  // Signed-out visitors never see the dashboard entry.
+  const visibleNavLinks = NAV_LINKS.filter((link) => !link.requiresAuth || user);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/85 backdrop-blur-xl shadow-[0_1px_0_0_var(--color-line),0_10px_30px_-18px_rgba(11,30,61,0.25)]'
-          : 'bg-white/60 backdrop-blur-md border-b border-line/50'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center shrink-0" aria-label="NAVORA home">
-            <Logo size="md" />
-          </Link>
+    <header className="fixed inset-x-0 top-0 z-50">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+        <div className="mt-3 sm:mt-4">
+          <div className="flex items-center justify-between h-[72px] px-4 sm:px-6 lg:px-8 rounded-2xl bg-white/95 backdrop-blur shadow-[0_1px_1px_rgba(15,23,42,0.02),0_10px_40px_rgba(15,23,42,0.08)] border border-white/60">
+            <Link to="/" className="flex items-center shrink-0 gap-2" aria-label="NAVORA home">
+              <Logo size="lg" />
+            </Link>
 
-          {/* ── Desktop nav ─────────────────────────────── */}
-          <nav className="hidden lg:flex items-center gap-6" aria-label="Primary">
-            {/* Explore dropdown */}
-            <div className="relative" ref={dropdownRef}>
+            {/* ── Desktop nav ─────────────────────────────── */}
+            <nav className="hidden lg:flex items-center gap-8 xl:gap-10" aria-label="Primary">
+              {visibleNavLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className={`text-sm font-semibold transition-colors ${
+                    link.isActive(location.pathname)
+                      ? 'text-[#0F1F4D]'
+                      : 'text-[#1f2f4d]/80 hover:text-[#0F1F4D]'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* ── Desktop actions ─────────────────────────── */}
+            <div className="hidden lg:flex items-center gap-2">
               <button
-                onClick={() => setExploreOpen(!exploreOpen)}
-                aria-expanded={exploreOpen}
-                className={`inline-flex items-center gap-1 py-2 text-[0.9rem] font-medium tracking-[-0.01em] transition-colors cursor-pointer ${
-                  isExploreActive ? 'text-ink' : 'text-ink-2 hover:text-ink'
-                }`}
+                type="button"
+                aria-label="Search"
+                className="p-2 rounded-lg text-[#1f2f4d]/80 hover:text-[#0F1F4D] hover:bg-slate-50 transition-colors"
               >
-                Explore
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-ink-3 transition-transform duration-200 ${exploreOpen ? 'rotate-180' : ''}`}
-                />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
               </button>
-              {isExploreActive && (
-                <span className="absolute -bottom-[1px] left-0 right-0 h-[2px] rounded-full bg-brand-500" />
-              )}
-
-              <AnimatePresence>
-                {exploreOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                    className="absolute left-1/2 -translate-x-1/2 mt-3 w-[26rem] bg-white rounded-2xl border border-line shadow-card-lg p-2.5 z-50"
+              {user ? (
+                <>
+                  <Link to="/account" className="text-sm font-semibold text-[#1f2f4d]/90 hover:text-[#0F1F4D] px-2">Account</Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm font-semibold text-[#1f2f4d]/90 hover:text-[#0F1F4D] px-2"
                   >
-                    <div className="grid grid-cols-2 gap-1">
-                      {exploreLinks.map((l) => (
-                        <Link
-                          key={l.to + l.label}
-                          to={l.to}
-                          className="group flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-brand-50/70 transition-colors"
-                        >
-                          <span className="mt-0.5 w-8 h-8 rounded-lg bg-paper border border-line flex items-center justify-center shrink-0 group-hover:border-brand-200 group-hover:bg-white transition-colors">
-                            <l.icon className="w-4 h-4 text-brand-600" />
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block text-[0.85rem] font-semibold text-ink leading-tight">
-                              {l.label}
-                            </span>
-                            <span className="block text-xs text-ink-3 leading-snug mt-0.5">{l.desc}</span>
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    Sign out
+                  </button>
+                  <Link to={CTA_TO} className="ml-2 inline-flex items-center justify-center rounded-full bg-[#0F1F4D] text-white text-sm font-semibold px-6 py-2.5 hover:bg-[#0b173a] transition-colors shadow-[0_10px_30px_rgba(15,31,77,0.18)]">
+                    Get Started
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm font-semibold text-[#1f2f4d]/90 hover:text-[#0F1F4D] px-2">Login</Link>
+                  <Link to={CTA_TO} className="ml-2 inline-flex items-center justify-center rounded-full bg-[#0F1F4D] text-white text-sm font-semibold px-6 py-2.5 hover:bg-[#0b173a] transition-colors shadow-[0_10px_30px_rgba(15,31,77,0.18)]">
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
 
-            {primaryLinks.map((link) => {
-              const active = isActive(link.to);
-              return (
-                <Link key={link.to} to={link.to} aria-current={active ? 'page' : undefined} className={linkCls(active)}>
-                  {link.label}
-                  {active && <ActiveBar />}
-                </Link>
-              );
-            })}
-
-            {user && (
-              <>
-                <span className="w-px h-5 bg-line" aria-hidden="true" />
-                {appLinks.map((link) => {
-                  const active = isActive(link.to);
-                  return (
-                    <Link key={link.to} to={link.to} aria-current={active ? 'page' : undefined} className={linkCls(active)}>
-                      {link.label}
-                      {active && <ActiveBar />}
-                    </Link>
-                  );
-                })}
-              </>
-            )}
-          </nav>
-
-          {/* ── Desktop actions ─────────────────────────── */}
-          <div className="hidden lg:flex items-center gap-2.5">
-            {user ? (
-              <>
-                <Link
-                  to="/get-started"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-ink text-white font-ui font-semibold text-[0.83rem] px-4 py-2 hover:bg-brand-950 transition-all hover:-translate-y-px"
-                >
-                  Start Your Path
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  to="/account"
-                  className="flex items-center gap-2 rounded-full pl-1 pr-2 py-1 hover:bg-paper-deep transition-colors"
-                  aria-label="View account"
-                >
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-brand-950 text-white font-ui font-semibold text-[0.8rem]">
-                    {(user.name || user.email || '?').charAt(0).toUpperCase()}
-                  </span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  aria-label="Sign out"
-                  title="Sign out"
-                  className="p-2 rounded-full text-ink-3 hover:text-error hover:bg-paper-deep transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => openAuthModal('login')}
-                  className="px-4 py-2 text-[0.88rem] font-semibold text-ink-2 hover:text-ink transition-colors cursor-pointer"
-                >
-                  Sign In
-                </button>
-                <Link
-                  to="/get-started"
-                  className="inline-flex items-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-ui font-semibold text-[0.85rem] px-5 py-2.5 shadow-brand transition-all hover:-translate-y-px"
-                >
-                  Start Your Path
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* ── Mobile toggle ───────────────────────────── */}
-          <div className="flex items-center gap-2 lg:hidden">
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 -mr-2 rounded-lg text-ink hover:bg-paper-deep transition-colors"
-              aria-label="Toggle menu"
-              aria-expanded={mobileOpen}
-            >
-              {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* ── Mobile toggle ───────────────────────────── */}
+            <div className="flex items-center lg:hidden">
+              <button
+                ref={menuButtonRef}
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="p-2 -mr-2 rounded-lg text-[#0F1F4D]"
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}
+                aria-controls="mobile-nav"
+              >
+                {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Mobile menu ─────────────────────────────────── */}
-      <AnimatePresence>
+        {/* ── Mobile menu ─────────────────────────────────── */}
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:hidden border-t border-line bg-white overflow-hidden max-h-[85vh] overflow-y-auto"
+          <div
+            id="mobile-nav"
+            className="relative lg:hidden mt-2"
           >
-            <div className="px-5 py-4 space-y-5">
-              <div>
-                <p className="px-3 text-[0.7rem] font-semibold text-ink-3 uppercase tracking-[0.12em] mb-1">
-                  Explore
-                </p>
-                {exploreLinks.map((l) => (
+            <div className="rounded-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)] border border-slate-100 overflow-hidden">
+              <nav className="flex flex-col">
+                {visibleNavLinks.map((link) => (
                   <Link
-                    key={l.to + l.label}
-                    to={l.to}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[0.92rem] font-medium text-ink-2 hover:bg-paper hover:text-ink transition-colors"
+                    key={link.label}
+                    to={link.to}
+                    onClick={() => setMobileOpen(false)}
+                    className="px-5 py-3 text-sm font-semibold text-[#1f2f4d] border-b border-slate-50 last:border-b-0"
                   >
-                    <l.icon className="w-4 h-4 text-brand-600 shrink-0" />
-                    {l.label}
+                    {link.label}
                   </Link>
                 ))}
-              </div>
-
-              <div>
-                <p className="px-3 text-[0.7rem] font-semibold text-ink-3 uppercase tracking-[0.12em] mb-1">
-                  Company
-                </p>
-                {primaryLinks.map((link) => {
-                  const active = isActive(link.to);
-                  return (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className={`block px-3 py-2.5 rounded-xl text-[0.92rem] font-medium transition-colors ${
-                        active ? 'text-brand-700 bg-brand-50' : 'text-ink-2 hover:bg-paper hover:text-ink'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {user && (
-                <div>
-                  <p className="px-3 text-[0.7rem] font-semibold text-ink-3 uppercase tracking-[0.12em] mb-1">
-                    Your Space
-                  </p>
-                  {appLinks.map((link) => (
-                    <Link
-                      key={link.to}
-                      to={link.to}
-                      className="block px-3 py-2.5 rounded-xl text-[0.92rem] font-medium text-ink-2 hover:bg-paper hover:text-ink transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-              <div className="pt-1 space-y-2 border-t border-line/60">
+              </nav>
+              <div className="px-5 py-4 flex flex-col gap-2 border-t border-slate-100">
                 {user ? (
-                  <div className="pt-3">
-                    <Link
-                      to="/account"
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-paper transition-colors"
-                    >
-                      <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-brand-950 text-white font-ui font-semibold text-sm">
-                        {(user.name || user.email || '?').charAt(0).toUpperCase()}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-ink truncate">{user.name || user.email}</p>
-                        <p className="text-xs text-ink-3">View account</p>
-                      </div>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="mt-1.5 text-xs text-ink-3 hover:text-error flex items-center gap-1.5 px-3 py-1.5 cursor-pointer"
-                    >
-                      <LogOut className="w-3.5 h-3.5" /> Sign out
-                    </button>
-                    <Link
-                      to="/get-started"
-                      className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-ink text-white font-ui font-semibold text-sm px-5 py-3"
-                    >
-                      Start Your Path
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
+                  <>
+                    <Link to="/account" onClick={() => setMobileOpen(false)} className="text-sm font-semibold text-[#1f2f4d]">Account</Link>
+                    <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="text-left text-sm font-semibold text-[#1f2f4d]">Sign out</button>
+                    <Link to={CTA_TO} onClick={() => setMobileOpen(false)} className="mt-2 inline-flex items-center justify-center rounded-full bg-[#0F1F4D] text-white text-sm font-semibold px-6 py-2.5">Get Started</Link>
+                  </>
                 ) : (
-                  <div className="pt-3 space-y-2">
-                    <Link
-                      to="/get-started"
-                      className="flex items-center justify-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-ui font-semibold text-sm px-5 py-3 shadow-brand transition-colors"
-                    >
-                      Start Your Path
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                    <button
-                      onClick={() => { setMobileOpen(false); openAuthModal('login'); }}
-                      className="flex w-full items-center justify-center rounded-xl text-sm font-semibold text-ink-2 hover:text-ink px-5 py-2.5 transition-colors cursor-pointer"
-                    >
-                      Sign In
-                    </button>
-                  </div>
+                  <>
+                    <Link to="/login" onClick={() => setMobileOpen(false)} className="text-sm font-semibold text-[#1f2f4d]">Login</Link>
+                    <Link to={CTA_TO} onClick={() => setMobileOpen(false)} className="mt-2 inline-flex items-center justify-center rounded-full bg-[#0F1F4D] text-white text-sm font-semibold px-6 py-2.5">Get Started</Link>
+                  </>
                 )}
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </header>
   );
 }

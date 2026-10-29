@@ -71,17 +71,17 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
 
       <div className="mt-4 grid sm:grid-cols-3 gap-3">
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Recommended degree</p>
+          <p className="text-xs font-semibold text-ink-3">Recommended degree</p>
           <p className="mt-1 text-sm font-semibold text-ink break-words">{degree?.short || 'See route'}</p>
           {degree?.full && degree.full !== degree.short && <p className="mt-0.5 text-xs text-ink-3 line-clamp-2">{degree.full}</p>}
         </div>
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Entrance exams</p>
+          <p className="text-xs font-semibold text-ink-3">Entrance exams</p>
           <p className="mt-1 text-sm font-semibold text-ink break-words">{exams.map(e=>e.name||e).join(' · ') || 'Merit / university admission'}</p>
           <p className="mt-0.5 text-xs text-ink-3">Typical periods — check notices.</p>
         </div>
         <div className="rounded-xl border border-line bg-paper px-3.5 py-3">
-          <p className="text-[0.65rem] font-bold tracking-[0.12em] uppercase text-ink-3">Foundations to build</p>
+          <p className="text-xs font-semibold text-ink-3">Foundations to build</p>
           <p className="mt-1 text-sm font-semibold text-ink break-words">{Array.isArray(foundations) ? foundations.join(', ') : foundations}</p>
           <p className="mt-0.5 text-xs text-ink-3">Strengthen alongside studies.</p>
         </div>
@@ -89,11 +89,11 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
 
       <div className="mt-3 grid sm:grid-cols-2 gap-3">
         <div className="rounded-xl bg-[#eaf7ef] px-4 py-3.5">
-          <p className="text-[0.68rem] font-bold uppercase text-[#1c8a4b]">✓ Why it matches</p>
+          <p className="text-xs font-semibold text-[#1c8a4b]">✓ Why it matches</p>
           <ul className="mt-2 space-y-1.5">{why.slice(0,4).map(m=> <li key={m} className="text-[0.82rem] text-ink-2 leading-snug">• {m}</li>)}{why.length===0 && <li className="text-[0.82rem] text-ink-2">Balanced option for your answers.</li>}</ul>
         </div>
         <div className="rounded-xl bg-[#fff8e8] border border-[#f0dfae] px-4 py-3.5">
-          <p className="text-[0.68rem] font-bold uppercase text-[#7a5b12]">⚠ Why this may not be right</p>
+          <p className="text-xs font-semibold text-[#7a5b12]">⚠ Why this may not be right</p>
           <ul className="mt-2 space-y-1.5">{cons.slice(0,3).map(m=> <li key={m} className="text-[0.82rem] text-ink-2 leading-snug">• {m}</li>)}{cons.length===0 && <li className="text-[0.82rem] text-ink-2">Needs real-world exposure before committing.</li>}</ul>
         </div>
       </div>
@@ -106,11 +106,11 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
         <div id={`rec-jd-${c.id || rank}`} className={`grid transition-all duration-300 ${showPreview ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden"><div className="px-4 pb-4 pt-1 border-t border-line space-y-3">
             <div>
-              <p className="text-[0.68rem] font-bold uppercase text-ink-3">Objectives of this role</p>
+              <p className="text-xs font-semibold text-ink-3">Objectives of this role</p>
               <ul className="mt-1.5 space-y-1">{objectives.slice(0,2).map(o => <li key={o} className="text-[0.82rem] text-ink-2 leading-snug">• {o}</li>)}</ul>
             </div>
             <div>
-              <p className="text-[0.68rem] font-bold uppercase text-ink-3">Responsibilities</p>
+              <p className="text-xs font-semibold text-ink-3">Responsibilities</p>
               <ul className="mt-1.5 space-y-1">{responsibilities.slice(0,2).map(o => <li key={o} className="text-[0.82rem] text-ink-2 leading-snug">• {o}</li>)}</ul>
             </div>
             <button type="button" onClick={() => setShowDetails(true)} className="inline-flex items-center gap-1 text-[0.82rem] font-semibold text-brand-700 hover:underline">See full job description in Learn more <ArrowRight className="w-3.5 h-3.5" /></button>
@@ -137,7 +137,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               <p className="mt-3 text-sm text-ink-3">Scored from your stream, interests, strengths and priorities. Same answers → same result.</p>
             )}
             <div className="mt-3 rounded-lg bg-brand-50 border border-brand-100 px-3.5 py-3">
-              <p className="text-[0.68rem] font-bold uppercase text-brand-700">Try this month</p>
+              <p className="text-xs font-semibold text-brand-700">Try this month</p>
               <p className="mt-1 text-sm text-ink-2">{activity}</p>
             </div>
           </div></div>
@@ -155,7 +155,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
 
       {showDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby={`rec-learn-${c.id || rank}`}>
-          <button type="button" aria-label="Close details" onClick={() => setShowDetails(false)} className="absolute inset-0 bg-ink/60 backdrop-blur-sm" />
+          <button type="button" aria-label="Close details" onClick={() => setShowDetails(false)} className="absolute inset-0 bg-ink/60" />
           <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
             <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-line shrink-0">
               <div className="min-w-0">
@@ -171,7 +171,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               {c.description && <p className="text-sm text-ink-2 leading-relaxed">{c.description}</p>}
               {c.subjects?.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><BookOpen className="w-4 h-4 text-brand-500" /> Subjects you&apos;ll study</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><BookOpen className="w-4 h-4 text-brand-500" /> Subjects you&apos;ll study</h4>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {c.subjects.map((s) => (
                       <span key={s} className="inline-flex items-center rounded-full bg-brand-50 border border-brand-100 px-3 py-1.5 text-sm font-medium text-brand-700">{s}</span>
@@ -182,7 +182,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {roles.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Briefcase className="w-4 h-4 text-brand-500" /> Job Roles</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><Briefcase className="w-4 h-4 text-brand-500" /> Job Roles</h4>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {roles.map((r) => (
                       <span key={r} className="inline-flex items-center rounded-full bg-brand-50 border border-brand-100 px-3 py-1.5 text-sm font-medium text-brand-700">{r}</span>
@@ -192,7 +192,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {responsibilities.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><ClipboardList className="w-4 h-4 text-brand-500" /> Responsibilities</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><ClipboardList className="w-4 h-4 text-brand-500" /> Responsibilities</h4>
                   <ul className="mt-3 space-y-2.5">
                     {responsibilities.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -202,7 +202,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {objectives.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Target className="w-4 h-4 text-brand-500" /> Objectives of this role</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><Target className="w-4 h-4 text-brand-500" /> Objectives of this role</h4>
                   <ul className="mt-3 space-y-2.5">
                     {objectives.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -212,7 +212,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {skillsAndQualifications.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Award className="w-4 h-4 text-brand-500" /> Required skills and qualifications</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><Award className="w-4 h-4 text-brand-500" /> Required skills and qualifications</h4>
                   <ul className="mt-3 space-y-2.5">
                     {skillsAndQualifications.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -222,7 +222,7 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
               )}
               {preferredQualifications.length > 0 && (
                 <div>
-                  <h4 className="flex items-center gap-2 text-[0.72rem] font-bold tracking-[0.14em] uppercase text-ink-3"><Star className="w-4 h-4 text-amber-500" /> Preferred skills and qualifications</h4>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold text-ink-3"><Star className="w-4 h-4 text-amber-500" /> Preferred skills and qualifications</h4>
                   <ul className="mt-3 space-y-2.5">
                     {preferredQualifications.map((r) => (
                       <li key={r} className="flex gap-2.5 text-sm text-ink-2 leading-relaxed"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" aria-hidden="true" /><span>{r}</span></li>
@@ -234,13 +234,13 @@ export default function RecommendationCard({ item, rank, compared, cantAdd, onTo
                 <div className="grid sm:grid-cols-2 gap-4 pt-2 border-t border-line">
                   {c.skillsToDevelop?.length > 0 && (
                     <div className="rounded-xl bg-paper border border-line p-4">
-                      <p className="text-xs font-bold uppercase tracking-wide text-ink-3">Skills to develop</p>
+                      <p className="text-xs font-semibold text-ink-3">Skills to develop</p>
                       <p className="mt-2 text-sm text-ink-2 leading-relaxed">{c.skillsToDevelop.join(' · ')}</p>
                     </div>
                   )}
                   {c.educationRoutes?.length > 0 && (
                     <div className="rounded-xl bg-paper border border-line p-4">
-                      <p className="text-xs font-bold uppercase tracking-wide text-ink-3">Education route</p>
+                      <p className="text-xs font-semibold text-ink-3">Education route</p>
                       <p className="mt-2 text-sm text-ink-2 leading-relaxed">{c.educationRoutes[0]}</p>
                     </div>
                   )}

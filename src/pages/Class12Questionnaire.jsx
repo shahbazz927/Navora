@@ -50,15 +50,8 @@ function ChoiceCard({ option, selected, multi = false, onClick, disabled = false
           )}
         </span>
         <span className="flex flex-col min-w-0">
-          <span className="flex items-center gap-2 min-w-0">
-            {option.emoji && (
-              <span className="text-base leading-none shrink-0" aria-hidden="true">
-                {option.emoji}
-              </span>
-            )}
-            <span className={`font-medium text-[0.95rem] leading-snug ${selected ? 'text-white' : 'text-ink'}`}>
-              {option.label}
-            </span>
+          <span className={`font-medium text-[0.95rem] leading-snug ${selected ? 'text-white' : 'text-ink'}`}>
+            {option.label}
           </span>
           {option.description && (
             <span className={`mt-0.5 text-[0.82rem] leading-relaxed ${selected ? 'text-white/85' : 'text-ink-3'}`}>
@@ -94,14 +87,6 @@ function StreamCard({ option, selected, onClick }) {
         {selected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
       </span>
       <span className="flex items-center gap-3 pr-8">
-        <span
-          className={`w-11 h-11 shrink-0 rounded-xl border flex items-center justify-center text-xl transition-colors ${
-            selected ? 'border-brand-200 bg-brand-100' : 'border-brand-100 bg-brand-50'
-          }`}
-          aria-hidden="true"
-        >
-          {option.emoji}
-        </span>
         <span className={`font-ui font-semibold text-lg leading-tight ${selected ? 'text-brand-700' : 'text-ink'}`}>
           {option.label}
         </span>
@@ -354,7 +339,7 @@ export default function Class12Questionnaire() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-paper-gradient">
+      <div className="min-h-screen bg-surface">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
           <div className="flex items-center justify-between mb-8">
             <span aria-hidden="true" />
@@ -390,7 +375,7 @@ export default function Class12Questionnaire() {
                 <span className="text-sm text-ink-3">Question {step + 1} of {totalSteps}</span>
               </div>
               <Button onClick={handleContinue} size="lg" shine>
-                {step === totalSteps - 1 ? '🚀 See my path' : 'Continue'}
+                {step === totalSteps - 1 ? 'See my path' : 'Continue'}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </div>

@@ -189,10 +189,7 @@ export default function GlobalStudyShowcase() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-xs font-semibold text-brand-700 uppercase tracking-wider mb-3">
-              <Globe className="w-3.5 h-3.5" />
-              14 International Study Destinations
-            </span>
+            <p className="eyebrow text-brand-700 mb-3">Global study</p>
             <h2 className="font-ui font-bold text-3xl sm:text-4xl lg:text-5xl text-ink tracking-tight">
               Global study guidance, <br className="hidden sm:inline" />
               <span className="text-brand-500">grounded in real economic facts.</span>

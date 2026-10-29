@@ -57,7 +57,7 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-paper-gradient flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-surface flex items-center justify-center relative overflow-hidden">
       <div className="absolute -top-32 right-0 w-96 h-96 rounded-full bg-brand-400/15 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-32 -left-16 w-96 h-96 rounded-full bg-cyan-300/10 blur-3xl pointer-events-none" />
       <div className="relative w-full max-w-lg px-5 sm:px-8 py-16">

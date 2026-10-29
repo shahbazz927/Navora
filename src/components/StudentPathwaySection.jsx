@@ -205,10 +205,7 @@ export default function StudentPathwaySection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-xs font-semibold text-brand-700 uppercase tracking-wider mb-3">
-              <Compass className="w-3.5 h-3.5" />
-              Comprehensive Academic Catalog
-            </span>
+            <p className="eyebrow text-brand-700 mb-3">Academic pathways</p>
             <h2 className="font-ui font-bold text-3xl sm:text-4xl text-ink tracking-tight">
               Tailored pathways for your exact academic stage.
             </h2>
@@ -252,7 +249,7 @@ export default function StudentPathwaySection() {
                 key={st.id}
                 className={`flex flex-col justify-between rounded-2xl border p-6 sm:p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-lg ${
                   st.special
-                    ? 'bg-gradient-to-br from-brand-50 via-white to-brand-100/50 border-brand-300'
+                    ? 'bg-brand-50 border-brand-300'
                     : 'bg-paper border-line hover:border-brand-200'
                 }`}
               >

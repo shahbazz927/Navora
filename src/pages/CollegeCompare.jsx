@@ -129,7 +129,7 @@ export default function CollegeCompare() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/70">
-                  <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider w-48 sticky left-0 bg-slate-50/90 backdrop-blur z-10">
+                  <th className="p-4 text-xs font-bold text-slate-400 uppercase tracking-wider w-48 sticky left-0 bg-slate-50/90 z-10">
                     Category
                   </th>
                   {comparedInstitutions.map((inst) => (

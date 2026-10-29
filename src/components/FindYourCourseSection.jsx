@@ -6,7 +6,6 @@ import {
   Compass,
   GraduationCap,
   Briefcase,
-  Sparkles,
   CheckCircle2,
   ShieldCheck,
   Clock,
@@ -80,19 +79,11 @@ export default function FindYourCourseSection() {
       className="py-20 sm:py-24 bg-paper border-t border-line"
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <FadeIn className="relative rounded-[2rem] border border-line bg-surface shadow-card-lg overflow-hidden">
-          <span
-            className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-brand-400 to-brand-600"
-            aria-hidden="true"
-          />
-
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 p-6 sm:p-10 lg:p-14">
+        <FadeIn className="relative rounded-panel border border-line bg-surface overflow-hidden">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 p-6 sm:p-10 lg:p-12">
             {/* ── Left: message + primary CTA ───────────────────────────── */}
             <div className="flex flex-col justify-center">
-              <p className="inline-flex items-center gap-2 self-start rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1.5 text-brand-700 eyebrow">
-                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                Personalized Course Guidance
-              </p>
+              <p className="eyebrow text-brand-700">Course guidance</p>
 
               <h2
                 id="find-course-heading"
@@ -129,11 +120,7 @@ export default function FindYourCourseSection() {
 
             {/* ── Right: CSS-based education pathway visual ─────────────── */}
             <div className="relative">
-              <div
-                className="absolute -inset-3 rounded-[2rem] bg-gradient-to-tr from-brand-100/70 via-transparent to-brand-200/50 blur-2xl"
-                aria-hidden="true"
-              />
-              <div className="relative rounded-[1.75rem] border border-line bg-paper/70 p-5 sm:p-6 shadow-card">
+              <div className="relative rounded-panel border border-line bg-paper p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2.5">
                     <span className="w-9 h-9 rounded-xl bg-white border border-brand-100 text-brand-600 flex items-center justify-center shadow-xs">
@@ -150,7 +137,7 @@ export default function FindYourCourseSection() {
 
                 <ol className="relative space-y-4">
                   <span
-                    className="absolute left-5 top-3 bottom-3 w-px -translate-x-1/2 bg-gradient-to-b from-brand-300 via-brand-200 to-brand-100"
+                    className="absolute left-5 top-3 bottom-3 w-px -translate-x-1/2 bg-line-strong"
                     aria-hidden="true"
                   />
                   {PATHWAY.map((step) => {
@@ -185,16 +172,13 @@ export default function FindYourCourseSection() {
           <div className="border-t border-line bg-paper/50 p-6 sm:p-10 lg:px-14 lg:py-12">
             <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               <div className="lg:col-span-6">
-                <p className="eyebrow text-brand-600">Counselling</p>
+                <p className="eyebrow text-brand-700">Talk to the team</p>
                 <h3 className="mt-2 font-ui font-bold text-2xl sm:text-3xl text-ink tracking-tight">
-                  Need Personal Guidance?
+                  Prefer to talk it through?
                 </h3>
-                <p className="mt-3 font-ui font-semibold text-brand-700">
-                  Talk to a NAVORA Career Counselor
-                </p>
-                <p className="mt-2 text-sm sm:text-base text-ink-2 leading-relaxed">
-                  Get 1-on-1 guidance to understand your options and make a confident decision about
-                  your education and career.
+                <p className="mt-3 text-sm sm:text-base text-ink-2 leading-relaxed">
+                  Share a mobile number and a member of the NAVORA team will follow up
+                  to discuss your options. This is a callback request, not an instant call.
                 </p>
               </div>
 
@@ -208,7 +192,7 @@ export default function FindYourCourseSection() {
                     <div>
                       <p className="font-ui font-semibold text-sm text-ink">Request received</p>
                       <p className="text-xs text-ink-2 mt-1 leading-relaxed">
-                        Thanks — a NAVORA career counsellor will reach out on {confirmedPhone}.
+                        Thanks. A member of the NAVORA team will follow up on {confirmedPhone}.
                       </p>
                     </div>
                   </div>
@@ -256,7 +240,7 @@ export default function FindYourCourseSection() {
                         loading={submitting}
                         className="w-full sm:w-auto shrink-0"
                       >
-                        Talk to an Expert
+                        Request a callback
                       </Button>
                     </div>
                     {error && (

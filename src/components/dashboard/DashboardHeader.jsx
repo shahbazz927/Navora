@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BadgeCheck, Sparkles } from 'lucide-react';
+import { BadgeCheck } from 'lucide-react';
 import { firstName } from '../../lib/dashboard';
 
 export function SectionTitle({ title, action }) {
@@ -43,12 +43,10 @@ export function EmptyState({ title, desc, ctaLabel, ctaTo }) {
   );
 }
 
-export default function DashboardHeader({ isPro, user, onboarding, planLabel }) {
+export default function DashboardHeader({ user, onboarding, planLabel }) {
   const name = firstName({ onboarding, user });
-  const hello = name ? `Hello, ${name} 👋` : 'Hello there 👋';
-  const sub = isPro
-    ? "Your personalized journey is ready. Here's your complete roadmap."
-    : "Your future is full of possibilities. Let's explore them together!";
+  const hello = name ? `Hello, ${name}.` : 'Hello there.';
+  const sub = "Your personalized journey is ready. Here's your complete roadmap.";
   const initial = (onboarding?.name || user?.user_metadata?.full_name || user?.email || '?').charAt(0).toUpperCase();
 
   return (
@@ -59,12 +57,8 @@ export default function DashboardHeader({ isPro, user, onboarding, planLabel }) 
         </h1>
         <p className="text-sm text-ink-2 mt-1">{sub}</p>
         <p className="mt-2">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 border text-xs font-semibold ${
-              isPro ? 'bg-violet-50 border-violet-200 text-violet-800' : 'bg-white border-line text-ink-3'
-            }`}
-          >
-            {isPro ? <Sparkles className="w-3.5 h-3.5" /> : <BadgeCheck className="w-3.5 h-3.5" />}
+          <span className="inline-flex items-center gap-1.5 rounded-control px-2.5 py-1 border text-xs font-semibold bg-brand-50 border-brand-200 text-brand-800">
+            <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />
             {planLabel}
           </span>
         </p>

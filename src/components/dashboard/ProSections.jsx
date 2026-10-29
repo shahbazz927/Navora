@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Check, Download, FileText, Sparkles, BadgeCheck } from 'lucide-react';
+import { ArrowRight, Download, FileText } from 'lucide-react';
 import { SectionTitle, EmptyState } from './DashboardHeader';
 import { supabase } from '../../lib/supabase';
 
@@ -100,7 +100,7 @@ export function ActionPlan({ userId }) {
       <div className="grid sm:grid-cols-2 gap-3">
         {roadmap.weeks.map((w) => (
           <div key={w.week} className="bg-white border border-line rounded-2xl p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.1em] text-brand-600">Week {w.week}</p>
+            <p className="text-xs font-semibold text-brand-700">Week {w.week}</p>
             <p className="text-sm font-semibold text-ink mt-1">{w.title}</p>
             <ul className="mt-2.5 space-y-2">
               {w.tasks.map((t, i) => {
@@ -129,7 +129,7 @@ export function ActionPlan({ userId }) {
   );
 }
 
-export function ReportsCard({ hasAssessment, isPro, onLocked }) {
+export function ReportsCard({ hasAssessment }) {
   const openPrintReport = () => {
     window.print();
   };
@@ -137,7 +137,7 @@ export function ReportsCard({ hasAssessment, isPro, onLocked }) {
     <section className="bg-white border border-line rounded-2xl p-5 sm:p-6" aria-labelledby="reports">
       <div className="flex items-center justify-between mb-3">
         <h2 id="reports" className="font-ui font-bold text-[1.15rem] tracking-[-0.02em] text-ink">Your Reports</h2>
-        {isPro && hasAssessment && (
+        {hasAssessment && (
           <button onClick={openPrintReport} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700">
             <Download className="w-3.5 h-3.5" /> Download
           </button>
@@ -148,53 +148,18 @@ export function ReportsCard({ hasAssessment, isPro, onLocked }) {
       ) : (
         <ul className="space-y-2">
           {[
-            { name: 'Career Assessment Report', ready: true },
-            { name: 'Personalized Education Roadmap', ready: isPro },
-            { name: 'Career Pathway Report', ready: isPro },
-          ].map((r) => (
-            <li key={r.name} className="flex items-center gap-3 border border-line rounded-xl px-4 py-3">
+            'Career Assessment Report',
+            'Personalized Education Roadmap',
+            'Career Pathway Report',
+          ].map((name) => (
+            <li key={name} className="flex items-center gap-3 border border-line rounded-xl px-4 py-3">
               <FileText className="w-4 h-4 text-brand-600 shrink-0" />
-              <span className="flex-1 text-sm font-medium text-ink">{r.name}</span>
-              {r.ready ? (
-                isPro ? (
-                  <button onClick={openPrintReport} className="text-xs font-semibold text-brand-600 hover:text-brand-700">Print / PDF</button>
-                ) : (
-                  <span className="inline-flex items-center gap-1 text-xs text-emerald-700"><Check className="w-3.5 h-3.5" /> Ready</span>
-                )
-              ) : (
-                <button onClick={onLocked} className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-violet-800">
-                  <Sparkles className="w-3 h-3" /> Pro
-                </button>
-              )}
+              <span className="flex-1 text-sm font-medium text-ink">{name}</span>
+              <button onClick={openPrintReport} className="text-xs font-semibold text-brand-600 hover:text-brand-700">Print / PDF</button>
             </li>
           ))}
         </ul>
       )}
-    </section>
-  );
-}
-
-export function SubscriptionCard({ isPro, expiresAt, onUpgrade }) {
-  const date = expiresAt ? new Date(expiresAt).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : null;
-  return (
-    <section className={`rounded-2xl p-5 sm:p-6 border ${isPro ? 'bg-violet-50/60 border-violet-200' : 'bg-white border-line'}`} aria-labelledby="sub-status">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold border w-fit ${isPro ? 'bg-white border-violet-200 text-violet-800' : 'bg-paper border-line text-ink-3'}`}>
-          <BadgeCheck className="w-3.5 h-3.5" /> {isPro ? 'NAVORA Pro' : 'NAVORA Free'}
-        </span>
-        <p className="flex-1 text-sm text-ink-2">
-          {isPro ? (
-            <>Active{date ? <> until <strong className="text-ink">{date}</strong></> : ''}. Thanks for being Pro.</>
-          ) : (
-            <>You’re exploring with Free. Pro adds your roadmap, comparisons, reports and 30 AI messages/day.</>
-          )}
-        </p>
-        {!isPro && (
-          <button onClick={onUpgrade} className="shrink-0 inline-flex items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-6 py-2.5 transition-colors">
-            Upgrade · ₹999/year
-          </button>
-        )}
-      </div>
     </section>
   );
 }

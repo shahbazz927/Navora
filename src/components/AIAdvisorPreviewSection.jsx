@@ -34,10 +34,9 @@ export default function AIAdvisorPreviewSection() {
         <div className="grid lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Heading & Capabilities */}
           <div className="lg:col-span-6">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 border border-brand-200 px-3.5 py-1 text-xs font-semibold text-brand-700 uppercase tracking-wider mb-4">
-              <BrainCircuit className="w-3.5 h-3.5" />
-              Context-Aware Guidance
-            </span>
+            <p className="eyebrow text-brand-700 mb-3">
+              Context-aware guidance
+            </p>
             <h2 className="font-ui font-bold text-3xl sm:text-4xl lg:text-5xl text-ink tracking-tight">
               Meet Your <br className="hidden sm:inline" />
               <span className="text-brand-500">AI Career Advisor.</span>
@@ -138,8 +137,7 @@ export default function AIAdvisorPreviewSection() {
                 </div>
 
                 <div className="bg-brand-50/70 p-4 rounded-2xl border border-brand-100 text-ink space-y-2">
-                  <p className="font-semibold text-brand-800 text-xs flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" /> NAVORA Advisor perspective:
+                  <p className="font-semibold text-brand-800 text-xs flex items-center gap-1.5">NAVORA Advisor perspective:
                   </p>
                   <p className="text-xs leading-relaxed text-ink-2">
                     "With a 7.8 CGPA, you sit in the sweet spot. If your financial plan supports 2 years of study and you enjoy deep algorithms, GATE gives you IIT/NIT M.Tech credentials with full stipend. But if immediate earnings matter, secure a product engineering placement first — top tier firms value 2 years of production system experience over an average master's degree."
@@ -152,7 +150,7 @@ export default function AIAdvisorPreviewSection() {
 
               {/* Quick Prompt Selectors */}
               <div className="mt-6 pt-5 border-t border-line">
-                <p className="text-[0.7rem] font-bold uppercase tracking-wider text-ink-3 mb-2.5">
+                <p className="text-xs font-semibold text-ink-3 mb-2.5">
                   Try asking the counselor:
                 </p>
                 <div className="space-y-1.5">

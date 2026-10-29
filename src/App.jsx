@@ -36,7 +36,6 @@ import Disclaimer from './pages/legal/Disclaimer';
 import Accessibility from './pages/legal/Accessibility';
 import AcceptableUse from './pages/legal/AcceptableUse';
 import Security from './pages/legal/Security';
-import Pricing from './pages/Pricing';
 import Account from './pages/Account';
 import VerifyEmail from './pages/VerifyEmail';
 import ResetPassword from './pages/ResetPassword';
@@ -128,7 +127,6 @@ function App() {
           <Route path="/account" element={<Layout><RequireAuth><Account /></RequireAuth></Layout>} />
           <Route path="/verify-email" element={<Layout><VerifyEmail /></Layout>} />
           <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
-          <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
           <Route path="/support" element={<Layout><Support /></Layout>} />
           <Route path="/help" element={<Layout><Help /></Layout>} />
           <Route path="/403" element={<Layout><Forbidden /></Layout>} />

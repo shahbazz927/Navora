@@ -43,7 +43,6 @@ export default function ResultsLayout({
             {sidebarExams && <ExamCalendar exams={sidebarExams} />}
             {sidebarNextColleges}
             <section className="bg-brand-950 border border-white/10 rounded-[14px] p-5 relative overflow-hidden">
-              <div className="absolute inset-0 bg-mesh-dark opacity-40 pointer-events-none" />
               <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-brand-600/20 blur-2xl pointer-events-none" />
               <p className="relative text-sm font-semibold text-white">Not fully convinced?</p>
               <p className="relative mt-1 text-sm text-white/70 leading-relaxed">That&apos;s completely okay. Let&apos;s talk it through 1-on-1 with a career counselor.</p>

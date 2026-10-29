@@ -110,7 +110,7 @@ function getDegreeByLabel(label) {
 function SkillGroupSection({ groupName, skills, selected, onToggle, disabled }) {
   return (
     <div className="mb-4">
-      <h4 className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2 px-1">{groupName}</h4>
+      <h4 className="text-xs font-semibold text-ink-3 mb-2 px-1">{groupName}</h4>
       <div className="flex flex-wrap gap-2">
         {skills.map((skill) => {
           const isSelected = selected.includes(skill.value);
@@ -411,7 +411,6 @@ export default function Questions() {
       const grouped = {};
       Object.entries(graduateCategoryMap).forEach(([catName, cat]) => {
         grouped[catName] = {
-          emoji: cat.emoji,
           degrees: cat.degreeLabels.map((label) => {
             const deg = getDegreeByLabel(label);
             return { label, hasSpecs: deg && deg.specializations && deg.specializations.length > 0 };
@@ -421,11 +420,10 @@ export default function Questions() {
 
       return (
         <div className="mt-8 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-          {Object.entries(grouped).map(([catName, { emoji, degrees }]) => (
+          {Object.entries(grouped).map(([catName, { degrees }]) => (
             <GraduateDegreeGroup
               key={catName}
               category={catName}
-              emoji={emoji}
               degrees={degrees}
               selectedDegree={q1SelectedDegree}
               onSelect={handleQ1DegreeSelect}
@@ -506,7 +504,7 @@ export default function Questions() {
   };
 
   return (
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-2xl mx-auto px-5 sm:px-8 py-10 lg:py-14">
         <div className="flex items-center justify-between mb-8">
           <BackLink onClick={handleBack} />
@@ -597,11 +595,6 @@ export default function Questions() {
                               )}
                             </span>
                             <span className="flex items-center gap-3 min-w-0">
-                              {option.emoji && (
-                                <span className="text-[1.1rem] leading-none shrink-0" aria-hidden="true">
-                                  {option.emoji}
-                                </span>
-                              )}
                               <span className={`font-medium ${isSelected ? 'text-white' : 'text-ink'}`}>
                                 {option.label}
                               </span>
@@ -652,7 +645,7 @@ export default function Questions() {
   );
 }
 
-function GraduateDegreeGroup({ category, emoji, degrees, selectedDegree, onSelect }) {
+function GraduateDegreeGroup({ category, degrees, selectedDegree, onSelect }) {
   const [expanded, setExpanded] = useState(true);
   const hasSelected = degrees.some((d) => d.label === selectedDegree);
 
@@ -664,7 +657,6 @@ function GraduateDegreeGroup({ category, emoji, degrees, selectedDegree, onSelec
         className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-paper/50 transition-colors"
       >
         <span className="flex items-center gap-2.5">
-          <span className="text-lg">{emoji}</span>
           <span className="font-semibold text-ink text-sm">{category}</span>
           {hasSelected && (
             <span className="text-xs bg-brand-500 text-white px-2 py-0.5 rounded-full">

@@ -6,19 +6,14 @@ import CareerPaths from './CareerPaths';
 import ProfileSummary from './ProfileSummary';
 import CollegeRecs from './CollegeRecs';
 import AIAdvisorWidget from './AIAdvisorWidget';
-import { CourseCompareCard, ActionPlan, ReportsCard, SubscriptionCard } from './ProSections';
-import { SectionError } from './DashboardHeader';
+import { CourseCompareCard, ActionPlan, ReportsCard } from './ProSections';
 
-export default function ProDashboard({ d, onUpgrade }) {
+export default function ProDashboard({ d }) {
   return (
     <div className="space-y-6 sm:space-y-8">
-      <DashboardHeader isPro user={d.user} onboarding={d.onboardingData} planLabel="NAVORA Pro · Connect the dots and build your plan" />
+      <DashboardHeader user={d.user} onboarding={d.onboardingData} planLabel="Full access · every feature is free" />
 
-      {d.remoteError ? (
-        <SectionError onRetry={d.retry} />
-      ) : (
-        <RoadmapHero answers={d.answers} userType={d.userType} onboarding={d.onboardingData} />
-      )}
+      <RoadmapHero answers={d.answers} userType={d.userType} onboarding={d.onboardingData} />
 
       <SummaryCards
         careerCount={d.unified.length}
@@ -33,7 +28,7 @@ export default function ProDashboard({ d, onUpgrade }) {
         <ProfileSummary answers={d.answers} userType={d.userType} />
         <div className="space-y-4 sm:space-y-6">
           <CourseCompareCard />
-          <ReportsCard hasAssessment={d.hasAssessment} isPro onLocked={onUpgrade} />
+          <ReportsCard hasAssessment={d.hasAssessment} />
         </div>
       </div>
 
@@ -41,9 +36,7 @@ export default function ProDashboard({ d, onUpgrade }) {
 
       <ActionPlan userId={d.user?.id} />
 
-      <AIAdvisorWidget isPro used={d.aiUsed} limit={d.aiLimit} onUpgrade={onUpgrade} />
-
-      <SubscriptionCard isPro expiresAt={d.expiresAt} onUpgrade={onUpgrade} />
+      <AIAdvisorWidget used={d.aiUsed} />
 
       <p className="text-center text-xs text-ink-3">
         Want a parent-friendly overview? <Link to="/parents" className="text-brand-600 font-semibold hover:text-brand-700">Open Parent Summary →</Link>

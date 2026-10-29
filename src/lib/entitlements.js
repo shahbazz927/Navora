@@ -1,41 +1,23 @@
-// Centralized entitlement config — single source of truth
+// Centralized entitlement config — single source of truth.
+//
+// PAID MODE IS OFF: there is exactly one plan and it unlocks everything.
+// Every limit is Infinity and every feature flag is on, so nothing in the
+// product is gated. Re-introducing a paid tier later means adding a second
+// entry here and re-wiring the callers that branch on `isPro`.
 export const PLANS = {
   free: {
     id: 'free',
-    name: 'NAVORA Free',
+    name: 'NAVORA',
     shortName: 'Free',
     price: 0,
     currency: 'INR',
     billing: 'forever',
-    label: '₹0 Forever',
-    ai_daily_limit: 5,
-    career_recommendation_limit: 3,
-    college_compare_limit: 2,
-    country_compare_limit: 2,
-    university_compare_limit: 0,
-    saved_limit: 5,
-    personalized_roadmap: false,
-    pdf_reports: false,
-    full_global_study: false,
-    course_comparison: false,
-    detailed_fees: false,
-    conversation_history: false,
-    profile_aware: false,
-  },
-  pro: {
-    id: 'pro',
-    name: 'NAVORA Pro',
-    shortName: 'Pro',
-    price: 999,
-    currency: 'INR',
-    billing: 'yearly',
-    label: '₹999/year',
-    monthlyEquivalent: 83,
-    ai_daily_limit: 30,
+    label: 'Free',
+    ai_daily_limit: Infinity,
     career_recommendation_limit: Infinity,
-    college_compare_limit: 10,
-    country_compare_limit: 10,
-    university_compare_limit: 20, // per month
+    college_compare_limit: Infinity,
+    country_compare_limit: Infinity,
+    university_compare_limit: Infinity,
     saved_limit: Infinity,
     personalized_roadmap: true,
     pdf_reports: true,
@@ -47,17 +29,13 @@ export const PLANS = {
   },
 };
 
-export function getPlan(planId) {
-  return PLANS[planId] || PLANS.free;
+export function getPlan() {
+  return PLANS.free;
 }
 
-export function isPro(planId) {
-  return planId === 'pro';
-}
-
-// Feature gates — pure functions, testable
-export function canAccess(planId, feature) {
-  const p = getPlan(planId);
+// Feature gates — everything is open while paid mode is off.
+export function canAccess(feature) {
+  const p = getPlan();
   const map = {
     personalized_roadmap: p.personalized_roadmap,
     pdf_reports: p.pdf_reports,
@@ -66,11 +44,11 @@ export function canAccess(planId, feature) {
     detailed_fees: p.detailed_fees,
     conversation_history: p.conversation_history,
   };
-  return map[feature] ?? false;
+  return map[feature] ?? true;
 }
 
-export function limitFor(planId, kind) {
-  return getPlan(planId)[kind] ?? 0;
+export function limitFor(kind) {
+  return getPlan()[kind] ?? Infinity;
 }
 
 // Analytics helper (no PII)

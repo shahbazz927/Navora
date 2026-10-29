@@ -1,0 +1,313 @@
+{
+  "generatedAt": "2026-10-22",
+  "countryCount": 18,
+  "totalUniversities": 598,
+  "publicTotal": 333,
+  "privateTotal": 265,
+  "errors": [],
+  "warnings": [
+    "United Kingdom: only 6 private universities",
+    "Canada: only 15 private universities",
+    "Australia: only 9 private universities",
+    "Netherlands: only 11 private universities",
+    "Ireland: only 12 public universities",
+    "Ireland: only 1 private universities",
+    "Sweden: only 8 private universities",
+    "Norway: only 16 public universities",
+    "Norway: only 12 private universities",
+    "Belgium: only 17 public universities",
+    "Belgium: only 18 private universities",
+    "Poland: only 17 private universities",
+    "Latvia: only 11 public universities",
+    "Latvia: only 5 private universities",
+    "Malaysia: only 16 public universities",
+    "Singapore: only 6 public universities",
+    "Singapore: only 11 private universities",
+    "UAE / Dubai: only 8 public universities"
+  ],
+  "countries": [
+    {
+      "countryId": "usa",
+      "country": "United States",
+      "total": 42,
+      "public": 22,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true,
+      "verified": 42,
+      "publishedTuition": 2,
+      "kinds": {
+        "University": 42
+      }
+    },
+    {
+      "countryId": "uk",
+      "country": "United Kingdom",
+      "total": 27,
+      "public": 21,
+      "private": 6,
+      "publicShortfall": 0,
+      "privateShortfall": 14,
+      "meetsTarget": false,
+      "verified": 27,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 27
+      }
+    },
+    {
+      "countryId": "canada",
+      "country": "Canada",
+      "total": 36,
+      "public": 21,
+      "private": 15,
+      "publicShortfall": 0,
+      "privateShortfall": 5,
+      "meetsTarget": false,
+      "verified": 36,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 33,
+        "International Branch Campus": 3
+      }
+    },
+    {
+      "countryId": "australia",
+      "country": "Australia",
+      "total": 30,
+      "public": 21,
+      "private": 9,
+      "publicShortfall": 0,
+      "privateShortfall": 11,
+      "meetsTarget": false,
+      "verified": 30,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 30
+      }
+    },
+    {
+      "countryId": "germany",
+      "country": "Germany",
+      "total": 42,
+      "public": 22,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true,
+      "verified": 42,
+      "publishedTuition": 2,
+      "kinds": {
+        "University": 42
+      }
+    },
+    {
+      "countryId": "france",
+      "country": "France",
+      "total": 49,
+      "public": 24,
+      "private": 25,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true,
+      "verified": 49,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 28,
+        "Grande École": 21
+      }
+    },
+    {
+      "countryId": "netherlands",
+      "country": "Netherlands",
+      "total": 36,
+      "public": 25,
+      "private": 11,
+      "publicShortfall": 0,
+      "privateShortfall": 9,
+      "meetsTarget": false,
+      "verified": 36,
+      "publishedTuition": 1,
+      "kinds": {
+        "University of Applied Sciences": 17,
+        "University": 18,
+        "International Branch Campus": 1
+      }
+    },
+    {
+      "countryId": "italy",
+      "country": "Italy",
+      "total": 45,
+      "public": 25,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true,
+      "verified": 45,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 45
+      }
+    },
+    {
+      "countryId": "ireland",
+      "country": "Ireland",
+      "total": 13,
+      "public": 12,
+      "private": 1,
+      "publicShortfall": 8,
+      "privateShortfall": 19,
+      "meetsTarget": false,
+      "verified": 13,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 13
+      }
+    },
+    {
+      "countryId": "sweden",
+      "country": "Sweden",
+      "total": 32,
+      "public": 24,
+      "private": 8,
+      "publicShortfall": 0,
+      "privateShortfall": 12,
+      "meetsTarget": false,
+      "verified": 32,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 29,
+        "University College": 3
+      }
+    },
+    {
+      "countryId": "norway",
+      "country": "Norway",
+      "total": 28,
+      "public": 16,
+      "private": 12,
+      "publicShortfall": 4,
+      "privateShortfall": 8,
+      "meetsTarget": false,
+      "verified": 28,
+      "publishedTuition": 1,
+      "kinds": {
+        "University College": 11,
+        "University": 12,
+        "University of Applied Sciences": 5
+      }
+    },
+    {
+      "countryId": "belgium",
+      "country": "Belgium",
+      "total": 35,
+      "public": 17,
+      "private": 18,
+      "publicShortfall": 3,
+      "privateShortfall": 2,
+      "meetsTarget": false,
+      "verified": 35,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 14,
+        "University of Applied Sciences": 21
+      }
+    },
+    {
+      "countryId": "spain",
+      "country": "Spain",
+      "total": 41,
+      "public": 21,
+      "private": 20,
+      "publicShortfall": 0,
+      "privateShortfall": 0,
+      "meetsTarget": true,
+      "verified": 41,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 41
+      }
+    },
+    {
+      "countryId": "poland",
+      "country": "Poland",
+      "total": 38,
+      "public": 21,
+      "private": 17,
+      "publicShortfall": 0,
+      "privateShortfall": 3,
+      "meetsTarget": false,
+      "verified": 38,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 38
+      }
+    },
+    {
+      "countryId": "latvia",
+      "country": "Latvia",
+      "total": 16,
+      "public": 11,
+      "private": 5,
+      "publicShortfall": 9,
+      "privateShortfall": 15,
+      "meetsTarget": false,
+      "verified": 16,
+      "publishedTuition": 1,
+      "kinds": {
+        "University": 15,
+        "University of Applied Sciences": 1
+      }
+    },
+    {
+      "countryId": "malaysia",
+      "country": "Malaysia",
+      "total": 38,
+      "public": 16,
+      "private": 22,
+      "publicShortfall": 4,
+      "privateShortfall": 0,
+      "meetsTarget": false,
+      "verified": 38,
+      "publishedTuition": 5,
+      "kinds": {
+        "University": 37,
+        "International Branch Campus": 1
+      }
+    },
+    {
+      "countryId": "singapore",
+      "country": "Singapore",
+      "total": 17,
+      "public": 6,
+      "private": 11,
+      "publicShortfall": 14,
+      "privateShortfall": 9,
+      "meetsTarget": false,
+      "verified": 17,
+      "publishedTuition": 5,
+      "kinds": {
+        "University": 15,
+        "University of Applied Sciences": 2
+      }
+    },
+    {
+      "countryId": "uae",
+      "country": "UAE / Dubai",
+      "total": 33,
+      "public": 8,
+      "private": 25,
+      "publicShortfall": 12,
+      "privateShortfall": 0,
+      "meetsTarget": false,
+      "verified": 33,
+      "publishedTuition": 6,
+      "kinds": {
+        "University": 20,
+        "International Branch Campus": 12,
+        "Higher Education College": 1
+      }
+    }
+  ]
+}

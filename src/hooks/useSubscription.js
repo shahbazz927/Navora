@@ -5,13 +5,6 @@ import { PLANS } from '../lib/entitlements';
 // UI cache only — NEVER authorization. Backend (/api/entitlement) decides.
 const STORAGE_KEY = 'navora_subscription_v1';
 
-function loadCache() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return null;
-}
 function saveCache(v) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(v)); } catch {}
 }
@@ -30,9 +23,7 @@ export function incAiUsage() { return getAiUsage(); }
 
 export function useSubscription() {
   const [ent, setEnt] = useState(() => {
-    const cached = loadCache();
-    // Cached plan is display-only; treated as free until server confirms.
-    if (cached?.plan === 'pro') return { plan: 'free', status: 'active', features: PLANS.free, serverVerified: false };
+    // Paid mode is off: the only plan is the free plan, which unlocks everything.
     return { plan: 'free', status: 'active', features: PLANS.free, serverVerified: false };
   });
   const [loading, setLoading] = useState(true);
@@ -54,11 +45,11 @@ export function useSubscription() {
         return;
       }
       const j = await res.json().catch(() => null);
-      if (j?.success && (j.plan === 'pro' || j.plan === 'free')) {
+      if (j?.success) {
         const next = {
-          plan: j.plan,
+          plan: 'free',
           status: j.status || 'active',
-          features: { ...PLANS[j.plan], ...(j.features || {}) },
+          features: { ...PLANS.free, ...(j.features || {}) },
           used: typeof j.used === 'number' ? j.used : 0,
           currentPeriodEnd: j.currentPeriodEnd || null,
           serverVerified: true,
@@ -66,7 +57,6 @@ export function useSubscription() {
         setEnt(next);
         saveCache({ plan: next.plan, status: next.status });
       } else {
-        // Fail-safe: lookup failed => Free, never Pro.
         setEnt((p) => ({ ...p, plan: 'free', features: PLANS.free, serverVerified: false }));
       }
     } catch {
@@ -84,12 +74,13 @@ export function useSubscription() {
     return () => sub?.subscription?.unsubscribe();
   }, [fetchRemote]);
 
-  const isPro = ent.serverVerified === true && ent.plan === 'pro' && ent.status !== 'expired';
-  const plan = isPro ? { ...PLANS.pro, ...(ent.features || {}) } : { ...PLANS.free, ...(isPro ? {} : ent.features || {}) };
-  const sub = { plan: isPro ? 'pro' : 'free', status: ent.status, expires_at: ent.currentPeriodEnd, currentPeriodEnd: ent.currentPeriodEnd };
+  // No paid tier — `isPro` stays false, `plan` carries every feature.
+  const isPro = false;
+  const plan = { ...PLANS.free, ...(ent.features || {}) };
+  const sub = { plan: 'free', status: ent.status, expires_at: null, currentPeriodEnd: null };
 
   // Server verification helper (sends JWT; never trusts local state).
-  const verifyFeature = useCallback(async (feature) => {
+  const verifyFeature = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch('/api/entitlement/check', {
@@ -98,7 +89,7 @@ export function useSubscription() {
           'Content-Type': 'application/json',
           ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
         },
-        body: JSON.stringify({ feature }),
+        body: JSON.stringify({ feature: 'default' }),
       });
       const j = await res.json().catch(() => null);
       return j?.allowed === true;

@@ -596,7 +596,7 @@ export default function CollegeDetail() {
             </div>
 
             {/* NAVORA Career Pathway Card */}
-            <div className="bg-gradient-to-br from-[#0A192F] to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-4">
+            <div className="bg-brand-950 text-white rounded-card p-5 space-y-4">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-400" />
                 <h3 className="font-bold text-sm">NAVORA Career Pathway</h3>

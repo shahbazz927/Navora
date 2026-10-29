@@ -325,11 +325,8 @@ const triggerError = (msg) => {
       id="auth-main-card"
       animate={shakeKey > 0 ? { x: [0, -10, 10, -8, 8, -4, 4, 0], rotate: [0, -1, 1, -0.8, 0.8, 0] } : {}}
       transition={{ duration: 0.45, ease: 'easeInOut' }}
-      className="relative w-full max-w-[360px] rounded-2xl p-5 backdrop-blur-2xl transition-all duration-300 shadow-2xl border bg-white/95 border-slate-200/90 text-slate-900 shadow-xl shadow-slate-200/60 ring-1 ring-black/5"
+      className="relative w-full max-w-[380px] rounded-panel p-5 sm:p-6 bg-white border border-line text-ink"
     >
-      {/* Decorative Card Top Glow Bar */}
-      <div className="absolute -top-px left-12 right-12 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80" />
-
       {/* Mode Switcher Tabs */}
       <div className="grid grid-cols-2 p-1.5 rounded-2xl mb-6 border transition-colors bg-slate-100/90 border-slate-200/80">
         <button
@@ -386,7 +383,7 @@ const triggerError = (msg) => {
             ? 'Enter your number to receive a one-time code by SMS'
             : isLogin
               ? 'Enter your credentials to access your NAVORA portal'
-              : 'Join NAVORA and unlock intelligent high-performance workflows'}
+              : 'Join NAVORA to explore your options and build a plan'}
         </p>
       </div>
 
@@ -436,7 +433,7 @@ const triggerError = (msg) => {
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-1.5 overflow-hidden"
             >
-              <label htmlFor="input-name" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <label htmlFor="input-name" className="block text-xs font-semibold text-ink-2">
                 Full Name
               </label>
               <motion.div
@@ -468,7 +465,7 @@ const triggerError = (msg) => {
 
         {/* Email field */}
         <div className="space-y-1.5">
-          <label htmlFor="input-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <label htmlFor="input-email" className="block text-xs font-semibold text-ink-2">
             Email Address
           </label>
           <motion.div
@@ -499,7 +496,7 @@ const triggerError = (msg) => {
         </div>
 {/* Password field */}
         <div className="space-y-1.5">
-          <label htmlFor="input-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+          <label htmlFor="input-password" className="block text-xs font-semibold text-ink-2">
             Password
           </label>
           <motion.div
@@ -619,7 +616,7 @@ const triggerError = (msg) => {
               transition={{ duration: 0.35, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-1.5 overflow-hidden"
             >
-              <label htmlFor="input-confirm-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+              <label htmlFor="input-confirm-password" className="block text-xs font-semibold text-ink-2">
                 Confirm Password
               </label>
               <motion.div
@@ -704,7 +701,7 @@ const triggerError = (msg) => {
           type="submit"
           id="auth-submit-btn"
           disabled={isLoading}
-          className="w-full relative group mt-2 py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+          className="w-full relative group mt-2 py-3 px-6 rounded-control font-semibold text-sm text-white bg-brand-600 hover:bg-brand-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -725,7 +722,7 @@ const triggerError = (msg) => {
           {phoneStep === 'enter' ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="input-phone" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                <label htmlFor="input-phone" className="block text-xs font-semibold text-ink-2">
                   Phone Number
                 </label>
                 <motion.div
@@ -765,7 +762,7 @@ const triggerError = (msg) => {
                 type="submit"
                 id="auth-send-otp-btn"
                 disabled={isLoading}
-                className="w-full relative group mt-2 py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+                className="w-full relative group mt-2 py-3 px-6 rounded-control font-semibold text-sm text-white bg-brand-600 hover:bg-brand-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -780,7 +777,7 @@ const triggerError = (msg) => {
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-1.5">
-                <label htmlFor="input-otp" className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                <label htmlFor="input-otp" className="block text-xs font-semibold text-ink-2">
                   Enter Code
                 </label>
                 <motion.div
@@ -829,7 +826,7 @@ const triggerError = (msg) => {
                 type="submit"
                 id="auth-verify-otp-btn"
                 disabled={isLoading}
-                className="w-full relative group mt-2 py-3.5 px-6 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:via-indigo-500 hover:to-blue-500 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
+                className="w-full relative group mt-2 py-3 px-6 rounded-control font-semibold text-sm text-white bg-brand-600 hover:bg-brand-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer"
               >
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -854,8 +851,8 @@ const triggerError = (msg) => {
       )}
       {/* Security Footer Notice */}
       <div className="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-        <span>Connected to Supabase PostgreSQL &amp; Auth</span>
+        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+        <span>Your account details are handled securely</span>
       </div>
     </motion.div>
   );

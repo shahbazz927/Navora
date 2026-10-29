@@ -78,9 +78,9 @@ export default function ParentClass10ResultsView({
   };
 
   return (
-    <div className="min-h-screen bg-paper-gradient text-ink pb-20">
+    <div className="min-h-screen bg-surface text-ink pb-20">
       {/* Top Header Bar */}
-      <div className="sticky top-0 z-20 backdrop-blur-md bg-paper/85 border-b border-line">
+      <div className="sticky top-0 z-20 bg-paper border-b border-line">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
           <button
             type="button"
@@ -149,7 +149,7 @@ export default function ParentClass10ResultsView({
 
           {/* Core Subjects in 10+2 / Intermediate */}
           <div className="pt-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2.5">
+            <p className="text-xs font-semibold text-ink-3 mb-2.5">
               Core subjects in this pathway (Class 11 &amp; 12):
             </p>
             <div className="flex flex-wrap gap-2">
@@ -218,7 +218,7 @@ export default function ParentClass10ResultsView({
         {/* ── Section: Future Gateways ───────────────────────────── */}
         <section className="space-y-5">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
+            <span className="text-xs font-semibold text-brand-600">
               Future Educational &amp; Career Trajectory
             </span>
             <h2 className="font-ui font-bold text-2xl sm:text-3xl text-ink mt-1">
@@ -274,7 +274,7 @@ export default function ParentClass10ResultsView({
                     <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-line/60 bg-surface/30 space-y-5">
                       {/* Example Courses */}
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2 flex items-center gap-1.5">
+                        <p className="text-xs font-semibold text-ink-3 mb-2 flex items-center gap-1.5">
                           <GraduationCap className="w-4 h-4 text-brand-600" />
                           Example Accredited Courses &amp; Degrees:
                         </p>
@@ -292,7 +292,7 @@ export default function ParentClass10ResultsView({
 
                       {/* Possible Career Directions */}
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2 flex items-center gap-1.5">
+                        <p className="text-xs font-semibold text-ink-3 mb-2 flex items-center gap-1.5">
                           <Briefcase className="w-4 h-4 text-emerald-600" />
                           Possible Career Directions:
                         </p>
@@ -328,7 +328,7 @@ export default function ParentClass10ResultsView({
         {alternativePathways && alternativePathways.length > 0 && (
           <section className="space-y-5">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-brand-600">
+              <span className="text-xs font-semibold text-brand-600">
                 Flexibility &amp; Viable Options
               </span>
               <h2 className="font-ui font-bold text-2xl sm:text-3xl text-ink mt-1">
@@ -360,7 +360,7 @@ export default function ParentClass10ResultsView({
                     </h3>
 
                     <div className="space-y-1.5 pt-1">
-                      <p className="text-xs font-bold text-ink-3 uppercase tracking-wider">
+                      <p className="text-xs font-semibold text-ink-3">
                         Why it could also fit:
                       </p>
                       <p className="text-sm text-ink-2 leading-relaxed">
@@ -369,7 +369,7 @@ export default function ParentClass10ResultsView({
                     </div>
 
                     <div className="space-y-1.5 pt-1">
-                      <p className="text-xs font-bold text-ink-3 uppercase tracking-wider">
+                      <p className="text-xs font-semibold text-ink-3">
                         Gateways it unlocks:
                       </p>
                       <p className="text-sm text-ink font-medium leading-relaxed">
@@ -431,7 +431,7 @@ export default function ParentClass10ResultsView({
         {/* ── Advisor Counselor Bridge CTA ───────────────────────── */}
         <section className="rounded-2xl border border-brand-200 bg-brand-50/50 p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-xs">
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-800 uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-800">
               <Sparkles className="w-3.5 h-3.5 text-brand-600" />
               NAVORA 30-Year Experienced Counselor
             </span>
@@ -499,7 +499,7 @@ export default function ParentClass10ResultsView({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setSelectedAltPathway(null)}
-                className="fixed inset-0 bg-ink/60 backdrop-blur-xs transition-opacity"
+                className="fixed inset-0 bg-ink/60 transition-opacity"
               />
 
               {/* Modal Card */}
@@ -511,7 +511,7 @@ export default function ParentClass10ResultsView({
                 className="relative w-full max-w-3xl max-h-[88vh] bg-white rounded-3xl border border-line shadow-2xl flex flex-col overflow-hidden z-10 my-auto"
               >
                 {/* Modal Header */}
-                <div className="sticky top-0 z-10 px-6 sm:px-8 py-5 bg-white/95 backdrop-blur-md border-b border-line flex items-center justify-between gap-4">
+                <div className="sticky top-0 z-10 px-6 sm:px-8 py-5 bg-white border-b border-line flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span
                       className="px-3 py-1 rounded-xl text-xs font-bold tracking-wide shrink-0"
@@ -524,7 +524,7 @@ export default function ParentClass10ResultsView({
                       {selectedAltPathway.code}
                     </span>
                     <div>
-                      <p className="text-xs font-semibold text-ink-3 uppercase tracking-wider">
+                      <p className="text-xs font-semibold text-ink-3">
                         Alternative Pathway Deep Dive
                       </p>
                       <h3 className="font-ui font-bold text-lg sm:text-xl text-ink leading-tight">
@@ -629,7 +629,7 @@ export default function ParentClass10ResultsView({
                           {/* Courses */}
                           {gw.courses && gw.courses.length > 0 && (
                             <div className="pl-7 space-y-1.5">
-                              <p className="text-xs font-bold text-brand-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <p className="text-xs font-semibold text-brand-700 flex items-center gap-1.5">
                                 <GraduationCap className="w-3.5 h-3.5" />
                                 Undergraduate Courses &amp; Degrees:
                               </p>
@@ -649,7 +649,7 @@ export default function ParentClass10ResultsView({
                           {/* Careers */}
                           {gw.careers && gw.careers.length > 0 && (
                             <div className="pl-7 space-y-1.5">
-                              <p className="text-xs font-bold text-emerald-700 uppercase tracking-wider flex items-center gap-1.5">
+                              <p className="text-xs font-semibold text-emerald-700 flex items-center gap-1.5">
                                 <Briefcase className="w-3.5 h-3.5" />
                                 Target Career Roles:
                               </p>
@@ -695,7 +695,7 @@ export default function ParentClass10ResultsView({
                 </div>
 
                 {/* Modal Footer */}
-                <div className="sticky bottom-0 z-10 px-6 sm:px-8 py-4 bg-white/95 backdrop-blur-md border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="sticky bottom-0 z-10 px-6 sm:px-8 py-4 bg-white border-t border-line flex flex-col sm:flex-row items-center justify-between gap-3">
                   <button
                     type="button"
                     onClick={() => setSelectedAltPathway(null)}

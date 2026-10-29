@@ -19,8 +19,6 @@ import { ALL_INSTITUTIONS, getCollegesMatchingProfile, filterInstitutions } from
 import { useUser } from '../context/UserContext';
 import { useSavedColleges } from '../hooks/useSavedColleges';
 import campusHeroBg from '../assets/images/campus_hero_bright_1790171606486.jpg';
-import { useSubscription } from '../hooks/useSubscription';
-import UpgradeModal from '../components/UpgradeModal';
 
 export default function Colleges() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,9 +39,6 @@ export default function Colleges() {
   const [searchQuery, setSearchQuery] = useState(paramSearch);
   const [compareList, setCompareList] = useState([]);
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
-  const { plan, isPro } = useSubscription();
-  const [showUpgrade, setShowUpgrade] = useState(false);
-  const compareLimit = plan.college_compare_limit;
 
   // Sync searchQuery local state if param changes externally
   useEffect(() => {
@@ -75,10 +70,6 @@ export default function Colleges() {
     setCompareList((prev) => {
       if (prev.includes(slug)) {
         return prev.filter((s) => s !== slug);
-      }
-      if (prev.length >= compareLimit) {
-        setShowUpgrade(true);
-        return prev;
       }
       return [...prev, slug];
     });
@@ -125,7 +116,7 @@ export default function Colleges() {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-24">
+    <div className="min-h-screen bg-surface text-ink pb-24">
       {/* Hero Header with College Campus Background Image */}
       <section className="relative overflow-hidden text-white pt-28 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800 shadow-md">
         {/* College Campus Background Image with Balanced Scrim */}
@@ -138,11 +129,11 @@ export default function Colleges() {
           />
           {/* Balanced dual scrim: keeps architectural buildings, trees, and sky vibrantly visible while ensuring 100% readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-900/35 to-slate-950/75" />
-          <div className="absolute inset-0 bg-slate-950/15" />
+          
         </div>
 
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-white/20 text-blue-300 text-xs font-semibold backdrop-blur-md mb-4 shadow-sm">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-control bg-brand-950/70 border border-white/20 text-brand-100 text-xs font-semibold mb-4">
             <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
             Official NIRF & State Council Verified Data (2026-27)
           </div>
@@ -155,7 +146,7 @@ export default function Colleges() {
 
           {/* Search Box */}
           <div className="max-w-3xl mx-auto relative mb-6">
-            <div className="relative flex items-center bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-1.5 border border-white/40 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 transition-all">
+            <div className="relative flex items-center bg-white rounded-card p-1.5 border border-line focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 transition-all">
               <Search className="w-5 h-5 text-slate-400 ml-3 shrink-0" />
               <input
                 type="text"
@@ -178,20 +169,20 @@ export default function Colleges() {
 
           {/* Campus Highlights / Quick Filters */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-white">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/20 shadow-xs font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-950/60 border border-white/20 font-medium">
               <Building className="w-3.5 h-3.5 text-blue-400" />
               Central & State Universities
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/20 shadow-xs font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-950/60 border border-white/20 font-medium">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               IITs, NITs & IIITs
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/20 shadow-xs font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-950/60 border border-white/20 font-medium">
               <Building className="w-3.5 h-3.5 text-emerald-400" />
               Top Medical Campuses
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/20 shadow-xs font-medium">
-              <Building className="w-3.5 h-3.5 text-purple-400" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-950/60 border border-white/20 font-medium">
+              <Building className="w-3.5 h-3.5 text-brand-200" />
               Management & Commerce Colleges
             </span>
           </div>
@@ -202,14 +193,14 @@ export default function Colleges() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Profile Recommendation Callout */}
         {matchedColleges.length > 0 && !hasActiveFilters && (
-          <div className="mb-8 p-5 bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="mb-8 p-5 bg-brand-950 text-white rounded-panel flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="p-2.5 bg-blue-500/20 border border-blue-400/30 rounded-xl shrink-0">
-                <Sparkles className="w-5 h-5 text-blue-300" />
+              <div className="p-2.5 bg-white/10 border border-white/20 rounded-control shrink-0">
+                <Sparkles className="w-5 h-5 text-brand-200" />
               </div>
               <div>
                 <h4 className="text-base font-bold">Colleges Matching Your NAVORA Assessment</h4>
-                <p className="text-xs text-blue-200 mt-0.5">
+                <p className="text-xs text-white/65 mt-0.5">
                   Filtered based on your stream, career goals, and eligibility criteria.
                 </p>
               </div>
@@ -619,7 +610,6 @@ export default function Colleges() {
         </div>
       </div>
 
-      <UpgradeModal open={showUpgrade} onClose={()=>setShowUpgrade(false)} feature="college_compare" />
       {/* Floating Compare Drawer */}
       {compareList.length > 0 && (
         <div className="fixed bottom-6 inset-x-4 sm:inset-x-auto sm:right-6 max-w-lg bg-[#0A192F] text-white p-4 rounded-2xl shadow-2xl border border-slate-700 z-50 flex items-center justify-between gap-4">
@@ -627,7 +617,7 @@ export default function Colleges() {
             <GitCompare className="w-5 h-5 text-blue-400" />
             <div>
               <span className="text-xs font-bold block">
-                {compareList.length} of {compareLimit} Colleges Selected
+                {compareList.length} {compareList.length === 1 ? 'College' : 'Colleges'} Selected
               </span>
               <span className="text-[11px] text-slate-300">Ready for factual side-by-side comparison</span>
             </div>

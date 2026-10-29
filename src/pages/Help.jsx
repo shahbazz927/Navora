@@ -310,7 +310,7 @@ export default function Help() {
         </div>
 
         {/* Bottom Support CTA Box */}
-        <div className="mt-10 p-6 bg-gradient-to-r from-blue-900 to-indigo-900 text-white rounded-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mt-10 p-6 bg-brand-950 text-white rounded-panel flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-base font-bold flex items-center gap-2">
               <Mail className="w-4 h-4 text-blue-300" />

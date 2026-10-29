@@ -45,8 +45,8 @@ export default function AICareerAdvisor({ userType, answersOverride }) {
   return (
     <section id="ai-career-advisor" className="mt-12" aria-live="polite">
       <div className="flex items-center gap-2 mb-2">
-        <span className="inline-flex w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 via-purple to-cyan text-white items-center justify-center shadow-brand">
-          <Sparkles className="w-4 h-4" strokeWidth={1.75} />
+        <span className="inline-flex w-8 h-8 rounded-control bg-brand-600 text-white items-center justify-center">
+          <Sparkles className="w-4 h-4" strokeWidth={1.75} aria-hidden="true" />
         </span>
         <div>
           <h3 className="font-ui font-bold text-xl text-ink leading-tight">Career Advisor</h3>
@@ -102,13 +102,13 @@ export default function AICareerAdvisor({ userType, answersOverride }) {
                 {career.degree && (
                   <div className="mt-4 flex items-start gap-2">
                     <GraduationCap className="w-4 h-4 text-brand-600 mt-0.5 shrink-0" />
-                    <p className="text-sm text-ink leading-relaxed"><span className="text-xs font-bold uppercase tracking-wider text-ink-3">Degree / course &middot; </span>{career.degree}</p>
+                    <p className="text-sm text-ink leading-relaxed"><span className="text-xs font-semibold text-ink-3">Degree / course &middot; </span>{career.degree}</p>
                   </div>
                 )}
 
                 {Array.isArray(career.skills) && career.skills.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2 flex items-center gap-1.5">
+                    <p className="text-xs font-semibold text-ink-3 mb-2 flex items-center gap-1.5">
                       <Wrench className="w-3.5 h-3.5 text-brand-500" /> Skills to develop
                     </p>
                     <div className="flex flex-wrap gap-1.5">
@@ -121,7 +121,7 @@ export default function AICareerAdvisor({ userType, answersOverride }) {
 
                 {Array.isArray(career.exams) && career.exams.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2">Relevant entrance exams</p>
+                    <p className="text-xs font-semibold text-ink-3 mb-2">Relevant entrance exams</p>
                     <div className="flex flex-wrap gap-1.5">
                       {career.exams.map((e) => (
                         <Chip key={e} tone="exam">{e}</Chip>
@@ -132,7 +132,7 @@ export default function AICareerAdvisor({ userType, answersOverride }) {
 
                 {Array.isArray(career.nextSteps) && career.nextSteps.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs font-bold uppercase tracking-wider text-ink-3 mb-2 flex items-center gap-1.5">
+                    <p className="text-xs font-semibold text-ink-3 mb-2 flex items-center gap-1.5">
                       <ClipboardList className="w-3.5 h-3.5 text-brand-500" /> Short-term next steps
                     </p>
                     <ol className="space-y-1.5">
@@ -223,13 +223,14 @@ export default function AICareerAdvisor({ userType, answersOverride }) {
 {(status === 'idle' || status === 'error') && (
         <div className="mt-5 bg-white border border-line rounded-[1.4rem] p-6 sm:p-7 card-lift">
           <p className="text-sm text-ink-2 leading-relaxed">
-            Let&rsquo;s sit down and figure out what career paths actually make sense for you. I&rsquo;ll look at your answers and walk you through it like a real counselling session.
+            I&rsquo;ll use your answers to explain which paths fit and what to check next,
+            with the limits of each suggestion made clear.
           </p>
           <button
             onClick={generate}
-            className="mt-5 inline-flex items-center gap-2 font-ui font-semibold text-sm bg-gradient-to-r from-brand-500 to-brand-700 text-white rounded-xl px-5 py-3 shadow-brand hover:opacity-95 transition-opacity cursor-pointer"
+            className="mt-5 inline-flex items-center gap-2 font-ui font-semibold text-sm bg-brand-600 hover:bg-brand-700 text-white rounded-control px-5 py-3 transition-colors cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" /> Let&rsquo;s talk about my career
+            <Sparkles className="w-4 h-4" aria-hidden="true" /> Explain my results
           </button>
         </div>
       )}

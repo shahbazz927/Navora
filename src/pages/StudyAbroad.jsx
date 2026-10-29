@@ -13,16 +13,20 @@ import { useUser } from '../context/UserContext';
 import { useScrollTop } from '../hooks/useLocalStorage';
 import globalStudyHeroImage from '../assets/images/global_study_hero_landmarks_1789742691121.jpg';
 import GlobalStudyMapGallery from '../components/GlobalStudyMapGallery';
-import { COUNTRIES, UNIVERSITIES, BUDGET_RANGES, FX, annualCostINR, degreeCostINR } from '../data/studyAbroad.js';
+import { COUNTRIES, UNIVERSITIES, BUDGET_RANGES, FX, annualCostINR, degreeCostINR, intakesFor, originCitiesFor } from '../data/studyAbroad.js';
 import { rankCountries, getBudgetMax } from '../data/studyAbroadEngine.js';
-import { useSubscription } from '../hooks/useSubscription';
-import UpgradeModal from '../components/UpgradeModal';
-import LockedFeature from '../components/LockedFeature';
 import {
   getScholarshipCountriesWithData,
   getAbroadScholarshipsByCountry,
 } from '../data/scholarships.js';
 import GatedOfficialLink from '../components/GatedOfficialLink';
+
+const NOT_PUBLISHED = 'Not published';
+const uniBadge = (u) => u?.ownership || u?.type || 'University';
+const uniText = (value, fallback = NOT_PUBLISHED) =>
+  (typeof value === 'string' && value.trim() ? value : fallback);
+const uniList = (values, fallback = NOT_PUBLISHED) =>
+  (Array.isArray(values) && values.length ? values.join(' · ') : fallback);
 
 const COUNTRY_HIGHLIGHTS = {
   usa: { tag: '36-Mo STEM OPT · World’s #1 Tech Ecosystem', badgeClass: 'bg-blue-50 text-blue-800 border-blue-200' },
@@ -113,6 +117,155 @@ function Choice({ selected, onClick, label, desc, multi }) {
   );
 }
 
+// Option row used by the eligibility flow (intake → current city).
+function FlowOption({ selected, onClick, title, subtitle, note, recommended, noteTone='emerald' }) {
+  return (
+    <button type="button" role="radio" aria-checked={selected} onClick={onClick}
+      className={`w-full text-left rounded-xl border px-4 py-3.5 flex items-start gap-3 transition-all ${selected?'border-brand-500 bg-brand-500 text-white shadow-brand':'border-line bg-white hover:border-brand-300 hover:shadow-sm'}`}>
+      <span className={`mt-0.5 w-5 h-5 shrink-0 flex items-center justify-center border-2 rounded-full ${selected?'bg-white border-white':'border-line-strong bg-transparent'}`}>
+        {selected && <span className="w-2.5 h-2.5 rounded-full" style={{background:'#2563eb'}}/>}
+      </span>
+      <span className="flex-1 min-w-0">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className={`text-sm font-semibold ${selected?'text-white':'text-ink'}`}>{title}</span>
+          {recommended && <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.62rem] font-bold uppercase tracking-wider ${selected?'bg-white/20 text-white':'bg-emerald-100 text-emerald-800 border border-emerald-200'}`}><Sparkles className="w-3 h-3"/>Recommended</span>}
+        </span>
+        {subtitle && <span className={`block text-xs mt-0.5 ${selected?'text-white/85':'text-ink-3'}`}>{subtitle}</span>}
+        {note && <span className={`block text-xs mt-1 font-medium ${selected?'text-white/90':noteTone==='emerald'?'text-emerald-700':'text-ink-2'}`}>{note}</span>}
+      </span>
+    </button>
+  );
+}
+
+// Universities + eligibility flow shown under a matched country card.
+function MatchFlowPanel({ country, universities, flow, onUpdate, studyLevel, onAddUni, uniCompare, onOpenShortlist }) {
+  const step = flow?.step || 'universities';
+  const intakes = useMemo(() => intakesFor(country.id, studyLevel), [country.id, studyLevel]);
+  const cities = useMemo(() => originCitiesFor(country.id), [country.id]);
+  const intake = intakes.find(i => i.id === flow?.intakeId) || null;
+  const city = cities.find(c => c.id === flow?.cityId) || null;
+  const lead = universities[0] || null;
+
+  if (step === 'universities') {
+    return (
+      <div className="mt-4 rounded-2xl border border-line bg-paper/70 p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="eyebrow text-ink-3">Universities in {country.name}</p>
+          <span className="text-[0.68rem] font-semibold text-ink-3">{universities.length} shortlisted</span>
+        </div>
+        {universities.length === 0 ? (
+          <p className="mt-3 text-sm text-ink-2">No university shortlist published for {country.name} yet.</p>
+        ) : (
+          <ul className="mt-3 space-y-2.5">
+            {universities.map(u => {
+              const sel = uniCompare.includes(u.id);
+              return (
+                <li key={u.id} className="rounded-xl border border-line bg-white px-4 py-3.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-ink leading-tight">{u.name}</p>
+                      <p className="text-xs text-ink-3 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3"/>{u.city}</span>
+                        <span>· {uniBadge(u)}</span>
+                        {u.reputation && <span>· {u.reputation}</span>}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-[0.62rem] font-bold tracking-wider uppercase bg-paper border border-line rounded-full px-2 py-1">{uniBadge(u)}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-ink-2"><b className="text-ink">Entry:</b> {uniText(u.entryRequirements)}</p>
+                  <p className="text-xs text-ink-2"><b className="text-ink">English:</b> {uniText(u.languageRequirements)}</p>
+                  <p className="text-xs text-ink-2"><b className="text-ink">Tuition:</b> {uniText(u.tuitionByProgram)}</p>
+                  {Array.isArray(u.scholarships) && u.scholarships.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">{u.scholarships.map(s => <Pill key={s}>{s}</Pill>)}</div>
+                  )}
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <button onClick={() => onAddUni(u.id)} className={`text-xs font-semibold rounded-full px-3 py-1.5 border ${sel?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{sel?'Remove from compare':'Add to compare'}</button>
+                    <GatedOfficialLink url={u.website} linkLabel="Official University Website" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></GatedOfficialLink>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button onClick={() => onUpdate({ step:'intake' })} className="inline-flex items-center gap-2 rounded-xl bg-ink text-white px-5 py-3 text-sm font-semibold hover:bg-ink-2"><ShieldCheck className="w-4 h-4"/>Check eligibility</button>
+          <button onClick={onOpenShortlist} className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:underline">Open the full shortlist <ArrowRight className="w-3.5 h-3.5"/></button>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'intake') {
+    return (
+      <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow text-brand-700">Eligibility check · {country.name}</p>
+            <h4 className="font-ui font-bold text-lg text-ink mt-1">What&apos;s your preferred intake?</h4>
+            <p className="text-xs text-ink-3 mt-1">The intake that fits your timeline is marked recommended.</p>
+          </div>
+          <button onClick={() => onUpdate({ step:'universities' })} className="shrink-0 text-xs font-semibold text-ink-2 hover:text-ink inline-flex items-center gap-1"><ArrowLeft className="w-3.5 h-3.5"/>Back</button>
+        </div>
+        <div className="mt-4 space-y-2" role="radiogroup" aria-label="Preferred intake">
+          {intakes.map(i => (
+            <FlowOption key={i.id} selected={false} recommended={i.recommended} onClick={() => onUpdate({ step:'city', intakeId:i.id })}
+              title={i.startLabel} subtitle={i.label}
+              note={i.recommended ? i.reason : (i.leadMonths <= 2 ? 'Very short window — most deadlines will have passed.' : null)} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 'city') {
+    return (
+      <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow text-brand-700">Eligibility check · {country.name}</p>
+            <h4 className="font-ui font-bold text-lg text-ink mt-1">Select your current city</h4>
+            <p className="text-xs text-ink-3 mt-1">We use this to estimate travel cost and time to {country.name}.</p>
+          </div>
+          <button onClick={() => onUpdate({ step:'intake' })} className="shrink-0 text-xs font-semibold text-ink-2 hover:text-ink inline-flex items-center gap-1"><ArrowLeft className="w-3.5 h-3.5"/>Back</button>
+        </div>
+        <div className="mt-4 space-y-2" role="radiogroup" aria-label="Current city">
+          {cities.map(c => (
+            <FlowOption key={c.id} selected={false} recommended={c.recommended} onClick={() => onUpdate({ step:'done', cityId:c.id })}
+              title={c.name} subtitle={c.state}
+              note={c.recommended ? c.reason : null} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // done
+  return (
+    <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 sm:p-5">
+      <p className="eyebrow text-emerald-700">Eligibility snapshot</p>
+      <h4 className="font-ui font-bold text-lg text-ink mt-1">
+        {intake ? intake.startLabel : 'Intake'} intake{lead ? ` · ${lead.city}` : ''}
+      </h4>
+      <p className="text-xs text-ink-3 mt-1">Travelling from {city ? city.name : 'your city'} for {country.name}.</p>
+      <ul className="mt-3 space-y-1.5 text-sm text-ink-2">
+        {lead && <>
+          <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">Entry:</b> {lead.entryRequirements}</span></li>
+          <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">English:</b> {lead.languageRequirements}</span></li>
+          <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">Tuition:</b> {lead.tuitionByProgram}</span></li>
+          {lead.scholarships.length > 0 && <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">Scholarships:</b> {lead.scholarships.join(' · ')}</span></li>}
+        </>}
+        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">Travel:</b> {city ? city.name : 'Your city'} is {city?.recommended ? 'the best-connected hub' : 'your departure point'} for {country.name}.</span></li>
+        {intake?.recommended && <li className="flex items-start gap-2"><Check className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0"/><span><b className="text-ink">Timing:</b> {intake.reason}</span></li>}
+      </ul>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {lead && <button onClick={() => onAddUni(lead.id)} className="inline-flex items-center gap-2 rounded-xl bg-brand-500 text-white px-4 py-2.5 text-sm font-semibold shadow-brand"><Scale className="w-4 h-4"/>{uniCompare.includes(lead.id) ? `Remove ${lead.name} from compare` : `Add ${lead.name} to compare`}</button>}
+        <button onClick={() => onUpdate({ step:'intake' })} className="rounded-xl bg-white border border-line px-4 py-2.5 text-sm font-semibold hover:border-brand-200">Change intake</button>
+        <button onClick={() => onUpdate({ step:'city' })} className="rounded-xl bg-white border border-line px-4 py-2.5 text-sm font-semibold hover:border-brand-200">Change city</button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main ──────────────────────────────────────────────────
 export default function StudyAbroad(){
   useScrollTop();
@@ -133,20 +286,32 @@ export default function StudyAbroad(){
   const [schLevel, setSchLevel] = useState('all');
   const [schFullOnly, setSchFullOnly] = useState(false);
   const [schOpenId, setSchOpenId] = useState(null);
-  const { isPro, plan } = useSubscription();
-  const [upgradeFeature, setUpgradeFeature] = useState(null);
-  const countryLimit = plan.country_compare_limit;
-  const uniLimit = plan.university_compare_limit || 0;
+  // Per-match universities + eligibility flow: { [countryId]: { step, intakeId, cityId } }
+  const [matchFlow, setMatchFlow] = useState({});
+  const countryLimit = Infinity;
+  const uniLimit = Infinity;
+
+  const toggleMatchFlow = (countryId) => {
+    setMatchFlow(prev => {
+      if (prev[countryId]) {
+        const next = { ...prev };
+        delete next[countryId];
+        return next;
+      }
+      return { [countryId]: { step: 'universities' } };
+    });
+  };
+  const updateMatchFlow = (countryId, patch) => {
+    setMatchFlow(prev => ({ ...prev, [countryId]: { ...(prev[countryId] || { step: 'universities' }), ...patch } }));
+  };
 
   // Canonical entitlement guards (display only — backend enforces where APIs exist).
   const addCountry = (id) => {
     if (compareIds.includes(id)) { setCompareIds(compareIds.filter((x) => x !== id)); return; }
-    if (compareIds.length >= countryLimit) { setUpgradeFeature('country_compare'); return; }
     setCompareIds([...compareIds, id]);
   };
   const addUni = (id) => {
     if (uniCompare.includes(id)) { setUniCompare(uniCompare.filter((x) => x !== id)); return; }
-    if (uniCompare.length >= uniLimit) { setUpgradeFeature('university_compare'); return; }
     setUniCompare([...uniCompare, id]);
   };
 
@@ -226,7 +391,7 @@ export default function StudyAbroad(){
         const matchStudies = c.studyStrengths?.some(s => s.toLowerCase().includes(q));
         const matchCurrency = c.currency?.toLowerCase().includes(q);
         const matchCity = c.cityNote?.toLowerCase().includes(q);
-        const matchUnis = UNIVERSITIES.some(u => u.countryId === c.id && (u.name.toLowerCase().includes(q) || u.city.toLowerCase().includes(q)));
+        const matchUnis = UNIVERSITIES.some(u => u.countryId === c.id && ((u.name || '').toLowerCase().includes(q) || (u.city || '').toLowerCase().includes(q)));
         return matchName || matchCode || matchRegion || matchCareers || matchStudies || matchCurrency || matchCity || matchUnis;
       }
       return true;
@@ -358,55 +523,62 @@ export default function StudyAbroad(){
     return (
       <div className="bg-surface">
         {/* Hero — editorial, calm, premium with photo background */}
-        <section className="relative overflow-hidden border-b border-line min-h-[580px] lg:min-h-[640px] flex items-center">
-          {/* Background photo covering the section */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
+        <section className="relative overflow-hidden border-b border-line bg-slate-950 lg:min-h-[640px] lg:flex lg:items-center">
+          {/* Mobile: full, uncropped photo band so every landmark is visible */}
+          <div className="relative lg:hidden">
             <img
               src={globalStudyHeroImage}
               alt="Global study destinations: USA, UK, Canada, Singapore"
+              className="block w-full h-auto"
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/25 via-slate-950/5 to-slate-950/90" />
+          </div>
+
+          {/* Desktop: background photo covering the section */}
+          <div className="hidden lg:block absolute inset-0 z-0 overflow-hidden">
+            <img
+              src={globalStudyHeroImage}
+              alt=""
               className="w-full h-full object-cover object-[center_35%] scale-[1.01]"
               referrerPolicy="no-referrer"
             />
             {/* Light, balanced scrim: allows landmarks, waters, and skylines to be vividly visible while keeping text legible */}
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/45 to-slate-950/15" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-black/10" />
           </div>
 
-          <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 py-14 sm:py-20 lg:py-24 w-full">
+          <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-8 py-10 sm:py-14 lg:py-24 w-full">
             <div className="max-w-2xl lg:max-w-3xl">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-md border border-white/60 px-4 py-1.5 shadow-md mb-6">
-                <Logo size="sm" />
-                <span className="eyebrow text-brand-800 font-semibold">Global Study · Premium Consultancy</span>
-              </span>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-[0.14em] uppercase text-brand-100 border border-white/25 rounded-full px-3 py-1 bg-slate-950/40 backdrop-blur-md shadow-xs">LEARN · EXPLORE · DECIDE · GROW</span>
-              </div>
-              <h1 className="font-ui font-bold text-[2.6rem] sm:text-5xl lg:text-[3.5rem] leading-[1.04] tracking-[-0.03em] text-white drop-shadow-md text-balance">
-                Global Study<br/>
-                <span className="font-display italic font-medium text-brand-300 drop-shadow-sm">with clarity.</span>
+              <p className="eyebrow text-brand-100 mb-3">Global study</p>
+              <h1 className="font-display font-bold text-[2.6rem] sm:text-5xl lg:text-[3.5rem] leading-[1.04] tracking-[-0.03em] text-white text-balance">
+                Study abroad,
+                <br />
+                with the trade-offs visible.
               </h1>
-              <p className="mt-5 text-[1.1rem] sm:text-[1.18rem] text-slate-100 drop-shadow leading-relaxed max-w-2xl">
-                Compare countries, courses, costs, universities and post-study opportunities — based on <em className="text-white font-semibold underline decoration-brand-400 decoration-2 underline-offset-4">your</em> profile. Not a directory. A decision.
+              <p className="mt-5 text-[1.05rem] sm:text-[1.15rem] text-white/85 leading-relaxed max-w-2xl">
+                Compare countries, courses, costs, universities, and post-study
+                routes against your own profile and budget.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <button onClick={()=>setView('quiz')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-400 text-white font-ui font-semibold px-7 py-3.5 shadow-xl shadow-brand-950/40 transition-all hover:-translate-y-px">
-                  Build my study plan <ArrowRight className="w-4 h-4"/>
+              <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-3">
+                <button onClick={()=>setView('quiz')} className="inline-flex items-center justify-center gap-2 rounded-control bg-brand-500 hover:bg-brand-400 text-white font-ui font-semibold px-7 py-3.5 transition-colors cursor-pointer">
+                  Build my study plan <ArrowRight className="w-4 h-4" aria-hidden="true"/>
                 </button>
-                <button onClick={()=>setView('explore')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900/60 hover:bg-slate-900/80 border border-white/30 text-white backdrop-blur-md font-ui font-semibold px-7 py-3.5 shadow-md transition-all hover:-translate-y-px">
-                  <Globe className="w-4 h-4 text-brand-300"/> Explore countries
+                <button onClick={()=>setView('explore')} className="inline-flex items-center justify-center gap-2 rounded-control bg-white/10 hover:bg-white/15 border border-white/25 text-white font-ui font-semibold px-7 py-3.5 transition-colors cursor-pointer">
+                  <Globe className="w-4 h-4 text-brand-200" aria-hidden="true"/> Explore countries
                 </button>
-                <button onClick={()=>setView('scholarships')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900/60 hover:bg-slate-900/80 border border-white/30 text-white backdrop-blur-md font-ui font-semibold px-7 py-3.5 shadow-md transition-all hover:-translate-y-px">
-                  <Award className="w-4 h-4 text-amber-300"/> Scholarships for Indians
+                <button onClick={()=>setView('scholarships')} className="inline-flex items-center justify-center gap-2 rounded-control bg-white/10 hover:bg-white/15 border border-white/25 text-white font-ui font-semibold px-7 py-3.5 transition-colors cursor-pointer">
+                  <Award className="w-4 h-4 text-amber-300" aria-hidden="true"/> Scholarships for Indians
                 </button>
               </div>
-              <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-200">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/40 backdrop-blur-sm border border-white/10"><Check className="w-3.5 h-3.5 text-emerald-400"/> ~6–8 questions</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/40 backdrop-blur-sm border border-white/10"><Check className="w-3.5 h-3.5 text-emerald-400"/> Uses your NAVORA profile</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/40 backdrop-blur-sm border border-white/10"><Check className="w-3.5 h-3.5 text-emerald-400"/> No spam, no agents</span>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-medium text-white/75">
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true"/> 6 to 8 questions</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true"/> Uses your NAVORA profile</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true"/> No agents or spam</span>
               </div>
             </div>
           </div>
         </section>
+
 
         {/* Website-ready interactive map layouts and banner variations */}
         <GlobalStudyMapGallery
@@ -440,7 +612,7 @@ export default function StudyAbroad(){
                 { n:'06', k:'PREFERENCE', d:'City, focus & optimization' },
               ].map(s=>(
                 <div key={s.n} className="bg-white border border-line rounded-2xl p-5 card-lift">
-                  <span className="font-display italic text-brand-500 text-xl">{s.n}</span>
+                  <span className="font-display text-brand-700 text-xl">{s.n}</span>
                   <p className="eyebrow text-ink mt-3">{s.k}</p>
                   <p className="text-sm text-ink-2 mt-1 leading-relaxed">{s.d}</p>
                 </div>
@@ -634,7 +806,7 @@ export default function StudyAbroad(){
                           }`}
                         >
                           <Scale className="w-3.5 h-3.5" />
-                          {isCompared ? `In Compare (${compareIds.length}/${countryLimit})` : '+ Add to Compare'}
+                          {isCompared ? `In Compare (${compareIds.length})` : '+ Add to Compare'}
                         </button>
                         <button
                           onClick={() => {
@@ -824,7 +996,7 @@ export default function StudyAbroad(){
                                   <div className="flex items-start justify-between gap-2">
                                     <div>
                                       <p className="font-ui font-bold text-sm text-ink">{u.name}</p>
-                                      <p className="text-xs text-ink-3">{u.city} · {u.type} · <span className="text-brand-700 font-medium">{u.reputation}</span></p>
+                                      <p className="text-xs text-ink-3">{u.city} · {uniBadge(u)}{u.reputation ? <> · <span className="text-brand-700 font-medium">{u.reputation}</span></> : null}</p>
                                     </div>
                                     <GatedOfficialLink
                                       url={u.website}
@@ -837,10 +1009,10 @@ export default function StudyAbroad(){
                                     </GatedOfficialLink>
                                   </div>
                                   <div className="text-xs text-ink-2 space-y-1">
-                                    <p><strong className="text-ink font-medium">Key Programs:</strong> {u.programs.join(' · ')}</p>
-                                    <p><strong className="text-ink font-medium">Tuition:</strong> {u.tuitionByProgram}</p>
-                                    <p><strong className="text-ink font-medium">Admission:</strong> {u.entryRequirements}</p>
-                                    <p><strong className="text-ink font-medium">Language:</strong> {u.languageRequirements}</p>
+                                    <p><strong className="text-ink font-medium">Key Programs:</strong> {uniList(u.programs)}</p>
+                                    <p><strong className="text-ink font-medium">Tuition:</strong> {uniText(u.tuitionByProgram)}</p>
+                                    <p><strong className="text-ink font-medium">Admission:</strong> {uniText(u.entryRequirements)}</p>
+                                    <p><strong className="text-ink font-medium">Language:</strong> {uniText(u.languageRequirements)}</p>
                                   </div>
                                 </div>
                               ))}
@@ -930,7 +1102,6 @@ export default function StudyAbroad(){
               )}
             </div>
           </div>
-          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -940,7 +1111,7 @@ export default function StudyAbroad(){
   if(view==='quiz'){
     return (
       <MotionConfig reducedMotion="user">
-        <div className="min-h-screen bg-paper-gradient">
+        <div className="min-h-screen bg-surface">
           <div className="max-w-3xl mx-auto px-5 sm:px-8 py-8 lg:py-10">
             <div className="flex items-center justify-between mb-6">
               <button onClick={back} className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink"><ArrowLeft className="w-4 h-4"/>Back</button>
@@ -1199,7 +1370,7 @@ export default function StudyAbroad(){
                 <div key={r.country.id} className={`bg-white border rounded-[1.4rem] p-6 sm:p-7 shadow-card ${idx===0?'ring-1 ring-brand-200 border-brand-200': 'border-line'}`}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex gap-4">
-                      <span className="hidden sm:flex w-11 h-11 rounded-xl bg-brand-50 border border-brand-100 items-center justify-center font-display italic text-brand-700">{String(idx+1).padStart(2,'0')}</span>
+                      <span className="hidden sm:flex w-11 h-11 rounded-xl bg-brand-50 border border-brand-100 items-center justify-center font-display text-brand-700">{String(idx+1).padStart(2,'0')}</span>
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="font-ui font-bold text-xl text-ink inline-flex items-center gap-2"><FlagLogo code={r.country.code} size={20} /><span aria-hidden="true" className="hidden">{flagForCountry(r.country)}</span>{r.country.name}</h3>
@@ -1255,10 +1426,33 @@ export default function StudyAbroad(){
                     <span className="text-ink-3">Visa requirement ≠ living cost — shown separately above.</span>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <button onClick={() => toggleMatchFlow(r.country.id)}
+                      className={`inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3.5 py-1.5 border transition-colors ${matchFlow[r.country.id] ? 'bg-brand-500 text-white border-brand-500 shadow-brand' : 'bg-white border-line hover:border-brand-200'}`}>
+                      <GraduationCap className="w-3.5 h-3.5"/>
+                      {matchFlow[r.country.id] ? 'Hide universities' : 'Check the Universities'}
+                      {matchFlow[r.country.id] ? <ChevronUp className="w-3.5 h-3.5"/> : <ChevronDown className="w-3.5 h-3.5"/>}
+                    </button>
                     <button onClick={()=> addCountry(r.country.id)} className={`text-xs font-semibold rounded-full px-3 py-1.5 border ${compareIds.includes(r.country.id)?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{compareIds.includes(r.country.id)?'Selected for compare':'Add to compare'}</button>
                     <GatedOfficialLink url={r.country.sourceUrl} linkLabel="Official source" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-ink-2 hover:text-ink">Official source <ExternalLink className="w-3 h-3"/></GatedOfficialLink>
                   </div>
+
+                  <AnimatePresence initial={false}>
+                    {matchFlow[r.country.id] && (
+                      <motion.div key="flow" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.28, ease: 'easeOut' }} className="overflow-hidden">
+                        <MatchFlowPanel
+                          country={r.country}
+                          universities={UNIVERSITIES.filter(u => u.countryId === r.country.id)}
+                          flow={matchFlow[r.country.id]}
+                          onUpdate={(patch) => updateMatchFlow(r.country.id, patch)}
+                          studyLevel={form.studyLevel}
+                          onAddUni={addUni}
+                          uniCompare={uniCompare}
+                          onOpenShortlist={() => setView('universities')}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
 
@@ -1299,7 +1493,6 @@ export default function StudyAbroad(){
               </div>
             </div>
           </div>
-          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -1344,7 +1537,6 @@ export default function StudyAbroad(){
               <button key={c.id} onClick={()=> addCountry(c.id)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium ${compareIds.includes(c.id)?'bg-ink text-white border-ink':'bg-white border-line'}`}><FlagLogo code={c.code} size={20} /><span aria-hidden="true" className="hidden">{flagFromCode(c.code)}</span>{c.name}</button>
             ))}
           </div>
-          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'country_compare'} />
         </div>
       </div>
     );
@@ -1361,15 +1553,10 @@ export default function StudyAbroad(){
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <h1 className="font-ui font-bold text-2xl text-ink">University shortlist</h1>
-              <p className="text-sm text-ink-3 mt-1">3–6 per recommended country. Categories: BEST FIT · AMBITIOUS · VALUE · ALTERNATIVE. {uniLimit > 0 ? `Select up to ${uniLimit} to compare.` : 'University comparison is a Pro feature.'}</p>
+              <p className="text-sm text-ink-3 mt-1">3–6 per recommended country. Categories: BEST FIT · AMBITIOUS · VALUE · ALTERNATIVE. Select as many as you like to compare.</p>
             </div>
-            {uniCompare.length>0 && <span className="text-xs bg-ink text-white rounded-full px-3 py-1.5">{uniCompare.length}/{Math.max(uniLimit, 1)} selected</span>}
+            {uniCompare.length>0 && <span className="text-xs bg-ink text-white rounded-full px-3 py-1.5">{uniCompare.length} selected</span>}
           </div>
-          {!isPro && (
-            <div className="mt-4">
-              <LockedFeature title="University comparison" desc="Free includes country discovery and up to 2 country comparisons. Compare up to 20 universities/month with NAVORA Pro." cta="Available with Pro" onUnlock={()=>setUpgradeFeature('university_compare')} />
-            </div>
-          )}
 
           <div className="mt-6 grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {list.map(u=>{
@@ -1382,15 +1569,15 @@ export default function StudyAbroad(){
                       <h3 className="font-ui font-semibold text-ink leading-tight flex items-center gap-2"><FlagLogo code={c?.code} size={20} /><span aria-hidden="true" className="hidden">{flagForCountry(c)}</span>{u.name}</h3>
                       <p className="text-xs text-ink-3 flex items-center gap-1.5 mt-1"><FlagLogo code={c?.code} size={16} /><span aria-hidden="true" className="hidden">{flagForCountry(c)}</span><MapPin className="w-3 h-3"/>{u.city}, {c?.name}</p>
                     </div>
-                    <span className="text-[0.65rem] font-bold tracking-wider uppercase bg-paper border border-line rounded-full px-2 py-1 shrink-0">{u.type}</span>
+                    <span className="text-[0.65rem] font-bold tracking-wider uppercase bg-paper border border-line rounded-full px-2 py-1 shrink-0">{uniBadge(u)}</span>
                   </div>
-                  <p className="mt-3 text-xs text-ink-2"><b>Relevant courses:</b> {u.programs.join(' · ')}</p>
-                  <p className="mt-2 text-xs text-ink-2"><b>Tuition:</b> {u.tuitionByProgram}</p>
-                  <p className="text-xs text-ink-2"><b>Entry:</b> {u.entryRequirements}</p>
-                  <p className="text-xs text-ink-2"><b>English:</b> {u.languageRequirements}</p>
-                  <p className="text-xs text-ink-3 mt-2"><b>Strengths:</b> {u.strengths.join(' · ')}</p>
+                  <p className="mt-3 text-xs text-ink-2"><b>Relevant courses:</b> {uniList(u.programs)}</p>
+                  <p className="mt-2 text-xs text-ink-2"><b>Tuition:</b> {uniText(u.tuitionByProgram)}</p>
+                  <p className="text-xs text-ink-2"><b>Entry:</b> {uniText(u.entryRequirements)}</p>
+                  <p className="text-xs text-ink-2"><b>English:</b> {uniText(u.languageRequirements)}</p>
+                  <p className="text-xs text-ink-3 mt-2"><b>Strengths:</b> {uniList(u.strengths)}</p>
                   {c && <p className="text-xs text-ink-3"><b>Est. living:</b> {c.currency} {c.monthlyLivingCost.min}–{c.monthlyLivingCost.max}/mo · <b>Post-study:</b> {c.postStudyDuration}</p>}
-                  <div className="mt-3 flex flex-wrap gap-1.5">{u.scholarships.map(s=><Pill key={s}>{s}</Pill>)}<GatedOfficialLink url={u.website} linkLabel="Official University Website" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></GatedOfficialLink></div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">{Array.isArray(u.scholarships) && u.scholarships.map(s=><Pill key={s}>{s}</Pill>)}<GatedOfficialLink url={u.website} linkLabel="Official University Website" section="study_abroad" className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">Website <ExternalLink className="w-3 h-3"/></GatedOfficialLink></div>
                   <button onClick={()=> addUni(u.id)} className={`mt-4 w-full rounded-xl py-2.5 text-sm font-semibold border ${sel?'bg-ink text-white border-ink':'bg-white border-line hover:border-brand-200'}`}>{sel?'Remove from compare':'Add to compare'}</button>
                   <SourceBadge url={u.sourceUrls[0]} date={u.lastVerified} />
                 </div>
@@ -1406,10 +1593,10 @@ export default function StudyAbroad(){
                   <thead className="text-xs text-ink-3 border-b border-line"><tr><th className="text-left px-4 py-3">Field</th>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <th key={id} className="text-left px-4 py-3 font-semibold text-ink">{u?.name}</th>})}</tr></thead>
                   <tbody className="divide-y divide-line">
                     <tr><td className="px-4 py-3 text-ink-3">City</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{u?.city}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Tuition</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{u?.tuitionByProgram}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Entry</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{u?.entryRequirements}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">English</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{u?.languageRequirements}</td>})}</tr>
-                    <tr><td className="px-4 py-3 text-ink-3">Strengths</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{u?.strengths.join(' · ')}</td>})}</tr>
+                    <tr><td className="px-4 py-3 text-ink-3">Tuition</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{uniText(u?.tuitionByProgram)}</td>})}</tr>
+                    <tr><td className="px-4 py-3 text-ink-3">Entry</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{uniText(u?.entryRequirements)}</td>})}</tr>
+                    <tr><td className="px-4 py-3 text-ink-3">English</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3">{uniText(u?.languageRequirements)}</td>})}</tr>
+                    <tr><td className="px-4 py-3 text-ink-3">Strengths</td>{uniCompare.map(id=>{const u=UNIVERSITIES.find(x=>x.id===id); return <td key={id} className="px-4 py-3 text-xs">{uniList(u?.strengths)}</td>})}</tr>
                   </tbody>
                 </table>
               </div>
@@ -1420,7 +1607,6 @@ export default function StudyAbroad(){
             <button onClick={()=>setView('plan')} className="rounded-xl bg-brand-500 text-white font-semibold px-6 py-3 shadow-brand">Generate my study plan →</button>
             <button onClick={()=>setView('results')} className="rounded-xl bg-white border border-line font-semibold px-6 py-3">Back to countries</button>
           </div>
-          <UpgradeModal open={!!upgradeFeature} onClose={()=>setUpgradeFeature(null)} feature={upgradeFeature || 'university_compare'} />
         </div>
       </div>
     );

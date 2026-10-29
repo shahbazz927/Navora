@@ -21,7 +21,7 @@ export default function UserType() {
   };
 
   return (
-    <div className="min-h-screen bg-paper-gradient">
+    <div className="min-h-screen bg-surface">
       <div className="max-w-5xl mx-auto px-5 sm:px-8 py-16 lg:py-24">
         <FadeIn className="max-w-2xl mx-auto text-center mb-12">
           <p className="inline-flex items-center gap-2 eyebrow text-brand-600 mb-5">
@@ -47,8 +47,7 @@ export default function UserType() {
               className="group w-full text-left bg-white border border-line rounded-2xl p-7 sm:p-8 hover:shadow-card hover:border-brand-200 transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               <div className="flex items-start justify-between gap-4">
-                <span className="inline-flex w-11 h-11 items-center justify-center rounded-xl bg-brand-50 border border-brand-100 text-xl shrink-0" aria-hidden="true">{option.emoji}</span>
-                <span className="inline-flex items-center gap-1.5 text-[0.8rem] font-semibold tracking-wide uppercase text-ink-3 group-hover:text-brand-700 transition-colors">
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-3 group-hover:text-brand-700 transition-colors">
                   Start
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
